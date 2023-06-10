@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.vscode
+
+src/*.js
+/src/index.css
+/src/App.test.tsx

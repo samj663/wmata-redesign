@@ -1,0 +1,150 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+.map-container {
+  height: 100%;
+  }
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+#testing{
+  background-color: red;
+}
+
+.test{
+  height: calc(100% - 71px);
+}
+
+html, body{
+  height: 100%;
+}
+#root{
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.marker {
+  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/WMATA_Metro_Logo_small.svg.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+
+  cursor: pointer;
+}
+.escalator-marker {
+  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/entrance_picture.png');
+  background-size: cover;
+  width: 35px;
+  height: 35px;
+
+  cursor: pointer;
+}
+
+.elevator-marker {
+  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/entrance_picture.png');
+  background-size: cover;
+  width: 35px;
+  height: 35px;
+
+  cursor: pointer;
+}
+.transfer-station-circle-RD{
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 2.5px;
+  border-radius: 50%;
+  background-color: rgb(191,53,62);
+  font-weight: bold;
+  display:inline-table;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.transfer-station-circle{
+  height: 30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-right: 2.5px;
+  border-radius: 50%;
+  font-size: 16px;
+  background-color: rgb(191,53,62);
+  color:white;
+  font-weight: bold;
+  justify-content: center;
+  text-justify: center;
+  text-align: center;
+  align-items: center; 
+  display: flex;
+}
+.BL{
+  background-color: rgb(4,106,164);
+  color:white;
+  color:white;
+}
+.RD{
+  background-color: rgb(191,53,62);
+  color:white;
+}
+
+.YL{
+  background-color: rgb(244,207,77);
+  color: black;
+}
+.GR{
+  background-color: rgb(25,154,82);
+  color:white;
+}
+.SV{
+  background-color: rgb(153,155,150);
+  color: black;
+}
+.OR{
+  background-color: rgb(222,144,68);
+  color: black;
+}

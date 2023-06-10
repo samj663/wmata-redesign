@@ -18,9 +18,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react"
   },
   "include": [
-    "src"
+    "src",
+    "src/pages",
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/backend.js"
   ]
 }

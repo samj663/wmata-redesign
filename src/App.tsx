@@ -1,26 +1,28 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Station from './pages/Station';
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import NextTrain from './pages/NextTrain';
+import Alerts from './pages/Alerts';
+import StationList from './pages/StationList';
 
-function App() {
+/**
+ * This component handles routing to the propper page.
+ * @returns Component based on routing
+ */
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+     <Router>
+        <Routes>
+           <Route path="/" element={<Home />} />
+           <Route path="/stationlist" element={<StationList />} />
+           <Route path="/station" element={<Station />} />
+           <Route path="/nexttrain" element={<NextTrain />} />
+           <Route path="/alerts" element={<Alerts />} />
+           <Route path="/*" element={<div>Not a valid path. Will point to a "404 not found" page</div>} />
+        </Routes>
+     </Router>
   );
-}
+};
 
 export default App;
