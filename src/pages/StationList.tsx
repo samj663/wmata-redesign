@@ -1,8 +1,8 @@
 import React, { useState, useEffect} from 'react';
-import { Link } from 'react-router-dom';
+//import { Link } from 'react-router-dom';
 
 import Navbar from "./shared-components/Navbar";
-import NextArrivalsTable from "./shared-components/NextArrivalsTable";
+//import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 import Map from "./shared-components/Map";
 import Station from './Station';
 
@@ -10,9 +10,9 @@ export default function StationList(props : any) {
   const [stationList, setStationList] = useState([]);
   const [lat, setLat] = useState(38.89834);
   const [lon, setLon] = useState(-77.021851);
-  const [showMap, setMap] = useState(0);
+ // const [showMap, setMap] = useState(0);
   const [zoom, setZoom] = useState(12);
-  const [showStation, setShowStation] = useState(0); // 0 means a statino wasn't selected.
+//  const [showStation, setShowStation] = useState(0); // 0 means a statino wasn't selected.
   const [station, setStation] = useState("");
   const [geojson_markers, setMarkers] = useState(null);
 
@@ -25,6 +25,7 @@ export default function StationList(props : any) {
         </div>
       </td>
   </tr>;
+  
   useEffect(()=>{
     if(!station.length) {
       setMarkers(null);
@@ -52,13 +53,13 @@ export default function StationList(props : any) {
   /*
   function handleStation(station : string){
     setStation(station)
-  }*/
+  }
 
   function setLocation(lat : number, lon : number){
     setLat(lat);
     setLon(lon);
     setMap(0);
-  }
+  }*/
 
   function handleStationList(){
     return(

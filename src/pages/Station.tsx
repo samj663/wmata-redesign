@@ -6,7 +6,7 @@ mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
 
 export default function Station(props : any) {
   const [station, setStation] = useState(props.station);
-  const [stationInfo, setStationInfo] = useState(null);
+ // const [stationInfo, setStationInfo] = useState(null);
   const [lat, setLat] = useState(0);
   const [lon, setLon] = useState(0);
 
@@ -19,6 +19,7 @@ export default function Station(props : any) {
     await fetch(`/api/stationInfo?station=${station}`)
     .then(res => res.json())
     .then(value=>{
+     // setStationInfo(value)
       props.setLat(value.Lat);
       props.setLon(value.Lon)
       setLat(value.Lat);
