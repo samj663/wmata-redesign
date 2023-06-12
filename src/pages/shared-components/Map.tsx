@@ -161,7 +161,6 @@ export default function Map(props : any) {
         map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
         return;
     }
-    console.log(lat + " " + lng);
     if(geojson_markers == null) return;
     else{
         for (const feature of geojson_markers!.features) {

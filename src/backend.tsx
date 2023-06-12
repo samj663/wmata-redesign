@@ -179,8 +179,8 @@ function parseStations(stations: any[], fares: ESMap<string,ESMap<string,fares>>
             output.set(s.Code, station);
         }
     }
-    temp_code_array.sort();
-    temp_name_array.sort();
+   // temp_code_array.sort();
+ //   temp_name_array.sort();
     stationNames = new stationCodeNameMap(temp_code_to_name, temp_name_to_code, temp_code_array, temp_name_array);
     return output;
 }
@@ -283,13 +283,15 @@ app.get('/api/stationInfo', function(request : any, response : any){
         let code = stationNames.getCode(request.query.station)!;
         let output = stations.get(code)
         if(output === undefined) response.status(404);
-        else response.json(output);
+        else response.send(output);
     }
 });
 app.get('/api/stationList', function(request : any, response : any){
         let code = stationNames.getCode(request.query.station)!;
         let output = stations.get(code)
-        if(output === undefined) response.json(stationNames.nameArray);
+        if(request.query.get === "codes")response.json(stationNames.codeArray);
+        else if(request.query.get === "names")response.json(stationNames.nameArray);
+        else if(output === undefined) response.json(stationNames.nameArray);
         else response.json(output);
 });
 

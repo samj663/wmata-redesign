@@ -1,19 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {stationCodeNameMap, train, fares, entrance, station} from "../../interfaces_and_classes"
 
 export default function NextArrivalsTable(props: any) {
   const [trains, setTrains] = useState([]);
   const [station, setStation] = useState(props.station)
   const [group, setGroup] = useState(props.group)
+	const timer = useRef<any>([])
+
+  const getNextTrain = useCallback(() => {
+		for(const e of timer.current){
+			clearTimeout(e);
+		}
+		fetch(`/api/nextarrival?station=${station}&group=${group}`)
+		.then(res => res.json())
+		.then(value=>{
+			setTrains(value)
+			timer.current.push(window.setTimeout(()=>{getNextTrain()}, 10000))
+		})
+		.catch(function(error) {
+			console.log('There has been a problem with your fetch operation: ' + error.message);
+			throw error;
+		});
+  },[timer]);
 
   useEffect(() => {
-    fetch(`/api/nextarrival?station=${station}&group=${group}`)
-	.then(res => res.json())
-	.then(value=>{
-	//	console.log(value);
-		setTrains(value)
-	})
-  },[]);
+		getNextTrain();
+		return()=>{
+      for(const e of timer.current){
+				clearTimeout(e);
+			}
+    }
+  },[props.station, props.group, timer, getNextTrain]);
+  
   return (
     <div>
 		<table className="table">

@@ -40,7 +40,7 @@ export default function StationList(props : any) {
       fetch(`/api/stationList`)
       .then(res => res.json())
       .then(value=>{
-        setStationList(value);
+        setStationList(value.sort());
       })
     }
     catch(error:any) {
@@ -85,8 +85,8 @@ export default function StationList(props : any) {
           <div className="col-5" style={{height:"100%"}}>
            <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} />
           </div>
-          <div className="col-7 overflow-auto" style={{height:"100%"}}>
-            {station.length ? <Station station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
+          <div className="col-7 overflow-auto " style={{height:"100%"}}>
+            {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
           </div>
         </div>
       </div>
