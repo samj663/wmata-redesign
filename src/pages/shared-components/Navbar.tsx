@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary" style={{backgroundColor: "blue"}}>
+    <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
       <Link to="/" className="navbar-brand align-text-end">
         <img src={logo} alt="Logo" width="35" height=" 24" className="d-inline-block align-text-center"></img>

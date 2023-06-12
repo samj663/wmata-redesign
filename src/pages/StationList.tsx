@@ -35,6 +35,22 @@ export default function StationList(props : any) {
     }
   //  console.log(station);
   //  console.log(geojson_markers);
+/*  if(station === ""){
+    try{
+      fetch(`/api/stationList`)
+      .then(res => res.json())
+      .then(value=>{
+        setStationList(value.sort());
+      })
+    }
+    catch(error:any) {
+      if (error.name === "AbortError") return;
+      console.log("Error ", error);
+   }
+  }*/
+  },[lat, lon, geojson_markers, zoom])
+
+  useEffect(()=>{
   if(station === ""){
     try{
       fetch(`/api/stationList`)
@@ -48,7 +64,8 @@ export default function StationList(props : any) {
       console.log("Error ", error);
    }
   }
-  },[lat, lon, station, geojson_markers, zoom])
+  },[station])
+
 
   /*
   function handleStation(station : string){
@@ -80,6 +97,7 @@ export default function StationList(props : any) {
   return (
     <div style={{height: "100%"}}>
       <Navbar/>
+      <div style={{height: "71px"}}></div>
       <div className="container-fluid text-center" style={{height: "calc(100% - 71px)"}}>
         <div className="row align-items-start"style={{height: "100%"}}>
           <div className="col-5" style={{height:"100%"}}>

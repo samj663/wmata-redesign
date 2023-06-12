@@ -31,14 +31,8 @@ export default function Map(props : any) {
         zoom: zoom
       });
       map.current.on("load", () =>{
-        map.current.addSource('Lines', {
-          'type': 'geojson',
-          'data': lines
-        })
-        map.current.addSource('Stations', {
-          'type': 'geojson',
-          'data': stations
-        });
+        map.current.addSource('Lines', { 'type': 'geojson', 'data': lines })
+        map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
         map.current.addLayer({
           'id': 'blue_line',
           'type': 'line',
@@ -149,33 +143,33 @@ export default function Map(props : any) {
     setMarkers(props.markers);
     if (!map.current ) return; // wait for map to initialize
     map.current.flyTo({ 
-        'center': [lng,lat], 
-        'zoom': zoom || 16.5
+      'center': [lng,lat], 
+      'zoom': zoom || 16.5
     });
     
     if(markerTracker.current.length > 0 && !props.markers){
-        for (var i = markerTracker.current.length -1; i>=0; i--){
-            markerTracker.current[i].remove();
-        }
-        markerTracker.current = [];
-        map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
-        return;
+      for (var i = markerTracker.current.length -1; i>=0; i--){
+          markerTracker.current[i].remove();
+      }
+      markerTracker.current = [];
+      map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
+      return;
     }
     if(geojson_markers == null) return;
     else{
-        for (const feature of geojson_markers!.features) {
-            const el = document.createElement('div');
-            if(feature.properties.type == "Elevator"){
-                el.className = 'elevator-marker';
-            }
-            else if(feature.properties.type == "Escalator"){
-                el.className = 'escalator-marker';
-            }
-            else el.className = 'marker';
-            var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
-            markerTracker.current.push(t);
-        }
-        map.current.setLayoutProperty('station-circles', 'visibility', 'none');
+      for (const feature of geojson_markers!.features) {
+          const el = document.createElement('div');
+          if(feature.properties.type == "Elevator"){
+              el.className = 'elevator-marker';
+          }
+          else if(feature.properties.type == "Escalator"){
+              el.className = 'escalator-marker';
+          }
+          else el.className = 'marker';
+          var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
+          markerTracker.current.push(t);
+      }
+      map.current.setLayoutProperty('station-circles', 'visibility', 'none');
     }
     // 
  /*   map.current.on('click', 'station-circles', (e:any) => {

@@ -44,13 +44,13 @@ async function get_train_data(){
 	try {
 		var trainResponse = await fetch(`https://api.wmata.com/StationPrediction.svc/json/GetPrediction/All?api_key=${key}`);
         rawTrains = await trainResponse.json();
-        if(rawTrains.Trains === undefined){
+        if(rawTrains === undefined){
             throw new Error("Proper data structure wasn't found within json file")
         }
         trains = parseTrains(rawTrains.Trains)
     } catch(e){
       //  console.error(e);
-      if(trainResponse.headers === undefined){
+      if(trainResponse === undefined){
         console.log(" NETWORK ERROR: Unable to get respomse ")
         return "ERROR"
       }
@@ -223,7 +223,12 @@ app.get('/api/nextarrival', function(request : any, response : any){
     else{
         let code = stationNames.getCode(request.query.station)!;
         let output =  trains.get(code)
+        
+        if( stations.get(code)?.StationTogether1 !== ''){
 
+            let temp = trains.get(stations.get(code)!.StationTogether1)
+            output = output!.concat(temp!)
+        }
         if(output === undefined) response.status(404);
 
         else {
@@ -255,8 +260,6 @@ app.get('/api/fares', function(request : any, response : any){
 
     else response.json(output);
 });
-
-
 
 /**
  * Gets all entrances from a certain station

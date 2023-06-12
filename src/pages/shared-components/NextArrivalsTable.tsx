@@ -34,7 +34,7 @@ export default function NextArrivalsTable(props: any) {
   
   return (
     <div>
-		<table className="table">
+		<table className="table text-center">
 			<thead>
 				<tr>
 					<th scope="col">Line</th>
@@ -46,7 +46,7 @@ export default function NextArrivalsTable(props: any) {
 			<tbody>
 				{trains.map((t: train, index:number) =>
 					<tr key={index}>
-						<th>{t.Line}</th>
+						<td className="text-center align-middle"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
 						<td>{t.Car}</td>
 						<td>{t.DestinationName}</td>
 						<td>{t.Min}</td>

@@ -113,7 +113,7 @@ code {
   margin-right: 2.5px;
   border-radius: 50%;
   font-size: 16px;
-  background-color: rgb(191,53,62);
+  background-color: lightgray;
   color:white;
   font-weight: bold;
   justify-content: center;
@@ -125,13 +125,11 @@ code {
 .BL{
   background-color: rgb(4,106,164);
   color:white;
-  color:white;
 }
 .RD{
   background-color: rgb(191,53,62);
   color:white;
 }
-
 .YL{
   background-color: rgb(244,207,77);
   color: black;
@@ -147,4 +145,8 @@ code {
 .OR{
   background-color: rgb(222,144,68);
   color: black;
+}
+.circle-table-margin{
+  margin-left: auto;
+  margin-right:auto;
 }
