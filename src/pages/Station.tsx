@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect} from 'react';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
@@ -14,6 +14,7 @@ export default function Station(props : any) {
   const [fareList, setFareList] = useState([]);
   const [lines, setLines] = useState<any>([]);
   const [entrances, setEntrances] = useState<any>([]);
+  const [alerts, setAlerts] = useState<any>([]);
 
   const list = (t:any, i:number) =>
     <option key={i} value={t[0]}>{t[1]}</option>
@@ -21,6 +22,11 @@ export default function Station(props : any) {
   const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => 
     [x, a2[i]]
   );
+
+  const alertsList = (t:any, index:number)=>
+  <div className={t.LinesAffected.slice(0,2) + " d-flex text-center justify-center m-1"} key={index} style={{borderRadius: "15px"}}>
+    <p className="justify-content-center align-items-center m-1  p-2">{t.Description}</p>
+  </div>
 
   const entrance = (t:any, index: number) =>
   <div className="text-left"key={index}>
@@ -46,7 +52,6 @@ export default function Station(props : any) {
       props.setLon(value.Lon)
       setLat(value.Lat);
       setLon(value.Lon);
-      console.log(value.entrances);
       setEntrances(value.entrances);
 
       let l = [];
@@ -94,6 +99,39 @@ export default function Station(props : any) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
     });
+  }
+  useEffect(()=>{  
+    getAlerts();
+  },[lines])
+
+  async function getAlerts(){
+    let output : any = []
+    for(const e of lines){
+      await fetch(`/api/alerts?line=${e}`)
+      .then(res => res.json())
+      .then(value=>{
+        if(value !== null){
+          for(const f of value){
+            if( output.find((e:any) => e.IncidentID === f.IncidentID)) continue;
+            else output.push(f);
+          }
+        }
+      })
+    }
+    let temp:any = []
+    for(const e of output){
+      let array = e.LinesAffected.split(/;[\s]?/).filter(function(fn:any) { return fn !== ''; })
+      if(array.length > 1){
+        for(const f of array){
+          let object:any = Object.create(e)
+          object.LinesAffected = f+";"
+          temp.push(object);
+        }
+      }
+      else temp.push(e)
+    }
+    output = temp;
+    setAlerts(output)
   }
 
   async function getNamesAndCodes(){
@@ -151,42 +189,54 @@ export default function Station(props : any) {
       </div>
       <div className="d-flex justify-content-start align-items-center  p-2">
         <h1 >{station}</h1>
+      <div className="d-flex justify-content-start align-items-center  p-2">
         {lines.map(linesServed)}
       </div>
-      <div className="row align-items-start text-center  p-2" id="next-train-tables">
-        <div className="col-6">
+      </div>
+      <div className="row align-items-start text-center" id="next-train-tables">
+        <div className="col-xl-6 col-md-12">
           <NextArrivalsTable station={station} group="1"/>
         </div>
-        <div className="col-6">
+        <div className="col-xl-6 col-md-12">
           <NextArrivalsTable station={station} group="2"/>
         </div>
       </div>
-      <div className="container p-4">
+      <div className="container p-sm-4">
         <div className="row">
-          <div className="col">
+          <div className="col-xl-4 col-md-12 mt-4">
             <select className="form-select" aria-label="Default select example" value={fare} onChange={handleChange}>
               <option defaultValue={""}>Select Station</option>
               {fareList.map(list)}
             </select>
           </div>
-          <div className="col">
-            PeakTime: {f.PeakTime}
+          <div className="col-xl-3 col-4 mt-4">
+            Peak Fare: 
+            <div>
+              {f.PeakTime}
+            </div>
           </div>
-          <div className="col">
-            OffPeakTime: {f.OffPeakTime}
+          <div className="col-xl-2 col-4 mt-4">
+            Off Peak: 
+            <div>
+              {f.OffPeakTime}
+            </div>
           </div>
-          <div className="col">
-            SeniorDisabled: {f.SeniorDisabled}
+          <div className="col-xl-3 col-4 mt-4">
+            Reduced: 
+            <div>
+              {f.SeniorDisabled}
+            </div>
           </div>
         </div>
       </div>
-      <div className="p-3 container">
+      <div className="container">
         <div className="row">
-          <div className="col">
-            <h3 className="">Alerts</h3>
+          <div className="col-xl-6 col-md-12">
+            <h2 className="m-4">Alerts</h2>
+            {!alerts.length ? <h4  className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h4> : alerts.map(alertsList)}
           </div>
-          <div className="col overflow-auto">
-            <h3>Entrances</h3>
+          <div className="col-xl-6 col-md-12 overflow-auto">
+            <h2 className="m-4">Entrances</h2>
             {entrances.map(entrance)}
           </div>
         </div>

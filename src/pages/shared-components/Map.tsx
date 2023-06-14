@@ -1,6 +1,4 @@
-import { data } from 'jquery';
 import React, { useState, useEffect, useRef} from 'react';
-//import { useLocation } from 'react-router-dom';
 import lines from "./Metro_Lines_Regional.json";
 import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
@@ -137,10 +135,11 @@ export default function Map(props : any) {
         });
       })
     }
-  },[props.lon, props.lat, lat,lng, props.markers, props.zoom])
+  },[props.lon, props.lat, lat,lng, props.markers, zoom, props.zoom])
 
   useEffect(() => {
     setMarkers(props.markers);
+    
     if (!map.current ) return; // wait for map to initialize
     map.current.flyTo({ 
       'center': [lng,lat], 
@@ -152,24 +151,41 @@ export default function Map(props : any) {
           markerTracker.current[i].remove();
       }
       markerTracker.current = [];
-      map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
+//      map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
       return;
     }
-    if(geojson_markers == null) return;
+    if(geojson_markers === null || props.station === "") return;
     else{
+      /*This finds station coordinates within geojson and uses them instead
+       * of the one provided by WMATA. I did this because the geojson seems 
+       * to propvide a location thats more in the middle of the entrance 
+       * locations
+       */
+      const features = map.current.querySourceFeatures('Stations', {
+        sourceLayer: "station-circles",
+        filter: ['==', 'NAME', props.station]
+      });
+      if(features.length > 0){
+        setLng(features[0].geometry.coordinates[0])
+        setLat(features[0].geometry.coordinates[1])
+ /*       const el = document.createElement('div');
+        el.className = 'marker'
+        var t = new mapboxgl.Marker(el).setLngLat([lng,lat]).addTo(map.current);
+        markerTracker.current.push(t);*/
+      }
       for (const feature of geojson_markers!.features) {
           const el = document.createElement('div');
-          if(feature.properties.type == "Elevator"){
+          if(feature.properties.type === "Elevator"){
               el.className = 'elevator-marker';
           }
-          else if(feature.properties.type == "Escalator"){
+          else if(feature.properties.type === "Escalator"){
               el.className = 'escalator-marker';
           }
           else el.className = 'marker';
           var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
           markerTracker.current.push(t);
       }
-      map.current.setLayoutProperty('station-circles', 'visibility', 'none');
+    //  map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
     }
     // 
  /*   map.current.on('click', 'station-circles', (e:any) => {
@@ -184,7 +200,7 @@ export default function Map(props : any) {
             'zoom': zoom || 16.5
         });
     });*/
-  },[props.lon, props.lat,lat,lng, props.markers, props.zoom, geojson_markers]);
+  },[props.lon, props.lat,lat,lng, props.markers, props.zoom, geojson_markers, props.station, zoom]);
   
   return (
     <div ref={mapContainer} className="map-container"></div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect} from 'react';
 //import { Link } from 'react-router-dom';
 
 import Navbar from "./shared-components/Navbar";
-//import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 import Map from "./shared-components/Map";
 import Station from './Station';
 
@@ -10,9 +9,7 @@ export default function StationList(props : any) {
   const [stationList, setStationList] = useState([]);
   const [lat, setLat] = useState(38.89834);
   const [lon, setLon] = useState(-77.021851);
- // const [showMap, setMap] = useState(0);
   const [zoom, setZoom] = useState(12);
-//  const [showStation, setShowStation] = useState(0); // 0 means a statino wasn't selected.
   const [station, setStation] = useState("");
   const [geojson_markers, setMarkers] = useState(null);
 
@@ -33,21 +30,6 @@ export default function StationList(props : any) {
       setLon(-77.021851);
       setZoom(12);
     }
-  //  console.log(station);
-  //  console.log(geojson_markers);
-/*  if(station === ""){
-    try{
-      fetch(`/api/stationList`)
-      .then(res => res.json())
-      .then(value=>{
-        setStationList(value.sort());
-      })
-    }
-    catch(error:any) {
-      if (error.name === "AbortError") return;
-      console.log("Error ", error);
-   }
-  }*/
   },[lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
@@ -66,18 +48,6 @@ export default function StationList(props : any) {
   }
   },[station])
 
-
-  /*
-  function handleStation(station : string){
-    setStation(station)
-  }
-
-  function setLocation(lat : number, lon : number){
-    setLat(lat);
-    setLon(lon);
-    setMap(0);
-  }*/
-
   function handleStationList(){
     return(
       <div className="row align-items-start" id="next-train-tables">
@@ -95,15 +65,15 @@ export default function StationList(props : any) {
     )
   }
   return (
-    <div style={{height: "100%"}}>
+    <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
       <div style={{height: "71px"}}></div>
       <div className="container-fluid text-center" style={{height: "calc(100% - 71px)"}}>
         <div className="row align-items-start"style={{height: "100%"}}>
-          <div className="col-5" style={{height:"100%"}}>
-           <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} />
+          <div id="map" className="col-lg-6 col-md-6 d-none d-md-block" style={{height:"100%"}}>
+           <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
           </div>
-          <div className="col-7 overflow-auto " style={{height:"100%"}}>
+          <div id="info" className="col-lg-6 col-md-6 overflow-auto" style={{height:"100%"}}>
             {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
           </div>
         </div>

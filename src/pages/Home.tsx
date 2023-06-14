@@ -4,27 +4,31 @@ import Navbar from "./shared-components/Navbar";
 
 export default function Home() {
   return (
-    <div style={{height: "100%"}}>
+    <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
       <div style={{height: "71px"}}></div>
       <div className="container-fluid text-center">
-        <h1 className="m-5">WMATA Information Hub</h1>
-        <div className="row g-3 align-items-center m-5">
-          <div className="col-5 d-flex container text-center">
-            <input type="email" className="form-control p-2 m-2" id="exampleFormControlInput1" placeholder="Search bar not functional yet" disabled></input>
-            <button type="button" className="btn btn-primary p-2 m-2" disabled>Search</button>
+        <h1 className="mt-5 mb-5">WMATA Information Hub</h1>
+        <div className="row align-items-center">
+          <div className="col-12 col-sm-8 col-lg-6 d-flex container text-center">
+            <input type="email" className="form-control m-1 " id="exampleFormControlInput1" placeholder="Search bar not functional yet" disabled></input>
+            <button type="button" className="btn btn-primary m-1 " disabled>Search</button>
           </div>
         </div>
-        <div className="row g-3">
-          <div className="container text-center" >
-            <Link to="/Stationlist">
-              <button type="button" className="btn btn-primary p-2 m-2">Station Information</button>
+        <div className="row">
+          <div className="d-grid d-sm-inline-block container text-center mt-5" >
+            <Link to="/Stationlist" className="d-grid d-sm-inline-block m-1 gap-2">
+              <button type="button" className="btn btn-primary">Station Information</button>
             </Link>
-            <Link to="/nexttrain">
-              <button type="button" className="btn btn-primary p-2 m-2">Next Arrivals</button>
+            <Link to="/nexttrain" className="d-grid d-sm-inline-block m-1 gap-2">
+              <button type="button" className="btn btn-primary">Next Arrivals</button>
             </Link>
-            <button type="button" className="btn btn-primary p-2 m-2" disabled> Bus Information</button>
-            <button type="button" className="btn btn-primary p-2 m-2" disabled>Maps</button>
+            <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
+              <button type="button" className="btn btn-primary" disabled> Bus Information</button>
+            </Link>
+            <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
+            <button type="button" className="btn btn-primary" disabled>Maps</button>
+            </Link>
           </div>
         </div>
       </div>

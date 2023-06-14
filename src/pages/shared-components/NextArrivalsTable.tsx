@@ -34,26 +34,26 @@ export default function NextArrivalsTable(props: any) {
   
   return (
     <div>
-		<table className="table text-center">
-			<thead>
-				<tr>
-					<th scope="col">Line</th>
-					<th scope="col">Cars</th>
-					<th scope="col">Destination</th>
-					<th scope="col">Time</th>
-				</tr>
-			</thead>
-			<tbody>
-				{trains.map((t: train, index:number) =>
-					<tr key={index}>
-						<td className="text-center align-middle"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
-						<td>{t.Car}</td>
-						<td>{t.DestinationName}</td>
-						<td>{t.Min}</td>
+			<table className="table text-center">
+				<thead>
+					<tr>
+						<th scope="col">Line</th>
+						<th scope="col">Cars</th>
+						<th scope="col">Destination</th>
+						<th scope="col">Time</th>
 					</tr>
-				)}
-			</tbody>
-		</table>
+				</thead>
+				<tbody className="table-group-divider">
+					{trains.map((t: train, index:number) =>
+						<tr key={index}>
+							<td className="text-center"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
+							<td>{t.Car}</td>
+							<td>{t.DestinationName}</td>
+							<td>{t.Min}</td>
+						</tr>
+					)}
+				</tbody>
+			</table>
     </div>
   );
 }

@@ -18,6 +18,7 @@ var stationNames : stationCodeNameMap;
 var trains : ESMap<string, train[]>;
 var stations: ESMap<string, station>;
 var lastUpdated = {next_train: null, stations_fares_entrances: null, alerts: null};
+var railAlerts: any;
 
 /**
  * Starts up backend system and manage when to get next arrival data
@@ -33,6 +34,7 @@ async function main(){
         console.log("Retrying fetching train data in 5 seconds")
         setTimeout(get_train_data, 5000)
     }
+    await get_rail_alerts();
 }
 
 /**
@@ -99,9 +101,12 @@ async function get_data() {
 async function get_rail_alerts(){
     let rawAlerts;
 	try {
-        var alertsResponse= await fetch(``);
+        var alertsResponse= await fetch(`https://api.wmata.com/Incidents.svc/json/Incidents?api_key=${key}`);
 		let date = alertsResponse.headers.get('date');
         rawAlerts = await alertsResponse.json();
+        railAlerts = rawAlerts.Incidents;
+        lastUpdated.alerts = date;
+      //  console.log(railAlerts)
 	} catch (e) {
 		console.error(e);
 	}
@@ -223,7 +228,7 @@ app.get('/api/nextarrival', function(request : any, response : any){
     else{
         let code = stationNames.getCode(request.query.station)!;
         let output =  trains.get(code)
-        
+        if(stations.get(code) === undefined) return;
         if( stations.get(code)?.StationTogether1 !== ''){
 
             let temp = trains.get(stations.get(code)!.StationTogether1)
@@ -302,7 +307,20 @@ app.get('/api/stationList', function(request : any, response : any){
  * Not implemented yet
  */
 app.get('/api/alerts', function(request : any, response : any){
-    response.status(501).send("Feature coming soon.");
+    let output = []
+    if(request.query.line !== null){
+        for(const e of railAlerts){
+            let temp = e.LinesAffected.split(/;[\s]?/).filter(function(fn : any) { return fn !== ''; })
+            if(temp.includes(request.query.line)){
+                output.push(e);
+            }
+         //   console.log(temp)
+        }
+        response.json(output);
+        return;
+    }
+    response.json(railAlerts);
+    //response.status().send("Feature coming soon.");
 });
 
 /**
