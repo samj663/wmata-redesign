@@ -38,19 +38,19 @@ export default function StationList(props : any) {
   },[lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
-  if(station === ""){
-    try{
-      fetch(`/api/stationList`)
-      .then(res => res.json())
-      .then(value=>{
-        setStationList(Array.from(new Set(value.sort())));
-      })
+    if(station === ""){
+      try{
+        fetch(`/api/stationList`)
+        .then(res => res.json())
+        .then(value=>{
+          setStationList(Array.from(new Set(value.sort())));
+        })
+      }
+      catch(error:any) {
+        if (error.name === "AbortError") return;
+        console.log("Error ", error);
+      }
     }
-    catch(error:any) {
-      if (error.name === "AbortError") return;
-      console.log("Error ", error);
-   }
-  }
   },[station])
 
   function handleStationList(){

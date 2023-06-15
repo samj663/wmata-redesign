@@ -3,6 +3,7 @@ import Navbar from "./shared-components/Navbar";
 
 export default function Alerts() {
   const [alerts, setAlerts] = React.useState<any>([])
+  
   React.useEffect(()=>{  
     getAlerts();
   },[])
