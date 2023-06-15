@@ -313,17 +313,17 @@ app.get('/api/stationInfo', function(request : any, response : any){
 });
 
 app.get('/api/stationList', function(request : any, response : any){
-        let code = stationNames.getCode(request.query.station)!;
-        let output = stations.get(code)
-        if(request.query.get === "codes")response.json(stationNames.codeArray);
-        else if(request.query.get === "names")response.json(stationNames.nameArray);
-        else if(output === undefined) response.json(stationNames.nameArray);
-        else response.json(output);
+    let code = stationNames.getCode(request.query.station)!;
+    let output = stations.get(code)
+    if(request.query.get === "codes")response.json(stationNames.codeArray);
+    else if(request.query.get === "names")response.json(stationNames.nameArray);
+    else if(output === undefined) response.json(stationNames.nameArray);
+    else response.json(output);
 });
 
 app.get('/api/alerts', function(request : any, response : any){
     let output = []
-    if(request.query.line !== null){
+    if(request.query.line !== undefined){
         for(const e of railAlerts){
             let temp = e.LinesAffected.split(/;[\s]?/).filter(function(fn : any) { return fn !== ''; })
             if(temp.includes(request.query.line)){
@@ -333,7 +333,9 @@ app.get('/api/alerts', function(request : any, response : any){
         response.json(output);
         return;
     }
-    response.json(railAlerts);
+    else{
+        response.send(railAlerts);
+    }
 });
 
 /**

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect} from 'react';
-//import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef} from 'react';
 
 import Navbar from "./shared-components/Navbar";
 import Map from "./shared-components/Map";
@@ -21,19 +20,18 @@ export default function StationList(props : any) {
       <div className="position-relative p-2" onClick={() => setStation(t)}>
         {t}
         <div className={"small-station-circle"}></div>
-        </div>
-      </td>
+      </div>
+    </td>
   </tr>;
-  
+
   useEffect(() => {
     setHeight(elementRef.current.clientHeight);
   }, [height]);
 
-  
   useEffect(()=>{
     if(!station.length) {
       setMarkers(null);
-      setLat(38.89834 );
+      setLat(38.89834);
       setLon(-77.021851);
       setZoom(12);
     }
@@ -73,6 +71,7 @@ export default function StationList(props : any) {
     </div>
     )
   }
+
   return (
     <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>

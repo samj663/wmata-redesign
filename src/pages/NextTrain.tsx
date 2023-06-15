@@ -7,24 +7,17 @@ export default function NextTrain() {
   const [showResults, setResults] = React.useState(1);
   const [stationList, setStationList] = React.useState([]);
   
-  const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => [x, a2[i]]);
+/*  const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => [x, a2[i]]);*/
 
   const list = (t:any, i:number) =>
-  <option key={i} value={t[0]}>{t[1]}</option>;
+  <option key={i} value={t}>{t}</option>;
 
   React.useEffect(()=>{  
     getNamesAndCodes();
   },[stationList])
 
   async function getNamesAndCodes(){
-    var a1, a2;
-    if(stationList.length !== 0) return;
-    await fetch('/api/stationList?get=codes')
-    .then(res => res.json())
-    .then(value=>{ a1 = value })
-    .catch(function(error) {
-      console.log('There has been a problem with your fetch operation: ' + error.message);throw error;
-    });
+    var a2 : any = [];
     await fetch('/api/stationList?get=names')
     .then(res => res.json())
     .then(value=>{ a2 = value })
@@ -32,12 +25,7 @@ export default function NextTrain() {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
     })
-    var t = zip(a1,a2).sort((x:any,y:any)=>{
-      if(x[1] < y[1]) return -1;
-      else if (x[1] > y[1]) return 1;
-      return 0;
-    })
-    setStationList(t)
+    setStationList(Array.from(new Set(a2.sort())));
   }
 
   const handleChange = (e:any) =>{
@@ -50,11 +38,11 @@ export default function NextTrain() {
     setStation(station);
   },[station])
 
-  const handleSubmit =(e:any)=>{
+ /* const handleSubmit =(e:any)=>{
     e.preventDefault()
     if(showResults === 0) setResults(1);
     setResults(0);
-  }
+  }*/
 
   return (
     <div>
@@ -62,7 +50,7 @@ export default function NextTrain() {
       <div className="text-center">
         <div style={{height: "71px", backgroundColor: "white"}}></div>
         <h1 className="m-4">Next Arrivals</h1>
-        <ul className="nav justify-content-center nav-underline nav-justified nav-fill m-4">
+        <ul className="nav justify-content-center nav-tabs nav-justified nav-fill mb-4">
           <li className="nav-item">
             <a className="nav-link active" aria-current="page" href="#rail-next-arrivals" data-bs-toggle="tab">Rail Arrivals</a>
           </li>

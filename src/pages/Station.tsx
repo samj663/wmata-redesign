@@ -2,7 +2,7 @@ import React, { useState, useEffect} from 'react';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
+//mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
 
 export default function Station(props : any) {
   const [station, setStation] = useState(props.station);
@@ -19,9 +19,9 @@ export default function Station(props : any) {
   const list = (t:any, i:number) =>
     <option key={i} value={t}>{t}</option>
 
-  const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => 
+ /* const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => 
     [x, a2[i]]
-  );
+  );*/
 
   const alertsList = (t:any, index:number)=>
   <div className={t.LinesAffected.slice(0,2) + " d-flex text-center justify-center m-1"} key={index} style={{borderRadius: "15px"}}>
@@ -166,8 +166,8 @@ export default function Station(props : any) {
   }
 
   return (
-    <div style={{height: "100%"}}>
-      <div className="d-md-flex mt-2 mb-2">
+    <div style={{height: "100%"}} className="p-md-3">
+      <div className="d-md-flex">
         <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
           <h1 className="d-flex">{station}</h1>
           <div className="d-md-flex align-items-center d-none">

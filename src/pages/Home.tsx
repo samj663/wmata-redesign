@@ -27,7 +27,10 @@ export default function Home() {
               <button type="button" className="btn btn-primary" disabled> Bus Information</button>
             </Link>
             <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
-            <button type="button" className="btn btn-primary" disabled>Maps</button>
+              <button type="button" className="btn btn-primary" disabled>Maps</button>
+            </Link>
+            <Link to="/alerts" className="d-grid d-sm-inline-block m-1 gap-2">
+              <button type="button" className="btn btn-primary">Alerts</button>
             </Link>
           </div>
         </div>
