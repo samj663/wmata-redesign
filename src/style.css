@@ -95,7 +95,7 @@ code {
 
   cursor: pointer;
 }
-.transfer-station-circle-RD{
+.small-station-circle{
   height: 12px;
   width: 12px;
   margin-left: 5px;
@@ -151,4 +151,10 @@ code {
 .circle-table-margin{
   margin-left: auto;
   margin-right:auto;
+}
+
+.mapboxgl-canvas {
+
+  height: 100%;
+
 }

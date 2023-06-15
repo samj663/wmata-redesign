@@ -70,4 +70,5 @@ export interface station{
     }
     entrances: entrance[];
     fares: ESMap<string,fares>;
+    lines: string[]
 }

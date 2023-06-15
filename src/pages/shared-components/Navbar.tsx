@@ -38,6 +38,11 @@ function Navbar() {
             </ul>
           </li>
           <li className="nav-item">
+            <Link to="/nexttrain" className="nav-link" aria-current="page">
+              Next Arrivals
+            </Link>
+          </li>
+          <li className="nav-item">
             <Link to="/" className="nav-link disabled" aria-current="page">
               Maps
             </Link>

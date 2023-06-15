@@ -59,10 +59,10 @@ export default function NextTrain() {
   return (
     <div>
       <Navbar/>
-      <div className="container text-center">
+      <div className="text-center">
         <div style={{height: "71px", backgroundColor: "white"}}></div>
         <h1 className="m-4">Next Arrivals</h1>
-        <ul className="nav justify-content-center nav-underline nav-fill m-4">
+        <ul className="nav justify-content-center nav-underline nav-justified nav-fill m-4">
           <li className="nav-item">
             <a className="nav-link active" aria-current="page" href="#rail-next-arrivals" data-bs-toggle="tab">Rail Arrivals</a>
           </li>
@@ -71,9 +71,8 @@ export default function NextTrain() {
           </li>
         </ul>
         <div className="tab-content">
-          <div id="rail-next-arrivals" className="container tab-pane fade active show">
+          <div id="rail-next-arrivals" className="tab-pane fade active show">
             <div  className="container-fluid text-center">
-              
               <div className="row align-items-center justify-content-center">
                 <div className="col-xl-4 col-md-12">
                   <select className="form-select" aria-label="Default select example" value={station} onChange={handleChange}>
@@ -93,10 +92,9 @@ export default function NextTrain() {
             </div>
           </div>
           <div id="bus-next-arrival" className="tab-pane fade">
-            <h2>Bus stuff not implemented</h2>
+            <h2>Bus arrivals not implemented</h2>
           </div>
         </div>
-        
       </div>
     </div>
   )

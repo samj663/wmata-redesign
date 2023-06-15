@@ -37,19 +37,19 @@ export default function NextArrivalsTable(props: any) {
 			<table className="table text-center">
 				<thead>
 					<tr>
-						<th scope="col">Line</th>
-						<th scope="col">Cars</th>
-						<th scope="col">Destination</th>
-						<th scope="col">Time</th>
+						<th scope="col-1">Line</th>
+						<th scope="col-1">Cars</th>
+						<th scope="col-9">Destination</th>
+						<th scope="col-1">Time</th>
 					</tr>
 				</thead>
 				<tbody className="table-group-divider">
 					{trains.map((t: train, index:number) =>
 						<tr key={index}>
-							<td className="text-center"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
-							<td>{t.Car}</td>
-							<td>{t.DestinationName}</td>
-							<td>{t.Min}</td>
+							<td className="text-center col-1"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
+							<td className="col-1">{t.Car}</td>
+							<td className="col-9">{t.DestinationName}</td>
+							<td className="col-1">{t.Min}</td>
 						</tr>
 					)}
 				</tbody>

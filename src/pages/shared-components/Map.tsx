@@ -28,7 +28,9 @@ export default function Map(props : any) {
         center: [-77.021851 ,38.89834 ],
         zoom: zoom
       });
+      map.current.on('idle',function(){ map.current.resize() })
       map.current.on("load", () =>{
+        map.current.resize();
         map.current.addSource('Lines', { 'type': 'geojson', 'data': lines })
         map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
         map.current.addLayer({
@@ -139,7 +141,6 @@ export default function Map(props : any) {
 
   useEffect(() => {
     setMarkers(props.markers);
-    
     if (!map.current ) return; // wait for map to initialize
     map.current.flyTo({ 
       'center': [lng,lat], 
@@ -193,13 +194,13 @@ export default function Map(props : any) {
         'center': e.features[0].geometry.coordinates,
         'zoom': 16.5
         });
-        });
+        });*/
    map.current.on("click", () => {
          map.current.flyTo({ 
             'center': [lng,lat], 
             'zoom': zoom || 16.5
         });
-    });*/
+    });
   },[props.lon, props.lat,lat,lng, props.markers, props.zoom, geojson_markers, props.station, zoom]);
   
   return (

@@ -34,7 +34,11 @@ async function main(){
         console.log("Retrying fetching train data in 5 seconds")
         setTimeout(get_train_data, 5000)
     }
-    await get_rail_alerts();
+    var status3 = await get_rail_alerts();
+    if(status3 === "ERROR"){
+        console.log("Retrying fetching train data in 5 seconds")
+        setTimeout(get_rail_alerts, 5000)
+    }
 }
 
 /**
@@ -51,7 +55,6 @@ async function get_train_data(){
         }
         trains = parseTrains(rawTrains.Trains)
     } catch(e){
-      //  console.error(e);
       if(trainResponse === undefined){
         console.log(" NETWORK ERROR: Unable to get respomse ")
         return "ERROR"
@@ -95,9 +98,6 @@ async function get_data() {
     return "SUCCESS"
 }
 
-/**
- * TODO: Implement function
- */
 async function get_rail_alerts(){
     let rawAlerts;
 	try {
@@ -106,10 +106,12 @@ async function get_rail_alerts(){
         rawAlerts = await alertsResponse.json();
         railAlerts = rawAlerts.Incidents;
         lastUpdated.alerts = date;
-      //  console.log(railAlerts)
 	} catch (e) {
 		console.error(e);
+        return "ERROR"
 	}
+    setTimeout(get_rail_alerts, 60000);
+    return "SUCCESS"
 }
 
 function parseEntrances(entrances : any[]): ESMap<string,entrance[]>{
@@ -179,13 +181,29 @@ function parseStations(stations: any[], fares: ESMap<string,ESMap<string,fares>>
                 Lon: s.Lon,
                 Address: s.Address,
                 fares: fares.get(s.Code)!,
-                entrances: entrances.get(s.Code)!
+                entrances: entrances.get(s.Code)!,
+                lines : [s.LineCode1]
             };
             output.set(s.Code, station);
         }
     }
-   // temp_code_array.sort();
- //   temp_name_array.sort();
+    for (const e of temp_code_array){
+        let s = output.get(e)!
+        if(s.LineCode2 !== null) s.lines.push(s.LineCode2);
+        if(s.LineCode3 !== null) s.lines.push(s.LineCode3);
+        if(s.LineCode4 !== null) s.lines.push(s.LineCode4);
+        for(const f of temp_code_array){
+            if(temp_code_to_name.get(e) === temp_code_to_name.get(f) && e !== f){
+                let t = output.get(f)!
+                if(t.LineCode1 !== null) s.lines.push(t.LineCode1);
+                if(t.LineCode2 !== null) s.lines.push(t.LineCode2);
+                if(t.LineCode3 !== null) s.lines.push(t.LineCode3);
+                if(t.LineCode4 !== null) s.lines.push(t.LineCode4);
+
+            }
+        }
+        output.set(e,s);
+    }
     stationNames = new stationCodeNameMap(temp_code_to_name, temp_name_to_code, temp_code_array, temp_name_array);
     return output;
 }
@@ -228,19 +246,18 @@ app.get('/api/nextarrival', function(request : any, response : any){
     else{
         let code = stationNames.getCode(request.query.station)!;
         let output =  trains.get(code)
+        
         if(stations.get(code) === undefined) return;
+
         if( stations.get(code)?.StationTogether1 !== ''){
-
-            let temp = trains.get(stations.get(code)!.StationTogether1)
-            output = output!.concat(temp!)
+            let temp = trains.get(stations.get(code)!.StationTogether1);
+            output = output!.concat(temp!);
         }
-        if(output === undefined) response.status(404);
 
+        if(output === undefined) response.status(404);
         else {
             if (request.query.group === "1") response.json(output.filter(x=>x.Group === "1"));
-
             else if (request.query.group === "2") response.json(output.filter(x=>x.Group === "2"));
-
             else response.json(trains.get(code));
         }
     }
@@ -294,6 +311,7 @@ app.get('/api/stationInfo', function(request : any, response : any){
         else response.send(output);
     }
 });
+
 app.get('/api/stationList', function(request : any, response : any){
         let code = stationNames.getCode(request.query.station)!;
         let output = stations.get(code)
@@ -303,9 +321,6 @@ app.get('/api/stationList', function(request : any, response : any){
         else response.json(output);
 });
 
-/**
- * Not implemented yet
- */
 app.get('/api/alerts', function(request : any, response : any){
     let output = []
     if(request.query.line !== null){
@@ -314,13 +329,11 @@ app.get('/api/alerts', function(request : any, response : any){
             if(temp.includes(request.query.line)){
                 output.push(e);
             }
-         //   console.log(temp)
         }
         response.json(output);
         return;
     }
     response.json(railAlerts);
-    //response.status().send("Feature coming soon.");
 });
 
 /**

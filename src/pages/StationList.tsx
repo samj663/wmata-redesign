@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect} from 'react';
 //import { Link } from 'react-router-dom';
 
 import Navbar from "./shared-components/Navbar";
@@ -12,16 +12,23 @@ export default function StationList(props : any) {
   const [zoom, setZoom] = useState(12);
   const [station, setStation] = useState("");
   const [geojson_markers, setMarkers] = useState(null);
+  const [height, setHeight] = useState(0);
+  const elementRef = useRef<any>(null);
 
   const list = (t: string, index:number) =>
   <tr key={index}>
     <td>
       <div className="position-relative p-2" onClick={() => setStation(t)}>
         {t}
-        <div className={"transfer-station-circle-RD"}></div>
+        <div className={"small-station-circle"}></div>
         </div>
       </td>
   </tr>;
+  
+  useEffect(() => {
+    setHeight(elementRef.current.clientHeight);
+  }, [height]);
+
   
   useEffect(()=>{
     if(!station.length) {
@@ -38,7 +45,7 @@ export default function StationList(props : any) {
       fetch(`/api/stationList`)
       .then(res => res.json())
       .then(value=>{
-        setStationList(value.sort());
+        setStationList(Array.from(new Set(value.sort())));
       })
     }
     catch(error:any) {
@@ -54,7 +61,9 @@ export default function StationList(props : any) {
       <table className="table table-hover">
         <thead>
           <tr>
-            <th scope="col">Stations</th>
+            <th scope="col"  className="p-2">
+              <div className="position-relative p-2">Stations</div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -68,15 +77,27 @@ export default function StationList(props : any) {
     <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
       <div style={{height: "71px"}}></div>
-      <div className="container-fluid text-center" style={{height: "calc(100% - 71px)"}}>
-        <div className="row align-items-start"style={{height: "100%"}}>
-          <div id="map" className="col-lg-6 col-md-6 d-none d-md-block" style={{height:"100%"}}>
-           <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
-          </div>
-          <div id="info" className="col-lg-6 col-md-6 overflow-auto" style={{height:"100%"}}>
-            {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
+      <div ref={elementRef}>
+        <ul className="nav nav-tabs justify-content-center nav-fill d-md-none  nav-justified">
+          <li className="nav-item">
+            <a className="nav-link" href="#map" data-bs-toggle="tab">Map</a>
+          </li>
+          <li className="nav-item">
+            <a className="nav-link active" aria-current="page" href="#info" data-bs-toggle="tab">Information</a>
+          </li>
+        </ul>
+      </div>
+      <div className="tab-content d-flex row m-0 p-0" style={{height: `calc(100% - 71px - ${height}px)`}}>
+        <div id="map" className="col d-md-block tab-pane col-lg-6 col-md-6 m-0 p-0" style={{height: "100%"}}>
+            <div className="m-0 p-0" style={{height: "100%"}}>
+              <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
           </div>
         </div>
+        <div id="info" className="col text-center tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
+            <div className="" style={{height: "100%"}}>
+              {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
+            </div>
+          </div>
       </div>
     </div>
   );

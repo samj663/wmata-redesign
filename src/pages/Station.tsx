@@ -17,7 +17,7 @@ export default function Station(props : any) {
   const [alerts, setAlerts] = useState<any>([]);
 
   const list = (t:any, i:number) =>
-    <option key={i} value={t[0]}>{t[1]}</option>
+    <option key={i} value={t}>{t}</option>
 
   const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => 
     [x, a2[i]]
@@ -53,13 +53,7 @@ export default function Station(props : any) {
       setLat(value.Lat);
       setLon(value.Lon);
       setEntrances(value.entrances);
-
-      let l = [];
-      if(value.LineCode1 !== null) l.push(value.LineCode1);
-      if(value.LineCode2 !== null) l.push(value.LineCode2);
-      if(value.LineCode3 !== null) l.push(value.LineCode3);
-      if(value.LineCode4 !== null) l.push(value.LineCode4);
-      setLines(l);
+      setLines(value.lines);
 
       var temp : any = {
         type: 'FeatureCollection',
@@ -135,13 +129,7 @@ export default function Station(props : any) {
   }
 
   async function getNamesAndCodes(){
-    var a1, a2;
-    await fetch('/api/stationList?get=codes')
-    .then(res => res.json())
-    .then(value=>{ a1 = value })
-    .catch(function(error) {
-      console.log('There has been a problem with your fetch operation: ' + error.message);throw error;
-    });
+    var a2 : any = [];
     await fetch('/api/stationList?get=names')
     .then(res => res.json())
     .then(value=>{ a2 = value })
@@ -149,15 +137,10 @@ export default function Station(props : any) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
     })
-    var t = zip(a1,a2).sort((x:any,y:any)=>{
-      if(x[1] < y[1]) return -1;
-      else if (x[1] > y[1]) return 1;
-      return 0;
-    })
-    setFareList(t)
+    setFareList(Array.from(new Set(a2.sort())));
   }
 
-  const handleClick =() =>{
+  const handleClick = () =>{
     props.setMarkers(null);
     props.setZoom(16);
     props.setStation('');
@@ -184,14 +167,19 @@ export default function Station(props : any) {
 
   return (
     <div style={{height: "100%"}}>
-      <div className="d-flex justify-content-start p-2">
-        <button type="button" className="btn btn-link" onClick={() => handleClick()}>Go Back</button>
-      </div>
-      <div className="d-flex justify-content-start align-items-center  p-2">
-        <h1 >{station}</h1>
-      <div className="d-flex justify-content-start align-items-center  p-2">
-        {lines.map(linesServed)}
-      </div>
+      <div className="d-md-flex mt-2 mb-2">
+        <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
+          <h1 className="d-flex">{station}</h1>
+          <div className="d-md-flex align-items-center d-none">
+            {lines.map(linesServed)}
+          </div>
+          <div className="d-flex flex-grow-1 d-md-none justify-content-end align-items-center">
+            <button type="button" className="btn btn-outline-primary btn-sm m-1" onClick={() => handleClick()}>{"Back"}</button>
+          </div>
+        </div>
+        <div className="d-md-flex justify-content-end align-items-center d-none">
+          <button type="button" className="btn btn-outline-primary m-1" onClick={() => handleClick()}>{"Back"}</button>
+        </div>
       </div>
       <div className="row align-items-start text-center" id="next-train-tables">
         <div className="col-xl-6 col-md-12">
@@ -233,7 +221,7 @@ export default function Station(props : any) {
         <div className="row">
           <div className="col-xl-6 col-md-12">
             <h2 className="m-4">Alerts</h2>
-            {!alerts.length ? <h4  className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h4> : alerts.map(alertsList)}
+            {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
           </div>
           <div className="col-xl-6 col-md-12 overflow-auto">
             <h2 className="m-4">Entrances</h2>
