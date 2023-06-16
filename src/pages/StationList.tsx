@@ -15,9 +15,9 @@ export default function StationList(props : any) {
   const elementRef = useRef<any>(null);
 
   const list = (t: string, index:number) =>
-  <tr key={index}>
+  <tr key={index}  onClick={() => setStation(t)}>
     <td>
-      <div className="position-relative p-2" onClick={() => setStation(t)}>
+      <div className="position-relative p-2">
         {t}
         <div className={"small-station-circle"}></div>
       </div>
@@ -56,19 +56,19 @@ export default function StationList(props : any) {
   function handleStationList(){
     return(
       <div className="row align-items-start" id="next-train-tables">
-      <table className="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col"  className="p-2">
-              <div className="position-relative p-2">Stations</div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {stationList.map(list)}
-        </tbody>
-      </table>
-    </div>
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col"  className="p-2">
+                <div className="position-relative p-2">Stations</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {stationList.map(list)}
+          </tbody>
+        </table>
+      </div>
     )
   }
 
@@ -93,10 +93,10 @@ export default function StationList(props : any) {
           </div>
         </div>
         <div id="info" className="col text-center tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
-            <div className="" style={{height: "100%"}}>
-              {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
-            </div>
+          <div className="" style={{height: "100%"}}>
+            {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
           </div>
+        </div>
       </div>
     </div>
   );

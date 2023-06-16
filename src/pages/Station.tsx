@@ -167,7 +167,7 @@ export default function Station(props : any) {
 
   return (
     <div style={{height: "100%"}} className="p-md-3">
-      <div className="d-md-flex">
+      <div className="d-md-flex  mt-md-0 mt-3 mb-md-0 mb-3">
         <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
           <h1 className="d-flex">{station}</h1>
           <div className="d-md-flex align-items-center d-none">
