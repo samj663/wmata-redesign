@@ -25,10 +25,15 @@ This is currently in development and has no planned release date. However, I do 
 
 ![Screenshot of Metro Center Information screen. It includes real time arrivals, alerts, maps, and entrance locations](readme_files/Station-info-page.png?raw=true "Metro Center Station Information Screen on Desktop")
 
-|             |             |             |
-| ----------- | ----------- | ----------- |
-|![](readme_files/mobile-station-info.png?raw=true ) | ![](readme_files/mobile-station-map.png?raw=true "") | ![](readme_files/mobile-next-arrival.png?raw=true "")|
 
+
+
+
+<p float="center">
+<img width="33%" src="readme_files/mobile-station-info.png?raw=true">
+<img width="33%" src="readme_files/mobile-station-map.png?raw=true">
+<img width="33%" src="readme_files/mobile-next-arrival.png?raw=true">
+</p>
 
 
 ## Installation
