@@ -1,6 +1,6 @@
 # WMATA Redesign
 
-This is a Web Application that serves real time information about the DC Metro system. Using WMATA's developer API, this app atempts to make next train arrvals, interactive maps, and system alerts more accesible and easier to read than WMATA's website.
+This is a Web Application that serves real time information about the DC Metro system. Using WMATA's developer API, this app atempts to make next train arrvals, interactive maps, and system alerts more accesible and easier to read than WMATA's website. This was built with TypeScript, React, Express, and Bootstrap.
 
 ## Project Status
 
@@ -23,7 +23,13 @@ This is currently in development and has no planned release date. However, I do 
 
 ## Screenshots
 
-![Screenshot of Metro Center Information screen. It includes real time arrivals, alerts, maps, and entrance locations](readme_files/Station-info-page.png?raw=true "Metro Center Station Information Screen")
+![Screenshot of Metro Center Information screen. It includes real time arrivals, alerts, maps, and entrance locations](readme_files/Station-info-page.png?raw=true "Metro Center Station Information Screen on Desktop")
+
+|             |             |             |
+| ----------- | ----------- | ----------- |
+|![](readme_files/mobile-station-info.png?raw=true ) | ![](readme_files/mobile-station-map.png?raw=true "") | ![](readme_files/mobile-next-arrival.png?raw=true "")|
+
+
 
 ## Installation
 
@@ -33,7 +39,7 @@ npm install
 ```
 To run backend:
 ```
-tsc src/backend.tsx src/interfaces_and_classes.tsx --jsx react&& node src/backend.js
+tsc src/backend.tsx src/interfaces_and_classes.tsx --jsx react && node src/backend.js
 ```
 To run frontend:
 ```
