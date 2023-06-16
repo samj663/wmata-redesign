@@ -30,9 +30,9 @@ This is currently in development and has no planned release date. However, I do 
 
 
 <p float="center">
-<img width="33%" src="readme_files/mobile-station-info.png?raw=true">
-<img width="33%" src="readme_files/mobile-station-map.png?raw=true">
-<img width="33%" src="readme_files/mobile-next-arrival.png?raw=true">
+<img width="32.5%" src="readme_files/mobile-station-info.png?raw=true">
+<img width="32.5%" src="readme_files/mobile-station-map.png?raw=true">
+<img width="32.5%" src="readme_files/mobile-next-arrival.png?raw=true">
 </p>
 
 
