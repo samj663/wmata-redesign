@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import {stationCodeNameMap, train, fares, entrance, station} from "../../interfaces_and_classes"
 
 export default function NextArrivalsTable(props: any) {
   const [trains, setTrains] = useState([]);
-  const [station, setStation] = useState(props.station)
-  const [group, setGroup] = useState(props.group)
-	const timer = useRef<any>([])
+  const timer = useRef<number[]>([])
 
   const getNextTrain = useCallback(() => {
 		for(const e of timer.current){
 			clearTimeout(e);
 		}
-		fetch(`/api/nextarrival?station=${station}&group=${group}`)
+		fetch(`/api/nextarrival?station=${props.station}&group=${props.group}`)
 		.then(res => res.json())
 		.then(value=>{
 			setTrains(value)
@@ -21,7 +18,7 @@ export default function NextArrivalsTable(props: any) {
 			console.log('There has been a problem with your fetch operation: ' + error.message);
 			throw error;
 		});
-  },[timer]);
+  },[props.group, props.station, timer]);
 
   useEffect(() => {
 		getNextTrain();
@@ -44,7 +41,7 @@ export default function NextArrivalsTable(props: any) {
 					</tr>
 				</thead>
 				<tbody className="table-group-divider">
-					{trains.map((t: train, index:number) =>
+					{trains.map((t: any, index:number) =>
 						<tr key={index}>
 							<td className="text-center col-1"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
 							<td className="col-1">{t.Car}</td>

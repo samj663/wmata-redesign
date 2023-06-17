@@ -35,7 +35,7 @@ export default function StationList(props : any) {
       setLon(-77.021851);
       setZoom(12);
     }
-  },[lat, lon, geojson_markers, zoom])
+  },[station,lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
     if(station === ""){
@@ -55,7 +55,7 @@ export default function StationList(props : any) {
 
   function handleStationList(){
     return(
-      <div className="row align-items-start" id="next-train-tables">
+      <div className="row align-items-start text-center" id="next-train-tables">
         <table className="table table-hover">
           <thead>
             <tr>
@@ -92,7 +92,7 @@ export default function StationList(props : any) {
               <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
           </div>
         </div>
-        <div id="info" className="col text-center tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
+        <div id="info" className="col tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
           <div className="" style={{height: "100%"}}>
             {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
           </div>

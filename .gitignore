@@ -23,7 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 .vscode
-
-src/*.js
+/api/*.js
 /src/index.css
 /src/App.test.tsx
+/package-lock.json
+/src/pages/shared-components/Metro_Lines_Regional.json

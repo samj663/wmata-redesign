@@ -24,7 +24,7 @@
     "src",
     "src/pages",
     "src/**/*"
-  ],
+, "api"  ],
   "exclude": [
     "src/backend.js"
   ]

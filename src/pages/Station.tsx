@@ -1,8 +1,5 @@
 import React, { useState, useEffect} from 'react';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
-var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
- 
-//mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
 
 export default function Station(props : any) {
   const [station, setStation] = useState(props.station);
@@ -19,13 +16,10 @@ export default function Station(props : any) {
   const list = (t:any, i:number) =>
     <option key={i} value={t}>{t}</option>
 
- /* const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => 
-    [x, a2[i]]
-  );*/
-
   const alertsList = (t:any, index:number)=>
-  <div className={t.LinesAffected.slice(0,2) + " d-flex text-center justify-center m-1"} key={index} style={{borderRadius: "15px"}}>
-    <p className="justify-content-center align-items-center m-1  p-2">{t.Description}</p>
+  <div className={" align-items-center d-flex mb-2 pb-2 pt-2"} key={index} style={{borderRadius: "10px", backgroundColor: "lightgray"}}>
+    <div className={"transfer-station-circle col-2 m-2 "+t.LinesAffected.slice(0,2)} key={index+t.LinesAffected.slice(0,2)} id={index+t.LinesAffected.slice(0,2)}>{t.LinesAffected.slice(0,2)} </div>
+    <p className="m-0">{t.Description}</p>
   </div>
 
   const entrance = (t:any, index: number) =>
@@ -105,10 +99,10 @@ export default function Station(props : any) {
       .then(res => res.json())
       .then(value=>{
         if(value !== null){
-          for(const f of value){
-            if( output.find((e:any) => e.IncidentID === f.IncidentID)) continue;
+          value.forEach((f:any)=>{
+            if(output.find((e:any) => e.IncidentID === f.IncidentID)) return;
             else output.push(f);
-          }
+          })
         }
       })
     }
@@ -181,7 +175,7 @@ export default function Station(props : any) {
           <button type="button" className="btn btn-outline-primary m-1" onClick={() => handleClick()}>{"Back"}</button>
         </div>
       </div>
-      <div className="row align-items-start text-center" id="next-train-tables">
+      <div className="row align-items-start" id="next-train-tables">
         <div className="col-xl-6 col-md-12">
           <NextArrivalsTable station={station} group="1"/>
         </div>
@@ -189,7 +183,7 @@ export default function Station(props : any) {
           <NextArrivalsTable station={station} group="2"/>
         </div>
       </div>
-      <div className="container p-sm-4">
+      <div className="container p-sm-4 text-center">
         <div className="row">
           <div className="col-xl-4 col-md-12 mt-4">
             <select className="form-select" aria-label="Default select example" value={fare} onChange={handleChange}>
@@ -197,19 +191,19 @@ export default function Station(props : any) {
               {fareList.map(list)}
             </select>
           </div>
-          <div className="col-xl-3 col-4 mt-4">
+          <div className="col-xl-3 col-4 mt-4 p-0">
             Peak Fare: 
             <div>
               {f.PeakTime}
             </div>
           </div>
-          <div className="col-xl-2 col-4 mt-4">
+          <div className="col-xl-2 col-4 mt-4 p-0">
             Off Peak: 
             <div>
               {f.OffPeakTime}
             </div>
           </div>
-          <div className="col-xl-3 col-4 mt-4">
+          <div className="col-xl-3 col-4 mt-4 p-0">
             Reduced: 
             <div>
               {f.SeniorDisabled}
@@ -219,12 +213,12 @@ export default function Station(props : any) {
       </div>
       <div className="container">
         <div className="row">
-          <div className="col-xl-6 col-md-12">
-            <h2 className="m-4">Alerts</h2>
-            {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
+          <div className="col-xl-6 col-md-12 p-0">
+            <h2 className="m-4 text-center">Alerts</h2>
+            {!alerts.length ? <p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p> : alerts.map(alertsList)}
           </div>
-          <div className="col-xl-6 col-md-12 overflow-auto">
-            <h2 className="m-4">Entrances</h2>
+          <div className="col-xl-6 col-md-12">
+            <h2 className="m-4 text-center">Entrances</h2>
             {entrances.map(entrance)}
           </div>
         </div>

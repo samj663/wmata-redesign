@@ -14,7 +14,7 @@ export default function NextTrain() {
 
   React.useEffect(()=>{  
     getNamesAndCodes();
-  },[stationList])
+  },[])
 
   async function getNamesAndCodes(){
     var a2 : any = [];

@@ -25,18 +25,24 @@ This is currently in development and has no planned release date. However, I do 
 
 ![Screenshot of Metro Center Information screen. It includes real time arrivals, alerts, maps, and entrance locations](readme_files/Station-info-page.png?raw=true "Metro Center Station Information Screen on Desktop")
 
-
-
-
-
 <p align="center">
 <img width="32.5%" src="readme_files/mobile-station-info.png?raw=true">
 <img width="32.5%" src="readme_files/mobile-station-map.png?raw=true">
 <img width="32.5%" src="readme_files/mobile-next-arrival.png?raw=true">
 </p>
 
+## Setup & Installation
 
-## Installation
+You will need your own WMATA api key to run the backend. You can signup for an account for free at [developer.wmata.com](https://developer.wmata.com). You will also need an api key from Mapbox. You can get a key from [mapbox.com](https://www.mapbox.com). Next, create a .env.local file in the root directtory to put your keys in. You also set the address of the backend and the style of the interactive maps here. The file should look like this below.
+
+```
+WMATA_KEY=<your api key>
+REACT_APP_PROXY_ADDR='http://localhost:4000' (or wherever you're hosting the backend)
+REACT_APP_MAPBOX_KEY=<your api key>
+REACT_APP_MAPBOX_STYLE='mapbox://styles/samuelj246/clj0ed7g7018v01qi7k96f2oe' (Or you can put your own style)
+```
+
+After that, you should be able to run the commands below and start using the app.
 
 To install:
 ```
@@ -44,13 +50,13 @@ npm install
 ```
 To run backend:
 ```
-tsc src/backend.tsx src/interfaces_and_classes.tsx --jsx react && node src/backend.js
+tsc api/backend.tsx api/interfaces_and_classes.tsx --jsx react && node api/backend.js
 ```
 To run frontend:
 ```
 npm start
 ```
-To visi frontent:
+To visit frontent:
 ```
 localhost:3000
 ```
