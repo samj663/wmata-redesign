@@ -48,7 +48,7 @@ const listPlaceholder = (t: any, index:number) =>
   },[station,lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
-    setLoading(1)
+    if(!stationList) setLoading(1)
     if(station === ""){
       try{
         fetch(`/api/stationList`)

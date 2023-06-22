@@ -13,6 +13,7 @@ export default function Station(props : any) {
   const [entrances, setEntrances] = useState<any>([]);
   const [alerts, setAlerts] = useState<any>([]);
   const [isLoading, setLoading] = useState(1);
+  const [isFareLoading, setFareLoading] = useState(0);
 
   const list = (t:any, i:number) =>
     <option key={i} value={t}>{t}</option>
@@ -103,6 +104,7 @@ export default function Station(props : any) {
       throw error;
     });
   }
+
   useEffect(()=>{  
     setLoading(1);
     getAlerts();
@@ -168,9 +170,10 @@ export default function Station(props : any) {
 
   async function fetchFares(){
     if(stationInfo === undefined) return
+    setFareLoading(1)
     await fetch(`/api/fares?sourcestation=${stationInfo.Code}&destinationstation=${fare}`)
     .then(res=>res.json())
-    .then(value=>{ setF(value) })
+    .then(value=>{ setF(value) ; setFareLoading(0)})
     .catch(function(error) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
@@ -179,7 +182,7 @@ export default function Station(props : any) {
 
   function isThereAlerts(){
 		if(alerts.length > 0) return(alerts.map(alertsList));
-    else if(lines.length > 0 && isLoading == 0){
+    else if(lines.length > 0 && isLoading === 0){
       return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)
     }
     else return([1].map(alertsPlaceholder));
@@ -212,27 +215,34 @@ export default function Station(props : any) {
       <div className="container p-sm-4 text-center">
         <div className="row">
           <div className="col-xl-4 col-md-12 mt-4">
-            <select className="form-select" aria-label="Default select example" value={fare} onChange={handleChange}>
-              <option defaultValue={""}>Select Station</option>
-              {fareList.map(list)}
-            </select>
+            {
+              fareList.length ? 
+              <select className="form-select" aria-label="Default select example" value={fare} onChange={handleChange}>
+                <option defaultValue={""}>Select Station</option>
+                {fareList.map(list)}
+              </select>
+              : 
+              <div className="placeholder-glow">
+                <select className="form-select placeholder" aria-label="Default select example" value={station} onChange={handleChange}></select>
+              </div>
+            }
           </div>
           <div className="col-xl-3 col-4 mt-4 p-0">
             Peak Fare: 
             <div>
-              {f.PeakTime}
+              {isFareLoading ? <div className="placeholder-glow"><div className="placeholder col-6"></div></div>: f.PeakTime}
             </div>
           </div>
           <div className="col-xl-2 col-4 mt-4 p-0">
             Off Peak: 
             <div>
-              {f.OffPeakTime}
+              {isFareLoading ? <div className="placeholder-glow"><div className="placeholder col-6"></div></div>: f.OffPeakTime}
             </div>
           </div>
           <div className="col-xl-3 col-4 mt-4 p-0">
             Reduced: 
             <div>
-              {f.SeniorDisabled}
+              {isFareLoading ? <div className="placeholder-glow"><div className="placeholder col-6"></div></div>: f.SeniorDisabled}
             </div>
           </div>
         </div>

@@ -56,10 +56,17 @@ export default function NextTrain() {
             <div  className="container-fluid text-center">
               <div className="row align-items-center justify-content-center">
                 <div className="col-xl-4 col-md-12">
+                  {
+                  !isLoading ? 
                   <select className="form-select" aria-label="Default select example" value={station} onChange={handleChange}>
                     <option defaultValue={""}>Select a Station</option>
                     {stationList.map(list)}
                   </select>
+                  : 
+                  <div className="placeholder-glow">
+                    <select className="form-select placeholder" aria-label="Default select example" value={station} onChange={handleChange}></select>
+                  </div>
+                  }
                 </div>
               </div>
             </div>
