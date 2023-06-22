@@ -247,15 +247,17 @@ app.get('/api/nextarrival', function(request : any, response : any){
         let code = stationNames.getCode(request.query.station)!;
         let output =  trains.get(code)
         
-        if(stations.get(code) === undefined) return;
-
+        if(stations.get(code) === undefined){
+            response.status(404).send("Invalid station")
+            return;
+        }
         if( stations.get(code)?.StationTogether1 !== ''){
             let temp = trains.get(stations.get(code)!.StationTogether1);
             output = output!.concat(temp!);
         }
 
-        if(output === undefined) response.status(404);
-        else {
+        if(output === undefined) response.status(204).send("No trains found");
+        else{
             if (request.query.group === "1") response.json(output.filter(x=>x.Group === "1"));
             else if (request.query.group === "2") response.json(output.filter(x=>x.Group === "2"));
             else response.json(trains.get(code));

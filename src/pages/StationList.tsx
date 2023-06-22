@@ -12,6 +12,7 @@ export default function StationList(props : any) {
   const [station, setStation] = useState("");
   const [geojson_markers, setMarkers] = useState(null);
   const [height, setHeight] = useState(0);
+  const [isLoading, setLoading] = useState(1);
   const elementRef = useRef<any>(null);
 
   const list = (t: string, index:number) =>
@@ -23,6 +24,15 @@ export default function StationList(props : any) {
       </div>
     </td>
   </tr>;
+
+const listPlaceholder = (t: any, index:number) =>
+<tr key={index}>
+  <td>
+    <div className="placeholder-glow position-relative p-2">
+      <span className="placeholder col-9"></span>
+    </div>
+  </td>
+</tr>;
 
   useEffect(() => {
     setHeight(elementRef.current.clientHeight);
@@ -38,17 +48,20 @@ export default function StationList(props : any) {
   },[station,lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
+    setLoading(1)
     if(station === ""){
       try{
         fetch(`/api/stationList`)
         .then(res => res.json())
         .then(value=>{
           setStationList(Array.from(new Set(value.sort())));
+          setLoading(0)
         })
       }
       catch(error:any) {
         if (error.name === "AbortError") return;
         console.log("Error ", error);
+        setLoading(0)
       }
     }
   },[station])
@@ -65,7 +78,7 @@ export default function StationList(props : any) {
             </tr>
           </thead>
           <tbody>
-            {stationList.map(list)}
+            {isLoading ? Array.from(Array(10).keys()).map(listPlaceholder) : stationList.map(list)}
           </tbody>
         </table>
       </div>

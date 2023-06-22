@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react';
-import lines from "./Metro_Lines_Regional.json";
+
 import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
@@ -19,7 +19,7 @@ export default function Map(props : any) {
     setLat(props.lat);
     setMarkers(props.markers);
     setZoom(props.zoom);
-  
+    
     if (map.current) return; // initialize map only once
     else{
       map.current = new mapboxgl.Map({
@@ -28,10 +28,10 @@ export default function Map(props : any) {
         center: [-77.021851 ,38.89834 ],
         zoom: zoom
       });
+
       map.current.on('idle',function(){ map.current.resize() })
+
       map.current.on("load", () =>{
-        map.current.resize();
-        map.current.addSource('Lines', { 'type': 'geojson', 'data': lines })
         map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
         map.current.addLayer({
           'id': 'station-circles',
@@ -44,13 +44,16 @@ export default function Map(props : any) {
           },
           'filter': ['==', '$type', 'Point']
         });
+        map.current.resize();
       })
     }
   },[props.lon, props.lat, lat,lng, props.markers, zoom, props.zoom])
 
   useEffect(() => {
+    
     setMarkers(props.markers);
     if (!map.current ) return; // wait for map to initialize
+    map.current.resize();
     map.current.flyTo({ 
       'center': [lng,lat], 
       'zoom': zoom || 16.5
@@ -75,13 +78,10 @@ export default function Map(props : any) {
         sourceLayer: "station-circles",
         filter: ['==', 'NAME', props.station]
       });
+
       if(features.length > 0){
         setLng(features[0].geometry.coordinates[0])
         setLat(features[0].geometry.coordinates[1])
- /*       const el = document.createElement('div');
-        el.className = 'marker'
-        var t = new mapboxgl.Marker(el).setLngLat([lng,lat]).addTo(map.current);
-        markerTracker.current.push(t);*/
       }
       for (const feature of geojson_markers!.features) {
           const el = document.createElement('div');

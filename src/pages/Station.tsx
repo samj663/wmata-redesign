@@ -12,22 +12,37 @@ export default function Station(props : any) {
   const [lines, setLines] = useState<any>([]);
   const [entrances, setEntrances] = useState<any>([]);
   const [alerts, setAlerts] = useState<any>([]);
+  const [isLoading, setLoading] = useState(1);
 
   const list = (t:any, i:number) =>
     <option key={i} value={t}>{t}</option>
 
   const alertsList = (t:any, index:number)=>
-  <div className={" align-items-center d-flex mb-2 pb-2 pt-2"} key={index} style={{borderRadius: "10px", backgroundColor: "lightgray"}}>
-    <div className={"transfer-station-circle col-2 m-2 "+t.LinesAffected.slice(0,2)} key={index+t.LinesAffected.slice(0,2)} id={index+t.LinesAffected.slice(0,2)}>{t.LinesAffected.slice(0,2)} </div>
-    <p className="m-0">{t.Description}</p>
-  </div>
+    <div className={"align-items-center d-flex mb-2 pb-2 pt-2"} key={index} style={{borderRadius: "10px", backgroundColor: "lightgray"}}>
+      <div className={"transfer-station-circle col-2 m-2 "+t.LinesAffected.slice(0,2)} key={index+t.LinesAffected.slice(0,2)} id={index+t.LinesAffected.slice(0,2)}>{t.LinesAffected.slice(0,2)} </div>
+      <p className="m-0">{t.Description}</p>
+    </div>
+
+  const alertsPlaceholder = (t:any, index:number)=>
+    <div className="placeholder-glow" key={index}>
+      <div className={"placeholder align-items-center d-flex mb-2 pb-2 pt-2"}  style={{borderRadius: "10px", backgroundColor: "lightgray"}}>
+        <div className={"placeholder transfer-station-circle col-2 m-2 "} key={index + t} id={index.toString()}>{} </div>
+        <p className="placeholder m-0">{t.Description}</p>
+      </div>
+    </div>
 
   const entrance = (t:any, index: number) =>
-  <div className="text-left"key={index}>
-    <p className="text-left">{t.Name}</p>
-  </div>
+    <div className="text-left"key={index}>
+      <p className="text-left">{t.Name}</p>
+    </div>
 
-  useEffect(()=>{  
+  useEffect(() => {
+    const element = document.getElementById('station-name-header');
+    element!.scrollIntoView();
+  }, []);
+
+  useEffect(()=>{
+  //  window.scrollTo({top: 0, behavior: 'smooth'})
     setStation(props.station);
     fetchStation();
   },[props.station])
@@ -89,10 +104,12 @@ export default function Station(props : any) {
     });
   }
   useEffect(()=>{  
+    setLoading(1);
     getAlerts();
   },[lines])
 
   async function getAlerts(){
+    setLoading(1);
     let output : any = []
     for(const e of lines){
       await fetch(`/api/alerts?line=${e}`)
@@ -120,6 +137,7 @@ export default function Station(props : any) {
     }
     output = temp;
     setAlerts(output)
+    setLoading(0);
   }
 
   async function getNamesAndCodes(){
@@ -147,7 +165,7 @@ export default function Station(props : any) {
 
   const linesServed = (value:any, index:any)=>
     <div className={"transfer-station-circle "+value} key={index+value} id={index+value}>{value} </div>;
-  
+
   async function fetchFares(){
     if(stationInfo === undefined) return
     await fetch(`/api/fares?sourcestation=${stationInfo.Code}&destinationstation=${fare}`)
@@ -159,11 +177,19 @@ export default function Station(props : any) {
     });
   }
 
+  function isThereAlerts(){
+		if(alerts.length > 0) return(alerts.map(alertsList));
+    else if(lines.length > 0 && isLoading == 0){
+      return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)
+    }
+    else return([1].map(alertsPlaceholder));
+	}
+
   return (
-    <div style={{height: "100%"}} className="p-md-3">
+    <div  id="station-name-header" style={{height: "100%"}} className="p-md-3">
       <div className="d-md-flex  mt-md-0 mt-3 mb-md-0 mb-3">
         <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
-          <h1 className="d-flex">{station}</h1>
+          <h1 className="d-flex" >{station}</h1>
           <div className="d-md-flex align-items-center d-none">
             {lines.map(linesServed)}
           </div>
@@ -215,11 +241,11 @@ export default function Station(props : any) {
         <div className="row">
           <div className="col-xl-6 col-md-12 p-0">
             <h2 className="m-4 text-center">Alerts</h2>
-            {!alerts.length ? <p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p> : alerts.map(alertsList)}
+            {isThereAlerts()}
           </div>
           <div className="col-xl-6 col-md-12">
             <h2 className="m-4 text-center">Entrances</h2>
-            {entrances.map(entrance)}
+            {!entrances.length ? [1].map(alertsPlaceholder) : entrances.map(entrance)}
           </div>
         </div>
       </div>

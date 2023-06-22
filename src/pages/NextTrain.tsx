@@ -6,8 +6,7 @@ export default function NextTrain() {
   const [station, setStation] = React.useState("");
   const [showResults, setResults] = React.useState(1);
   const [stationList, setStationList] = React.useState([]);
-  
-/*  const zip = (a1:any, a2:any) => a1.map((x:any, i:any) => [x, a2[i]]);*/
+  const [isLoading, setLoading] = React.useState(1);
 
   const list = (t:any, i:number) =>
   <option key={i} value={t}>{t}</option>;
@@ -20,7 +19,7 @@ export default function NextTrain() {
     var a2 : any = [];
     await fetch('/api/stationList?get=names')
     .then(res => res.json())
-    .then(value=>{ a2 = value })
+    .then(value=>{ a2 = value; setLoading(0)})
     .catch(function(error) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
@@ -37,12 +36,6 @@ export default function NextTrain() {
   React.useEffect(()=>{  
     setStation(station);
   },[station])
-
- /* const handleSubmit =(e:any)=>{
-    e.preventDefault()
-    if(showResults === 0) setResults(1);
-    setResults(0);
-  }*/
 
   return (
     <div>
