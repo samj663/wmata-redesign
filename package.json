@@ -10,8 +10,10 @@
     "@types/node": "^16.18.34",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
+    "cli-progress": "^3.12.0",
     "dotenv": "^16.1.3",
     "http-proxy-middleware": "^2.0.6",
+    "linebyline": "^1.3.0",
     "mapbox-gl": "^2.14.1",
     "node-fetch": "2.6.6",
     "react": "^18.2.0",
@@ -26,7 +28,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "both": "concurrently \"npm start\" \"tsc api/backend.tsx api/interfaces_and_classes.tsx --jsx react && node api/backend.js\""
+    "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
+    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx api/routes.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\""
   },
   "eslintConfig": {
     "extends": [
@@ -47,7 +50,7 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^8.2.0",
-    "@babel/plugin-proposal-private-property-in-object":"^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "concurrently": "^8.2.0"
   }
 }

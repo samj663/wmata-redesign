@@ -3,12 +3,14 @@ import Navbar from "./shared-components/Navbar";
 
 export default function Alerts() {
   const [alerts, setAlerts] = React.useState<any>([])
+  const [isLoading, setLoading] = React.useState(1);
   
   React.useEffect(()=>{  
     getAlerts();
   },[])
 
   async function getAlerts(){
+    setLoading(1);
     let output : any = []
       await fetch(`/api/alerts`)
       .then(res => res.json())
@@ -34,6 +36,7 @@ export default function Alerts() {
     }
     output = temp;
     setAlerts(output)
+    setLoading(0);
   }
 
   const alertsList = (t:any, index:number)=>
@@ -42,12 +45,29 @@ export default function Alerts() {
       <p className="d-flex justify-content-center align-items-center m-1 p-2">{t.Description}</p>
     </div>;
 
+  const alertsPlaceholder = (t:any, index:number)=>
+  <div className="placeholder-glow" key={index}>
+    <div className={"placeholder align-items-center d-flex mb-2 pb-2 pt-2"}  style={{borderRadius: "10px", backgroundColor: "lightgray"}}>
+      <div className={"placeholder transfer-station-circle col-2 m-2 "} key={index + t} id={index.toString()}>{} </div>
+      <p className="placeholder m-0">{t.Description}</p>
+    </div>
+  </div>
+
+  function isThereAlerts(){
+    if(alerts.length > 0) return(alerts.map(alertsList));
+    else if(isLoading === 0){
+      return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)
+    }
+    else return([1].map(alertsPlaceholder));
+  }
+
   return (
     <div className="m-4 text-center">
         <Navbar/>
         <div style={{height: "71px"}}></div>
         <h1 className="mb-4 text-center">Alerts</h1>
-        {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
+        {isThereAlerts()}
+        {/*!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)*/}
     </div>
   );
 }

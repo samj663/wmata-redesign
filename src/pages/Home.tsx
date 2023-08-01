@@ -21,6 +21,8 @@ export default function Home() {
           }
         }
       })
+      .catch(e=>console.error(e))
+
     let temp:any = []
     for(const e of output){
       let array = e.LinesAffected.split(/;[\s]?/).filter(function(fn:any) { return fn !== ''; })
@@ -44,7 +46,9 @@ export default function Home() {
     </div>;
   
   return (
-    <div style={{height: "100%", backgroundColor: "white"}}>
+    <div className="background-logo"style={{height: "100%", backgroundColor: "white", zIndex: 0}}>
+      
+      <div style={{zIndex: 20}}>
       <Navbar/>
       <div style={{height: "71px"}}></div>
       <div className="container-fluid text-center">
@@ -83,6 +87,7 @@ export default function Home() {
         <div className="offcanvas-body">
         {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
         </div>
+      </div>
       </div>
     </div>
   );

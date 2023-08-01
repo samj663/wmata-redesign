@@ -38,7 +38,7 @@ export default function NextArrivalsTable(props: any) {
 			}
     }
   },[props.station, props.group, timer, getNextTrain]);
-  
+  //DestinationName is full station while Destination is abbreviated
 	const trainList = (t: any, index:number) =>
 	<tr key={index}>
 		<td className="text-center col-1"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>

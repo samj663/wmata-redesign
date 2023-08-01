@@ -158,3 +158,35 @@ code {
   height: 100%;
 
 }
+
+@media (min-height: 100px){
+  .background-logo{
+    background-image:  radial-gradient(rgba(255,255,255,0.65)20%,rgba(255,255,255,1)70%), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png');
+    background-size: 1000px;
+    background-repeat:no-repeat;
+    background-position: bottom -320px right -350px;
+  }}/*
+.background-logo{
+  background-image:  linear-gradient(to bottom right, rgba(255,255,255,1) 15%,rgba(255,255,255,0)), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png');
+  background-size: 1000px;
+  background-repeat:no-repeat;
+  background-position: bottom -320px right -350px;
+}*/
+
+@media (max-height: 1000px) {  
+  .background-logo{
+    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png') ;
+    background-size: 750px;
+    background-repeat:no-repeat;
+    background-position: bottom -240px right -262.5px;
+  }
+}
+
+@media (max-height: 700px) {  
+  .background-logo{
+    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png') ;
+    background-size: 500px;
+    background-repeat:no-repeat;
+    background-position: bottom -160px right -175px;
+  }
+}

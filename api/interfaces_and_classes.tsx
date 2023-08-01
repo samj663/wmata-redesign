@@ -72,3 +72,34 @@ export interface station{
     fares: ESMap<string,fares>;
     lines: string[]
 }
+
+export interface busStop{
+    name: string,
+    lat: number,
+    lon: number,
+    routes: string[],
+    lastUpdated: number | undefined,
+    nextBus: nextBus[] | undefined
+}
+
+export interface busRoute{
+    name: string,
+    description: string,
+    lastUpdated: number,
+    paths: object | undefined
+}
+
+export interface nextBus{
+    route: string,
+    min: number,
+    directionText: string,
+    directionNum: string,
+    vehicleID: string
+}
+
+export interface error_template{
+    timestamp: string;
+    function: string;
+    error: string;
+    trace: string;
+}

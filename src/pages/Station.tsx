@@ -197,11 +197,19 @@ export default function Station(props : any) {
             {lines.map(linesServed)}
           </div>
           <div className="d-flex flex-grow-1 d-md-none justify-content-end align-items-center">
+            {fareList.length ?
             <button type="button" className="btn btn-outline-primary btn-sm m-1" onClick={() => handleClick()}>{"Back"}</button>
+            :
+            <div className="placeholder-glow"><button type="button" className="btn btn-outline-primary btn-sm m-1 placeholder"></button></div>
+            }
           </div>
         </div>
         <div className="d-md-flex justify-content-end align-items-center d-none">
-          <button type="button" className="btn btn-outline-primary m-1" onClick={() => handleClick()}>{"Back"}</button>
+          {fareList.length ?
+            <button type="button" className="btn btn-outline-primary m-1" onClick={() => handleClick()}>{"Back"}</button>
+            :
+            <div className="placeholder-glow"><button type="button" className="btn btn-outline-primary m-1 placeholder">{"Back"}</button></div>
+          }
         </div>
       </div>
       <div className="row align-items-start" id="next-train-tables">
@@ -215,8 +223,7 @@ export default function Station(props : any) {
       <div className="container p-sm-4 text-center">
         <div className="row">
           <div className="col-xl-4 col-md-12 mt-4">
-            {
-              fareList.length ? 
+            {fareList.length ? 
               <select className="form-select" aria-label="Default select example" value={fare} onChange={handleChange}>
                 <option defaultValue={""}>Select Station</option>
                 {fareList.map(list)}
