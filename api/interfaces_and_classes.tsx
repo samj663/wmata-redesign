@@ -86,7 +86,7 @@ export interface busRoute{
     name: string,
     description: string,
     lastUpdated: number,
-    paths: object | undefined
+    paths: any | undefined
 }
 
 export interface nextBus{

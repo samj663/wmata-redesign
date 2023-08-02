@@ -29,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
-    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx api/routes.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\""
+    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\""
   },
   "eslintConfig": {
     "extends": [
