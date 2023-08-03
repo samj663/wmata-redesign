@@ -84,7 +84,6 @@ describe("GET / ", () => {
 
   test('/api/nextarrival?station=A01', async () => {
     await backend.delay(500)
-//    await get_next_train("A01")
     const response = await request(app).get('/api/nextarrival?station=A01')
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -103,7 +102,6 @@ describe("GET / ", () => {
 
   test('/api/nextarrival?station=B01', async () => {
     await backend.delay(500)
- //   await get_next_train("B01")
     const response = await request(app).get('/api/nextarrival?station=B01')
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -119,28 +117,9 @@ describe("GET / ", () => {
       })
     ]))
   });
-  test('/api/nextarrival?station=B01', async () => {
-    await backend.delay(500)
- //   await get_next_train("B01")
-    const response = await request(app).get('/api/nextarrival?station=B01')
-    expect(response.body).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        Car: expect.any(String), 
-        Destination: expect.any(String), 
-        DestinationCode: expect.any(String),
-        DestinationName: expect.any(String),
-        Group: expect.any(String),
-        Line: expect.any(String), 
-        LocationCode: "0", 
-        LocationName: "Gallery Pl-Chinatown",
-        Min:expect.any(String)
-      })
-    ]))
-  });
 
   test('/api/nextarrival?station=F01', async () => {
     await backend.delay(500)
- //   await get_next_train("F01")
     const response = await request(app).get('/api/nextarrival?station=F01')
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -190,12 +169,7 @@ describe("GET / ", () => {
 async function get_test_station_info(station:string){
   station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
 }
-/*
-async function get_next_train(station:string){
-  var temp = await (await fetch(`https://api.wmata.com/StationPrediction.svc/json/GetPrediction/${station}?api_key=${process.env.WMATA_KEY}`)).json();
-  next_arrival_test = temp.Trains
-}
-*/
+
 async function get_fare_info(source:string, dest:string){
   var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
   console.log("HEOOO", temp);
