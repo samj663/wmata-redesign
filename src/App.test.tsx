@@ -119,6 +119,24 @@ describe("GET / ", () => {
       })
     ]))
   });
+  test('/api/nextarrival?station=B01', async () => {
+    await backend.delay(500)
+ //   await get_next_train("B01")
+    const response = await request(app).get('/api/nextarrival?station=B01')
+    expect(response.body).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        Car: expect.any(String), 
+        Destination: expect.any(String), 
+        DestinationCode: expect.any(String),
+        DestinationName: expect.any(String),
+        Group: expect.any(String),
+        Line: expect.any(String), 
+        LocationCode: "0", 
+        LocationName: "Gallery Pl-Chinatown",
+        Min:expect.any(String)
+      })
+    ]))
+  });
 
   test('/api/nextarrival?station=F01', async () => {
     await backend.delay(500)
