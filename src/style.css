@@ -71,7 +71,7 @@ code {
 }
 
 .marker {
-  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/WMATA_Metro_Logo_small.svg.png');
+  background-image: url('./images/WMATA_Metro_Logo_small.svg.png');
   background-size: cover;
   width: 40px;
   height: 40px;
@@ -79,7 +79,7 @@ code {
   cursor: pointer;
 }
 .escalator-marker {
-  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/entrance_picture.png');
+  background-image: url('./images/entrance_picture.png');
   background-size: cover;
   width: 35px;
   height: 35px;
@@ -88,7 +88,7 @@ code {
 }
 
 .elevator-marker {
-  background-image: url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/entrance_picture.png');
+  background-image: url('./images/entrance_picture.png');
   background-size: cover;
   width: 35px;
   height: 35px;
@@ -161,7 +161,7 @@ code {
 
 @media (min-height: 100px){
   .background-logo{
-    background-image:  radial-gradient(rgba(255,255,255,0.65)20%,rgba(255,255,255,1)70%), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png');
+    background-image:  radial-gradient(rgba(255,255,255,0.65)20%,rgba(255,255,255,1)70%), url('./images/testing.png');
     background-size: 1000px;
     background-repeat:no-repeat;
     background-position: bottom -320px right -350px;
@@ -175,7 +175,7 @@ code {
 
 @media (max-height: 1000px) {  
   .background-logo{
-    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png') ;
+    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('./images/testing.png') ;
     background-size: 750px;
     background-repeat:no-repeat;
     background-position: bottom -240px right -262.5px;
@@ -184,7 +184,7 @@ code {
 
 @media (max-height: 700px) {  
   .background-logo{
-    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('/Users/tech_wiz22/Documents/wmata-redesign-ts/src/images/testing.png') ;
+    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('./images/testing.png') ;
     background-size: 500px;
     background-repeat:no-repeat;
     background-position: bottom -160px right -175px;
