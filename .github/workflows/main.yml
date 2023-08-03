@@ -32,8 +32,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-      env:
-        PORT: 4000
     - run: npm install
     - run: npm run compile
     - run: npm test
+      env:
+          PORT: 4000
