@@ -15,7 +15,7 @@ const app = require("../api/routes")
 jest.setTimeout(120000)
 
 var station_info_test:any;
-var next_arrival_test:any;
+//var next_arrival_test:any;
 var fares_test:any;
 /*
 test('renders learn react link', () => {
@@ -172,12 +172,12 @@ describe("GET / ", () => {
 async function get_test_station_info(station:string){
   station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
 }
-
+/*
 async function get_next_train(station:string){
   var temp = await (await fetch(`https://api.wmata.com/StationPrediction.svc/json/GetPrediction/${station}?api_key=${process.env.WMATA_KEY}`)).json();
   next_arrival_test = temp.Trains
 }
-
+*/
 async function get_fare_info(source:string, dest:string){
   var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
   console.log("HEOOO", temp);
