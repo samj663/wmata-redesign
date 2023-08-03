@@ -98,7 +98,7 @@ describe("GET / ", () => {
       })
     ]))
   });
-
+  
   test('/api/nextarrival?station=B01', async () => {
     await backend.delay(500)
     await get_next_train("B01")
