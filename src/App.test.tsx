@@ -1,14 +1,16 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
-import Station from './pages/Station'
+//import React from 'react';
+//import { render, screen } from '@testing-library/react';
+//import App from './App';
+//import Station from './pages/Station'
+//import * as r from "../api/routes"
 import * as backend from "../api/backend"
-import * as r from "../api/routes"
-const express = require("express");
+//const express = require("express");
+const {default : fetch} = require('node-fetch');
 const request = require("supertest");
-const app = express();
-app.use(express.urlencoded({ extended: false }));
-app.use("/", r);
+const app = require("../api/routes")
+
+//app.use(express.urlencoded({ extended: false }));
+//app.use("/", r);
 
 jest.setTimeout(120000)
 
@@ -36,7 +38,7 @@ describe("GET / ", () => {
   
   test("/api", async () => {
     await backend.delay(500)
-    const response = await request(app).get("/api")
+    const response = await request("http://localhost:4000").get("/api")
     .expect('This is the api backend');
     expect(response.statusCode).toBe(200);
   });
@@ -98,7 +100,7 @@ describe("GET / ", () => {
       })
     ]))
   });
-  
+
   test('/api/nextarrival?station=B01', async () => {
     await backend.delay(500)
     await get_next_train("B01")
