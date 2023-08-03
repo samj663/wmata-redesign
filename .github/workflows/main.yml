@@ -4,16 +4,16 @@
 name: Node.js CI
 
 on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
   workflow_dispatch:
     inputs:
       version:
         description: Bump Version
         default: v1.0.0
         required: true
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
 
 jobs:
   build:
@@ -34,5 +34,4 @@ jobs:
         cache: 'npm'
     - run: npm install
     - run: npm run compile
-    - run: npm run build --if-present
     - run: npm test
