@@ -51,6 +51,7 @@ export async function get_next_bus_data(stopID: string){
   } catch(e:any){
       backend.bootstrap_status.rail_alerts = "ERROR"
       console.log("---- ERROR has been caught. Check Log ----")
+      console.log(e)
       var error:error_template ={
           timestamp: Date.now().toString(),
           function: "get_next_bus",
@@ -83,6 +84,7 @@ export async function get_bus_routes(){
   } catch(e:any) {
     backend.bootstrap_status.rail_alerts = "ERROR"
     console.log("---- ERROR has been caught. Check Log ----")
+    console.log(e)
     var error:error_template ={
         timestamp: Date.now().toString(),
         function: "get_bus_routes",
@@ -116,6 +118,7 @@ export async function get_bus_stops(){
   } catch(e:any){
     backend.bootstrap_status.rail_alerts = "ERROR"
     console.log("---- ERROR has been caught. Check Log ----")
+    console.log(e)
     var error:error_template ={
         timestamp: Date.now().toString(),
         function: "get_bus_stops",

@@ -34,6 +34,7 @@ export async function get_train_data(){
         
     } catch(e:any){
         console.log("---- ERROR has been caught. Check Log ----")
+        console.log(e)
         var error:error_template ={
             timestamp: Date.now().toString(),
             function: "get_train_data",
@@ -73,6 +74,8 @@ export async function get_data() {
         console.log("---- ERROR has been caught. Check Log ----")
         backend.bootstrap_status.stations_fares_entrances = "ERROR"
 
+        console.log(e)
+
         var error:error_template ={
             timestamp: Date.now().toString(),
             function: "get_data",
@@ -101,6 +104,7 @@ export async function get_rail_alerts(){
 	} catch(e:any){
         backend.bootstrap_status.rail_alerts = "ERROR"
         console.log("---- ERROR has been caught. Check Log ----")
+        console.log(e)
         var error:error_template ={
             timestamp: Date.now().toString(),
             function: "get_rail_alerts",
