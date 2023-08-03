@@ -18,7 +18,7 @@ jobs:
       matrix:
         node-version: [14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+    environment: testing
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -31,6 +31,6 @@ jobs:
     - name: running npm test
       env: # Set the secret as an input
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
-        PORT: 4000
+        BACKEND_PORT: 4000
       run: npm test
       
