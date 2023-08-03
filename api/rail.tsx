@@ -34,7 +34,7 @@ export async function get_train_data(){
         
     } catch(e:any){
         console.log("---- ERROR has been caught. Check Log ----")
-        console.log(e)
+        console.log(trainResponse)
         var error:error_template ={
             timestamp: Date.now().toString(),
             function: "get_train_data",
