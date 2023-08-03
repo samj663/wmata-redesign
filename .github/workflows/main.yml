@@ -37,4 +37,4 @@ jobs:
     - run: npm test
       env: # Set the secret as an input
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
-        PORT: ${{ secrets.PORT}}
+        PORT: 4000
