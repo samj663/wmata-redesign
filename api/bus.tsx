@@ -33,7 +33,7 @@ export async function get_next_bus_data(stopID: string){
   }
 
   queueCounter++;
-  await delay(queueCounter * 100)
+  await backend.delay(queueCounter * 100)
 
   try {
     var busResponse = await fetch(`https://api.wmata.com/NextBusService.svc/json/jPredictions?StopID=${stopID}&api_key=${key}`);
@@ -62,17 +62,6 @@ export async function get_next_bus_data(stopID: string){
   }
 }
 
-/**
- * Delays a function. Used to make sute rate limit isn't exceeded when calling WMATA's API.
- * @param millisec how long to delay the function in milliseconds.
- * @returns a promise
- */
-export function delay(millisec:number) {
-  return new Promise(resolve => {
-    setTimeout(() => { resolve('') }, millisec);
-  })
-}
-
 export async function get_bus_routes(){
   try{
     bus_routes = new Map<string, busRoute>;
@@ -89,7 +78,7 @@ export async function get_bus_routes(){
         paths: rawRoute
       }
       bus_routes.set(route.RouteID, temp);
-      await delay(100)
+      await backend.delay(100)
     }
   } catch(e:any) {
     backend.bootstrap_status.rail_alerts = "ERROR"

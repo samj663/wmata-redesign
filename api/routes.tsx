@@ -8,7 +8,7 @@ import * as rail from "./rail"
 import * as bus from "./bus"
 const express = require('express')
 const path = require('path');
-const app = express()
+export const app = express()
 
 require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -32,14 +32,14 @@ app.get('/api', function(request : any, response : any){
  */
 app.get('/api/nextarrival', function(request : any, response : any){
     if(request.query.station == null){
-        response.status(400).send("Provide station");
+        response.status(400).json({error: "Provide station"});
     }
     else{
         let code = rail.stationNames.getCode(request.query.station)!;
         let output =  rail.trains.get(code)
         
         if(rail.stations.get(code) === undefined){
-            response.send("Invalid station")
+            response.json({error:"Invalid station"})
             return;
         }
         if( rail.stations.get(code)?.StationTogether1 !== ''){
@@ -47,7 +47,7 @@ app.get('/api/nextarrival', function(request : any, response : any){
             output = output!.concat(temp!);
         }
 
-        if(output === undefined) response.send("No trains found");
+        if(output === undefined) response.json({error:"No trains found"});
         else{
             if (request.query.group === "1") response.json(output.filter(x=>x.Group === "1"));
             else if (request.query.group === "2") response.json(output.filter(x=>x.Group === "2"));
@@ -65,7 +65,7 @@ app.get('/api/nextarrival', function(request : any, response : any){
  */
 app.get('/api/fares', function(request : any, response : any){
     if(request.query.sourcestation == null && request.query.destinationstation == null){
-        response.status(400).send("Provide source and destination station");
+        response.status(400).json({error:"Provide source and destination station"});
     }
     let source = rail.stationNames.getCode(request.query.sourcestation)!;
     let dest = rail.stationNames.getCode(request.query.destinationstation)!;
@@ -83,7 +83,7 @@ app.get('/api/fares', function(request : any, response : any){
  */
 app.get('/api/entrances', function(request : any, response : any){
     if(request.query.station == null){
-        response.status(400).send("Provide station");
+        response.status(400).json({error:"Provide station"});
     }
     else{
         let code = rail.stationNames.getCode(request.query.station)!;
@@ -95,13 +95,13 @@ app.get('/api/entrances', function(request : any, response : any){
 
 app.get('/api/stationInfo', function(request : any, response : any){
     if(request.query.station == null){
-        response.status(400).send("Provide station");
+        response.status(400).json({error:"Provide station"});
     }
     else{
         let code = rail.stationNames.getCode(request.query.station)!;
         let output = rail.stations.get(code)
         if(output === undefined) response.status(404);
-        else response.send(output);
+        else response.json(output);
     }
 });
 
@@ -127,7 +127,7 @@ app.get('/api/alerts', function(request : any, response : any){
         return;
     }
     else{
-        response.send(rail.railAlerts);
+        response.json(rail.railAlerts);
     }
 });
 
@@ -141,60 +141,60 @@ app.get('/api/lastupdate', function(request : any, response : any){
 
 app.get('/api/busStop', function(request : any, response : any){
     if(backend.bootstrap_status.bus_stops === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_stops=== "ERROR"){
-        response.send("System ran into error fetching bus stops. Please try again later.")
+        response.json({error:"System ran into error fetching bus stops. Please try again later."})
     }
     else response.json(bus.bus_stops.get(request.query.stopid));
 });
 
 app.get('/api/busRoute', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_routes === "ERROR"){
-        response.send("System ran into error fetching bus routes. Please try again later.")
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route));
 });
 
 app.get('/api/busRoute/direction0', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_routes === "ERROR"){
-        response.send("System ran into error fetching bus routes. Please try again later.")
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route)?.paths.Direction0);
 });
 
 app.get('/api/busRoute/direction0/stops', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_routes === "ERROR"){
-        response.send("System ran into error fetching bus routes. Please try again later.")
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route)?.paths.Direction0.Stops);
 });
 
 app.get('/api/busRoute/direction1', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_routes === "ERROR"){
-        response.send("System ran into error fetching bus routes. Please try again later.")
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route)?.paths.Direction1);
 });
 
 app.get('/api/busRoute/direction1/stops', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
-        response.send("System is booting up. Please try again later.")
+        response.json({error:"System is booting up. Please try again later."})
     }
     else if(backend.bootstrap_status.bus_routes === "ERROR"){
-        response.send("System ran into error fetching bus routes. Please try again later.")
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route)?.paths.Direction1.Stops);
 });
@@ -205,7 +205,7 @@ app.get('/api/bootstrap', function(request : any, response : any){
 
 app.get('/api/errorLog', function(request : any, response : any){
     if(request.query.key === process.env.ERROR_LOG_KEY) response.json(backend.error_log);
-    else response.send("Invalid key");
+    else response.json({error:"Invalid key"});
 });
 
 app.get('/api/nextBus', async function(request : any, response : any){
@@ -213,21 +213,25 @@ app.get('/api/nextBus', async function(request : any, response : any){
         await bus.get_next_bus_data(request.query.stopid)
         response.json(bus.bus_stops.get(request.query.stopid))
     }
-    else response.send("Invalid key");
+    else response.json({error:"Invalid key"});
 });
 
 /**
  * Catchall function to handle invalid endpoints.
  */
 app.get('/api/*', function(request : any, response : any){
-    response.send("ummm... that wasn't a valid endpoint");
+    response.json({error:"ummm... that wasn't a valid endpoint"});
 });
 
-app.listen(process.env.PORT || 4000,() => {
-    backend.main();
-    console.log(`Example app listening on port ${process.env.PORT || 4000}`);
-});
+export var server :any = app.listen(process.env.PORT ,() => {
+        backend.main();
+        console.log(`Example app listening on port ${process.env.PORT}`);
+    });
 
+export var shutdown = function (message: string){
+    console.log(message)
+    server.close();
+}
 /*
 app.get('/api/queue', function(request : any, response : any){
     let output = []
@@ -242,6 +246,7 @@ app.get('/api/queue', function(request : any, response : any){
         return;
     }
     else{
-        response.send(railAlerts);
+        response.json(railAlerts);
     }
 });*/
+module.exports = app

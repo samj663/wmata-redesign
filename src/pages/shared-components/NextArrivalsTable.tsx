@@ -13,10 +13,11 @@ export default function NextArrivalsTable(props: any) {
 		fetch(`/api/nextarrival?station=${props.station}&group=${props.group}`)
 		.then(res => res.json())
 		.then(value=>{
-			setTrains(value)
+			if(value.error === undefined){
+				setTrains(value)
+				timer.current.push(window.setTimeout(()=>{getNextTrain()}, 10000))
+			}
 			setLoading(0);
-			
-			timer.current.push(window.setTimeout(()=>{getNextTrain()}, 10000))
 		})
 		.catch(function(error) {
 			console.log('There has been a problem with your fetch operation: ' + error.message);

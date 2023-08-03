@@ -26,10 +26,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --detectOpenHandles",
     "eject": "react-scripts eject",
     "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
-    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\""
+    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
+    "compile": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react"
   },
   "eslintConfig": {
     "extends": [
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "supertest": "^6.3.3"
   }
 }
