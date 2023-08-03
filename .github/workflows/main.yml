@@ -26,11 +26,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
+    - run: npm ci
     - run: npm run compile
     - name: running npm test
       env: # Set the secret as an input
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
         BACKEND_PORT: 4000
-      run: npm test
+      run: npm run test
       

@@ -26,7 +26,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --detectOpenHandles",
+    "test": "react-scripts test --detectOpenHandles --forceExit --watchAll",
     "eject": "react-scripts eject",
     "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
     "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
