@@ -78,8 +78,8 @@ export interface busStop{
     lat: number,
     lon: number,
     routes: string[],
-    lastUpdated: number | undefined,
-    nextBus: nextBus[] | undefined
+    lastUpdated: number | undefined | null,
+    nextBus: nextBus[] | undefined | null
 }
 
 export interface busRoute{

@@ -2,20 +2,16 @@
 //import { render, screen } from '@testing-library/react';
 //import App from './App';
 //import Station from './pages/Station'
-//import * as r from "../api/routes"
+import * as r from "../api/routes"
 import * as backend from "../api/backend"
-//const express = require("express");
 const {default : fetch} = require('node-fetch');
 const request = require("supertest");
 const app = require("../api/routes")
 
-//app.use(express.urlencoded({ extended: false }));
-//app.use("/", r);
-
 jest.setTimeout(120000)
 
 var station_info_test:any;
-//var next_arrival_test:any;
+var bus_route_test:any;
 var fares_test:any;
 /*
 test('renders learn react link', () => {
@@ -142,11 +138,38 @@ describe("GET / ", () => {
     const response = await request(app).get("/api/fares?sourcestation=F01&destinationstation=N01")
     expect(response.body).toEqual(fares_test)
   });
-/*
+
+  test('/api/entrances', async () => {
+    await backend.delay(500)
+    await get_fare_info("F01","N01")
+    const response = await request(app).get("/api/entrances?station=A01")
+    expect(response.body).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        Name: expect.any(String), 
+        Description: expect.any(String), 
+        Lat: expect.any(Number),
+        Lon: expect.any(Number),
+        Type: expect.any(String)
+      })
+    ]))
+  });
+
+  test('/api/busStop?stopid=1000031', async () => {
+    await backend.delay(500)
+    await get_fare_info("F01","N01")
+    const response = await request(app).get("/api/busStop?stopid=1000031")
+    expect(response.body).toEqual(expect.objectContaining({
+      name: "MARTIN LUTHER KING JR AVE SW + DARRINGTON ST SW", 
+      lat: expect.any(Number),
+      lon: expect.any(Number),
+      routes: expect.any(Array),
+    }))
+  });
+
   test('/api/bootstrap', async () => {
-   // await backend.delay(55000)
+    get_bus_route("A4")
     let isDone = false
-   // while(isDone === false){
+    while(isDone === false){
       const response = await request(app).get('/api/bootstrap')
       expect(response.body).toBeInstanceOf(Object)
       if(response.body.bus_routes === "SUCCESS"){
@@ -154,25 +177,28 @@ describe("GET / ", () => {
       }
       else {
         console.log(response.body.bus_routes + " --- Routes is not done. Retrying in 10 seconds")
-       // await backend.delay(10000)
+        await backend.delay(10000)
       }
-  //  }
+    }
   });
+
   test('/api/busRoute/direction1/stops?route=A4', async () => {
-    // await backend.delay(30000)
-      const response = await request(app).get("/api/busRoute/direction1/stops?route=A4")
-      expect(response.body).toEqual({error:"ummm... that wasn't a valid endpoint"})
+    await get_bus_route("A4");
+    const response = await request(app).get("/api/busRoute/direction1/stops?route=A4")
+    expect(response.body).toEqual(bus_route_test.Direction1.Stops)
   });
-  */
+
 })
 
+async function get_bus_route(route:string){
+  bus_route_test = await(await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route}&api_key=${process.env.WMATA_KEY}`)).json();
+}
 async function get_test_station_info(station:string){
   station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
 }
 
 async function get_fare_info(source:string, dest:string){
   var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
-  console.log("HEOOO", temp);
   fares_test = temp.StationToStationInfos[0].RailFare;
 }
 
