@@ -1,12 +1,16 @@
 import React from "react";
+import { AlertsOffCanvas } from "./shared-components/AlertsOffCanvas";
 import Navbar from "./shared-components/Navbar";
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
+import NextBusTable from "./shared-components/NextBusTable";
 
 export default function NextTrain() {
   const [station, setStation] = React.useState("");
   const [showResults, setResults] = React.useState(1);
   const [stationList, setStationList] = React.useState([]);
   const [isLoading, setLoading] = React.useState(1);
+  const [stopID, set_stopID] = React.useState("");
+  const [showBusResults, set_showBusResults] = React.useState(1);
 
   const list = (t:any, i:number) =>
   <option key={i} value={t}>{t}</option>;
@@ -33,6 +37,11 @@ export default function NextTrain() {
     setResults(0);
   }
 
+  const handleSubmit = (e:any) =>{
+    e.preventDefault();
+    set_showBusResults(0);
+  }
+
   React.useEffect(()=>{  
     setStation(station);
   },[station])
@@ -40,6 +49,7 @@ export default function NextTrain() {
   return (
     <div>
       <Navbar/>
+      <AlertsOffCanvas/>
       <div className="text-center">
         <div style={{height: "71px", backgroundColor: "white"}}></div>
         <h1 className="m-4">Next Arrivals</h1>
@@ -80,7 +90,13 @@ export default function NextTrain() {
             </div>
           </div>
           <div id="bus-next-arrival" className="tab-pane fade">
-            <h2>Bus arrivals not implemented</h2>
+            <form className="col-12 col-sm-8 col-lg-6 d-flex container text-center"  onSubmit={(e)=>handleSubmit(e)}>
+              <input type="text" className="form-control m-1 " id="exampleFormControlInput1" placeholder="" value={stopID} onChange={e=>set_stopID(e.target.value)}></input>
+              <button type="submit" className="btn btn-primary m-1 ">Search</button>
+            </form>
+            <div className="row m-0 mt-4" id="next-train-tables">
+              {showBusResults? null : <NextBusTable StopID={stopID}/>}
+            </div>
           </div>
         </div>
       </div>

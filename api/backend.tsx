@@ -22,6 +22,7 @@ export var lastUpdated = {
 
 export var bootstrap_status = { 
     bus_routes: "RUNNING",
+    bus_route_list: "RUNNING",
     bus_stops: "RUNNING",
   //  rail_stations: "RUNNING",
     next_train: "RUNNING",

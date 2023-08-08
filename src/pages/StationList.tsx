@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import Navbar from "./shared-components/Navbar";
 import Map from "./shared-components/Map";
 import Station from './Station';
+import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
 
 export default function StationList(props : any) {
   const [stationList, setStationList] = useState([]);
@@ -88,6 +89,7 @@ const listPlaceholder = (t: any, index:number) =>
   return (
     <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
+      <AlertsOffCanvas/>
       <div style={{height: "71px"}}></div>
       <div ref={elementRef}>
         <ul className="nav nav-tabs justify-content-center nav-fill d-md-none  nav-justified">

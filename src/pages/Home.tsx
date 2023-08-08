@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
 import Navbar from "./shared-components/Navbar";
 
 export default function Home() {
@@ -47,7 +48,6 @@ export default function Home() {
   
   return (
     <div className="background-logo"style={{height: "100%", backgroundColor: "white", zIndex: 0}}>
-      
       <div style={{zIndex: 20}}>
       <Navbar/>
       <div style={{height: "71px"}}></div>
@@ -67,14 +67,14 @@ export default function Home() {
             <Link to="/nexttrain" className="d-grid d-sm-inline-block m-1 gap-2">
               <button type="button" className="btn btn-primary">Next Arrivals</button>
             </Link>
-            <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" disabled> Bus Information</button>
+            <Link to="/busroutelist" className="d-grid d-sm-inline-block m-1 gap-2">
+              <button type="button" className="btn btn-primary"> Bus Information</button>
             </Link>
             <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
               <button type="button" className="btn btn-primary" disabled>Maps</button>
             </Link>
             <div className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">Alerts</button>
+              <button type="button" className="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
             </div>
           </div>
         </div>
@@ -88,6 +88,7 @@ export default function Home() {
         {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
         </div>
       </div>
+      <AlertsOffCanvas/>
       </div>
     </div>
   );
