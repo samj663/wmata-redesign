@@ -30,6 +30,7 @@ export var queueCounter: number = 0;
 export async function get_next_bus_data(stopID: string){
   let time = Date.now()
   let s = bus_stops.get(stopID)
+  if(s === undefined) return;
   if(s?.lastUpdated !== undefined && s?.lastUpdated !== null) {
     if(time - s.lastUpdated < 20000) return;
   }

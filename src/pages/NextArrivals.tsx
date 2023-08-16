@@ -10,7 +10,9 @@ export default function NextArrivals(props:any) {
   const [stationList, setStationList] = React.useState([]);
   const [isLoading, setLoading] = React.useState(1);
   const [stopID, set_stopID] = React.useState("");
+  const [active_stopID, set_active_stopID] = React.useState("");
   const [showBusResults, set_showBusResults] = React.useState(1);
+  const [invalid_stop, set_invalid_stop] = React.useState("");
 
   const list = (t:any, i:number) =>
   <option key={i} value={t}>{t}</option>;
@@ -39,6 +41,7 @@ export default function NextArrivals(props:any) {
 
   const handleSubmit = (e:any) =>{
     e.preventDefault();
+    set_active_stopID(stopID)
     set_showBusResults(0);
   }
 
@@ -95,11 +98,11 @@ export default function NextArrivals(props:any) {
             </div>
             <div id="bus-next-arrival" className={`tab-pane fade ${props.showBus} show`}>
               <form className="col-12 col-sm-8 col-lg-6 d-flex container text-center"  onSubmit={(e)=>handleSubmit(e)}>
-                <input type="text" className="form-control m-1 " id="exampleFormControlInput1" placeholder="" value={stopID} onChange={e=>set_stopID(e.target.value)}></input>
+                <input type="text" className={`form-control m-1 ${invalid_stop}`} id="exampleFormControlInput1" placeholder="" value={stopID} onChange={e=>set_stopID(e.target.value)}></input>
                 <button type="submit" className="btn btn-primary m-1 ">Search</button>
               </form>
               <div className="row m-0 mt-4" id="next-train-tables">
-                {showBusResults? null : <NextBusTable StopID={stopID}/>}
+                {showBusResults? null : <NextBusTable StopID={active_stopID}  set_showBusResults={set_showBusResults} set_invalid_stop={set_invalid_stop}/>}
               </div>
             </div>
           </div>

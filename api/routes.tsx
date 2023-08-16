@@ -249,7 +249,13 @@ app.get('/api/errorLog', function(request : any, response : any){
 app.get('/api/nextBus', async function(request : any, response : any){
     if(request.query.stopid !== undefined){
         await bus.get_next_bus_data(request.query.stopid)
-        response.json(bus.bus_stops.get(request.query.stopid))
+        var info = bus.bus_stops.get(request.query.stopid)
+        if(info === undefined){
+            response.json({error: "Stop not found"})
+        }
+        else{
+            response.json(info)
+        }
     }
     else response.json({error:"Invalid key"});
 });

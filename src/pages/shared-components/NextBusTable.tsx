@@ -14,13 +14,18 @@ export default function NextBusTable(props: any) {
 		fetch(`/api/nextBus?stopid=${props.StopID}`)
 		.then(res => res.json())
 		.then(value=>{
+			console.log("GOT A JSON")
 			if(value.error === undefined){
 				setBusList(value.nextBus)
 				timer.current.push(window.setTimeout(()=>{getNextBus()}, 10000))
 				setLoading(0);
+				props.set_invalid_stop("")
 				setError(1);
 			}
 			else if(value.error !== undefined){
+				console.log("ERROR FOUND")
+				props.set_invalid_stop("is-invalid")
+				props.set_showBusResults(1)
 				setError(0)
 		}
 		})
