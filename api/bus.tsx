@@ -76,7 +76,10 @@ export async function get_bus_routes(){
       else return true;
     });
 
+<<<<<<< HEAD
     await backend.delay(300)
+=======
+>>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
     backend.bootstrap_status.bus_route_list = "SUCCESS"
     for(const route of rawBus.Routes){
       var routeResponse = await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route.RouteID}&api_key=${key}`);
