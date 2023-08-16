@@ -90,11 +90,7 @@ const listPlaceholder = (t: any, index:number) =>
     <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
       <AlertsOffCanvas/>
-<<<<<<< HEAD
       <div style={{height: "61px"}}></div>
-=======
-      <div style={{height: "71px"}}></div>
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
       <div ref={elementRef}>
         <ul className="nav nav-tabs justify-content-center nav-fill d-md-none  nav-justified">
           <li className="nav-item">

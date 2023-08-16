@@ -47,13 +47,8 @@ export default function Home() {
     </div>;
   
   return (
-<<<<<<< HEAD
     <div className=" background-logo-new" style={{height: "100%", zIndex: 0}}>
    
-=======
-    <div className="background-logo"style={{height: "100%", backgroundColor: "white", zIndex: 0}}>
-      <div style={{zIndex: 20}}>
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
       <Navbar/>
       <div style={{height: "61px"}}></div>
       <div className="container-fluid text-center" style={{ zIndex: 2}}>
@@ -72,16 +67,11 @@ export default function Home() {
                 <div className="card-footer">Bus</div>
               </div>
             </Link>
-<<<<<<< HEAD
             <Link to="/nexttrain" className="d-inline-block m-2 gap-2 align-items-center card-custom">
               <div className="card text-white bg-primary card-custom">
                 <img src={require("../images/WMATA_PIDS_display.jpg")} className="card-img-top home-button-image card-image-custom" alt=""></img>
                 <div className="card-footer">Next Arrival</div>
               </div>
-=======
-            <Link to="/busroutelist" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary"> Bus Information</button>
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
             </Link>
             <Link to="/alerts" className="d-inline-block m-2 gap-2 align-items-center card-custom">
               <div className="card text-white bg-primary card-custom">
@@ -89,12 +79,6 @@ export default function Home() {
                 <div className="card-footer">Alerts</div>
               </div>
             </Link>
-<<<<<<< HEAD
-=======
-            <div className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
-            </div>
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
           </div>
         </div>
       </div>

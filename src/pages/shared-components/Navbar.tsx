@@ -32,11 +32,7 @@ function Navbar() {
             </Link>
             <ul className="dropdown-menu">
               <li><Link to="/busroutelist" className="dropdown-item">Routes</Link></li>
-<<<<<<< HEAD
               <li><Link to="/nextbus" className="dropdown-item">Next Bus</Link></li>
-=======
-              <li><Link to="/*" className="dropdown-item">Next Bus</Link></li>
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
               <li><hr className="dropdown-divider"></hr></li>
               <li><Link to="/" className="dropdown-item disabled" >Something else here</Link></li>
             </ul>
@@ -47,14 +43,6 @@ function Navbar() {
             </Link>
           </li>
           <li className="nav-item">
-<<<<<<< HEAD
-=======
-            <Link to="/" className="nav-link disabled" aria-current="page">
-              Maps
-            </Link>
-          </li>
-          <li className="nav-item">
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
             <button className="nav-link" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
           </li>
         </ul>

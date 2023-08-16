@@ -14,24 +14,13 @@ export default function NextBusTable(props: any) {
 		fetch(`/api/nextBus?stopid=${props.StopID}`)
 		.then(res => res.json())
 		.then(value=>{
-<<<<<<< HEAD
 			if(value.error === undefined){
 				setBusList(value.nextBus)
-=======
-			console.log(value)
-			if(value.error === undefined){
-				setBusList(value.nextBus)
-				console.log("jovrif");
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
 				timer.current.push(window.setTimeout(()=>{getNextBus()}, 10000))
 				setLoading(0);
 				setError(1);
 			}
 			else if(value.error !== undefined){
-<<<<<<< HEAD
-=======
-				console.log("IBGRVNO");
->>>>>>> e6bcdfd5a31abda072b4276b9480be337f6621de
 				setError(0)
 		}
 		})
