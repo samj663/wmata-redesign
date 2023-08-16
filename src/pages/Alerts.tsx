@@ -63,11 +63,11 @@ export default function Alerts() {
 
   return (
     <div className="m-4 text-center">
-        <Navbar/>
-        <div style={{height: "71px"}}></div>
-        <h1 className="mb-4 text-center">Alerts</h1>
-        {isThereAlerts()}
-        {/*!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)*/}
+      <Navbar/>
+      <div style={{height: "61px"}}></div>
+      <h1 className="mb-4 text-center">Alerts</h1>
+      {isThereAlerts()}
+      {/*!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)*/}
     </div>
   );
 }

@@ -3,12 +3,13 @@ import React, { useState, useEffect, useRef} from 'react';
 import Navbar from "./shared-components/Navbar";
 import Map from "./shared-components/Map";
 import Station from './Station';
+import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
 
 export default function StationList(props : any) {
   const [stationList, setStationList] = useState([]);
   const [lat, setLat] = useState(38.89834);
   const [lon, setLon] = useState(-77.021851);
-  const [zoom, setZoom] = useState(12);
+  const [zoom, setZoom] = useState(11);
   const [station, setStation] = useState("");
   const [geojson_markers, setMarkers] = useState(null);
   const [height, setHeight] = useState(0);
@@ -43,7 +44,7 @@ const listPlaceholder = (t: any, index:number) =>
       setMarkers(null);
       setLat(38.89834);
       setLon(-77.021851);
-      setZoom(12);
+      setZoom(11);
     }
   },[station,lat, lon, geojson_markers, zoom])
 
@@ -88,7 +89,8 @@ const listPlaceholder = (t: any, index:number) =>
   return (
     <div style={{height: "100%", backgroundColor: "white"}}>
       <Navbar/>
-      <div style={{height: "71px"}}></div>
+      <AlertsOffCanvas/>
+      <div style={{height: "61px"}}></div>
       <div ref={elementRef}>
         <ul className="nav nav-tabs justify-content-center nav-fill d-md-none  nav-justified">
           <li className="nav-item">

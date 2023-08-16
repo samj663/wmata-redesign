@@ -148,7 +148,6 @@ app.get('/api/busStop', function(request : any, response : any){
     }
     else response.json(bus.bus_stops.get(request.query.stopid));
 });
-
 app.get('/api/busRoute', function(request : any, response : any){
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
@@ -157,6 +156,19 @@ app.get('/api/busRoute', function(request : any, response : any){
         response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route));
+});
+
+app.get('/api/busRouteList', function(request : any, response : any){
+    if(backend.bootstrap_status.bus_route_list === "RUNNING"){
+        response.json({error:"System is booting up. Please try again later."})
+    }
+    else if(backend.bootstrap_status.bus_route_list === "ERROR"){
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
+    }
+    else {
+
+        response.json(bus.bus_route_list)
+    };
 });
 
 app.get('/api/busRoute/direction0', function(request : any, response : any){
@@ -187,6 +199,32 @@ app.get('/api/busRoute/direction1', function(request : any, response : any){
         response.json({error:"System ran into error fetching bus routes. Please try again later."})
     }
     else response.json(bus.bus_routes.get(request.query.route)?.paths.Direction1);
+});
+
+app.get('/api/busRoute/:route/direction/:directionNum/stops/:onlyStops', function(request : any, response : any){
+    if(backend.bootstrap_status.bus_routes === "RUNNING"){
+        response.json({error:"System is booting up. Please try again later."})
+    }
+    else if(backend.bootstrap_status.bus_routes === "ERROR"){
+        response.json({error:"System ran into error fetching bus routes. Please try again later."})
+    }
+    else {
+        if(request.params.directionNum === '0'){
+            if(request.params.onlyStops === 'true'){
+                response.json(bus.bus_routes.get(request.params.route)?.paths.Direction0.Stops);
+            }
+            else response.json(bus.bus_routes.get(request.params.route)?.paths.Direction0);
+        }
+        else if(request.params.directionNum === '1'){
+            if(request.params.onlyStops === 'true'){
+                response.json(bus.bus_routes.get(request.params.route)?.paths.Direction1.Stops)
+            }
+            else response.json(bus.bus_routes.get(request.params.route)?.paths.Direction1);
+        }
+        else{
+            response.json(bus.bus_routes.get(request.params.route));
+        }
+    }
 });
 
 app.get('/api/busRoute/direction1/stops', function(request : any, response : any){

@@ -28,3 +28,4 @@ yarn-error.log*
 /src/App.test.tsx
 /package-lock.json
 /src/pages/shared-components/Metro_Lines_Regional.json
+/api/gtfs

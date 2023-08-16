@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color:white;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -154,14 +154,12 @@ code {
 }
 
 .mapboxgl-canvas {
-
   height: 100%;
-
 }
-
-@media (min-height: 100px){
+/*
+@media (max-width: 10000px){
   .background-logo{
-    background-image:  radial-gradient(rgba(255,255,255,0.65)20%,rgba(255,255,255,1)70%), url('./images/testing.png');
+    background-image:  radial-gradient(rgba(255,255,255,0.8)20%,rgba(255,255,255,1)70%), url('./images/testing.png');
     background-size: 1000px;
     background-repeat:no-repeat;
     background-position: bottom -320px right -350px;
@@ -171,22 +169,139 @@ code {
   background-size: 1000px;
   background-repeat:no-repeat;
   background-position: bottom -320px right -350px;
-}*/
+}
 
-@media (max-height: 1000px) {  
+@media (max-width: 1000px) {  
   .background-logo{
-    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('./images/testing.png') ;
+    background-image: radial-gradient(rgba(255,255,255,0.8)20%,rgba(255,255,255,1)70%), url('./images/testing.png') ;
     background-size: 750px;
     background-repeat:no-repeat;
     background-position: bottom -240px right -262.5px;
   }
 }
 
-@media (max-height: 700px) {  
+@media (max-width: 500px) {  
   .background-logo{
-    background-image: linear-gradient(to right bottom, rgba(255,255,255,1),rgba(255,255,255,0)), url('./images/testing.png') ;
-    background-size: 500px;
+    background-image: radial-gradient(rgba(255,255,255,0.8)20%,rgba(255,255,255,1)70%), url('./images/testing.png') ;
+    background-size: 400px;
     background-repeat:no-repeat;
-    background-position: bottom -160px right -175px;
+    background-position: bottom -128px right -140px;
   }
+}
+
+.home-button-rail {
+  width: 300px;
+  height: 250px;
+  margin: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+}*/
+
+.home-button-image{
+  width: 100%;
+  height: 100%;
+  filter: grayscale(1);
+  z-index: 1;
+  position:relative;
+}
+/*
+.home-button{
+  width: 300px;
+  height: 50px;
+  background-color: rgb(0, 94, 255);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  color: white;
+}
+
+.home-button-image-overlay{
+  background-color:rgba(0, 94, 255, 0.336);
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  position:absolute;
+}
+
+.home-button-image-container{
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  position:relative;
+}
+
+.home-button-image-container:hover {
+  cursor: pointer;
+  background-color: rgba(173, 215, 230, 0.0);
+}
+
+.home-button-image-container:hover .home-button-image{
+  filter: hue-rotate(0deg);
+  background-size: cover;
+}
+
+.home-button-image-container:hover .home-button-image-overlay{
+  background-color: rgba(173, 215, 230, 0.0);
+}*/
+
+.card-custom{
+  width: 18rem;
+  overflow: hidden;
+  
+}
+/*
+@keyframes hover{
+  from { filter: grayscale(1);
+    opacity: 0.4;}
+  to { filter: grayscale(0);
+    opacity: 1;}
+}
+*/
+.card-custom:hover .card-image-custom{
+  filter: grayscale(0);
+  opacity: 1;
+  transition: 0.4s;
+}
+/*
+.card-image-overlay-custom{
+  background: black;
+  overflow: hidden;
+  background: #C33764;  /* fallback colour. Make sure this is just one solid colour. 
+  background: -webkit-linear-gradient(rgba(29, 38, 113, 0.8), rgba(195, 55, 100, 0.8));
+  background: linear-gradient(rgba(29, 38, 113, 0.8)); /* The least supported option. 
+}*/
+
+.card-image-custom{
+  height: 12rem;
+  width: 100%;
+  opacity: 0.7;
+  object-fit: cover;
+  animation: hover-container 4s;
+}
+
+
+@media (max-width: 576px) {
+  .card-image-custom{
+    height: 7rem;
+    width: 100%;
+  }
+  .card-custom{
+    width: 11rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .card-image-custom{
+    height: 5rem;
+    width: 100%;
+  }
+  .card-custom{
+    width: 9rem;
+  }
+}
+
+.background-logo-new{
+  background-color: white;
 }

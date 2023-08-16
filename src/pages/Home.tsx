@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
 import Navbar from "./shared-components/Navbar";
 
 export default function Home() {
@@ -46,36 +47,38 @@ export default function Home() {
     </div>;
   
   return (
-    <div className="background-logo"style={{height: "100%", backgroundColor: "white", zIndex: 0}}>
-      
-      <div style={{zIndex: 20}}>
+    <div className=" background-logo-new" style={{height: "100%", zIndex: 0}}>
+   
       <Navbar/>
-      <div style={{height: "71px"}}></div>
-      <div className="container-fluid text-center">
+      <div style={{height: "61px"}}></div>
+      <div className="container-fluid text-center" style={{ zIndex: 2}}>
         <h1 className="mt-5 mb-5">WMATA Information Hub</h1>
         <div className="row align-items-center">
-          <div className="col-12 col-sm-8 col-lg-6 d-flex container text-center">
-            <input type="email" className="form-control m-1 " id="exampleFormControlInput1" placeholder="Search bar not functional yet" disabled></input>
-            <button type="button" className="btn btn-primary m-1 " disabled>Search</button>
-          </div>
-        </div>
-        <div className="row">
-          <div className="d-grid d-sm-inline-block container text-center mt-5" >
-            <Link to="/Stationlist" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary">Station Information</button>
+          <div className="d-inline-block container text-center" >
+            <Link to="/stationlist" className="d-inline-block m-2 align-items-center card-custom">
+              <div className="card text-white bg-primary card-custom">
+                <img src={require("../images/greenline_metro_800_525_90.jpg")} className="card-img-top home-button-image card-image-custom" alt=""></img>
+                <div className="card-footer">Rail</div>
+              </div>
             </Link>
-            <Link to="/nexttrain" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary">Next Arrivals</button>
+            <Link to="/busroutelist" className="d-inline-block m-2 gap-2 align-items-center card-custom">
+              <div className="card text-white bg-primary card-custom">
+                <img src={require("../images/WMATA_2006_Orion_VII_CNG_30_ft.JPG")} className="card-img-top home-button-image card-image-custom" alt=""></img>
+                <div className="card-footer">Bus</div>
+              </div>
             </Link>
-            <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" disabled> Bus Information</button>
+            <Link to="/nexttrain" className="d-inline-block m-2 gap-2 align-items-center card-custom">
+              <div className="card text-white bg-primary card-custom">
+                <img src={require("../images/WMATA_PIDS_display.jpg")} className="card-img-top home-button-image card-image-custom" alt=""></img>
+                <div className="card-footer">Next Arrival</div>
+              </div>
             </Link>
-            <Link to="/" className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" disabled>Maps</button>
+            <Link to="/alerts" className="d-inline-block m-2 gap-2 align-items-center card-custom">
+              <div className="card text-white bg-primary card-custom">
+                <img src={require("../images/WMATA_PM35_at_Eisenhower_Avenue.jpg")} className="card-img-top home-button-image card-image-custom" alt=""></img>
+                <div className="card-footer">Alerts</div>
+              </div>
             </Link>
-            <div className="d-grid d-sm-inline-block m-1 gap-2">
-              <button type="button" className="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">Alerts</button>
-            </div>
           </div>
         </div>
       </div>
@@ -88,7 +91,20 @@ export default function Home() {
         {!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)}
         </div>
       </div>
+      <AlertsOffCanvas/>
       </div>
-    </div>
+    
   );
 }
+
+/*
+<div className="home-button-rail">
+            <div className="home-button"> Rail </div>
+            <div className="home-button-image-container">
+              <div className="home-button-image-overlay"></div>
+              <img src={require("../images/greenline_metro_800_525_90.jpg")} className="home-button-image"></img>
+            </div>
+          </div>
+
+          <button type="button" className="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
+*/

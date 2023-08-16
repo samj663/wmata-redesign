@@ -1,5 +1,5 @@
 import "../../style.css";
-import logo from "../../images/WMATA_Metro_Logo.svg.png";
+import logo from "../../images/traffic-39940_1280.png";
 import React from 'react';
 import { Link } from "react-router-dom";
 
@@ -27,12 +27,12 @@ function Navbar() {
             </ul>
           </li>
           <li className="nav-item dropdown">
-            <Link to="/" className="nav-link dropdown-toggle disabled" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <Link to="/" className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Bus
             </Link>
             <ul className="dropdown-menu">
-              <li><Link to="/Station" className="dropdown-item" state={{props: {station: "Anacostia"}}}>Stations</Link></li>
-              <li><Link to="/nexttrain" className="dropdown-item">Next Train</Link></li>
+              <li><Link to="/busroutelist" className="dropdown-item">Routes</Link></li>
+              <li><Link to="/nextbus" className="dropdown-item">Next Bus</Link></li>
               <li><hr className="dropdown-divider"></hr></li>
               <li><Link to="/" className="dropdown-item disabled" >Something else here</Link></li>
             </ul>
@@ -43,12 +43,7 @@ function Navbar() {
             </Link>
           </li>
           <li className="nav-item">
-            <Link to="/" className="nav-link disabled" aria-current="page">
-              Maps
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/alerts" className="nav-link">Alerts</Link>
+            <button className="nav-link" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
           </li>
         </ul>
       </div>

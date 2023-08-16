@@ -10,7 +10,7 @@ export default function Map(props : any) {
   const mapContainer = useRef(null);
   const [lng, setLng] = useState(0);
   const [lat, setLat] = useState(0);
-  const [zoom, setZoom] = useState(15);
+  const [zoom, setZoom] = useState(11);
   const [geojson_markers, setMarkers] = useState<any>(null)
   var  markerTracker : any = useRef([])
 
@@ -64,7 +64,6 @@ export default function Map(props : any) {
           markerTracker.current[i].remove();
       }
       markerTracker.current = [];
-//      map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
       return;
     }
     if(geojson_markers === null || props.station === "") return;
@@ -84,31 +83,24 @@ export default function Map(props : any) {
         setLat(features[0].geometry.coordinates[1])
       }
       for (const feature of geojson_markers!.features) {
-          const el = document.createElement('div');
-          if(feature.properties.type === "Elevator"){
-              el.className = 'elevator-marker';
-          }
-          else if(feature.properties.type === "Escalator"){
-              el.className = 'escalator-marker';
-          }
-          else el.className = 'marker';
-          var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
-          markerTracker.current.push(t);
+        const el = document.createElement('div');
+        if(feature.properties.type === "Elevator"){
+            el.className = 'elevator-marker';
+        }
+        else if(feature.properties.type === "Escalator"){
+            el.className = 'escalator-marker';
+        }
+        else el.className = 'marker';
+        var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
+        markerTracker.current.push(t);
       }
-    //  map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
     }
-    // 
- /*   map.current.on('click', 'station-circles', (e:any) => {
-        map.current.flyTo({
-        'center': e.features[0].geometry.coordinates,
-        'zoom': 16.5
-        });
-        });*/
-   map.current.on("click", () => {
-         map.current.flyTo({ 
-            'center': [lng,lat], 
-            'zoom': zoom || 16.5
-        });
+
+    map.current.on("click", () => {
+      map.current.flyTo({ 
+        'center': [lng,lat], 
+        'zoom': zoom || 16.5
+      });
     });
   },[props.lon, props.lat,lat,lng, props.markers, props.zoom, geojson_markers, props.station, zoom]);
   

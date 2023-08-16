@@ -18,6 +18,8 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 var key = process.env.WMATA_KEY
 export var bus_stops : ESMap<string, busStop>;
 export var bus_routes :ESMap<string, busRoute>;
+export var bus_route_list : any;
+export var bus_route_list_special : any;
 
 /**
  * When this is 0, run api call instantly.
@@ -69,9 +71,17 @@ export async function get_bus_routes(){
     var routesResponse = await fetch(`https://api.wmata.com/Bus.svc/json/jRoutes?api_key=${key}`);
     var rawBus = await routesResponse.json();
     console.log("Caching bus routes...")
+    bus_route_list = rawBus.Routes.filter((e:any)=>{
+      if(e.RouteID.includes("*") || e.RouteID.includes("/")) return false;
+      else return true;
+    });
+
+    await backend.delay(300)
+    backend.bootstrap_status.bus_route_list = "SUCCESS"
     for(const route of rawBus.Routes){
       var routeResponse = await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route.RouteID}&api_key=${key}`);
       var rawRoute = await routeResponse.json()
+      if(rawRoute.statusCode) if(rawRoute.statusCode == 429) console.log(rawRoute);
       const temp : busRoute = {
         name: route.Name,
         description: route.LineDescription,
@@ -79,10 +89,11 @@ export async function get_bus_routes(){
         paths: rawRoute
       }
       bus_routes.set(route.RouteID, temp);
-      await backend.delay(100)
+      await backend.delay(150)
     }
   } catch(e:any) {
-    backend.bootstrap_status.rail_alerts = "ERROR"
+    backend.bootstrap_status.bus_routes = "ERROR"
+    backend.bootstrap_status.bus_route_list ="ERROR"
     console.log("---- ERROR has been caught. Check Log ----")
     console.log(e)
     var error:error_template ={
@@ -116,7 +127,7 @@ export async function get_bus_stops(){
       bus_stops.set(stop.StopID, temp);
     }
   } catch(e:any){
-    backend.bootstrap_status.rail_alerts = "ERROR"
+    backend.bootstrap_status.bus_stops = "ERROR"
     console.log("---- ERROR has been caught. Check Log ----")
     console.log(e)
     var error:error_template ={
@@ -128,7 +139,7 @@ export async function get_bus_stops(){
     backend.error_log.push(error)
     return "ERROR"
 }
-  console.log("Bus stops cahced!")
+  console.log("Bus stops cached!")
   return "SUCCESS"
 }
 

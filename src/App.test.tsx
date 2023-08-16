@@ -13,24 +13,12 @@ jest.setTimeout(120000)
 var station_info_test:any;
 var bus_route_test:any;
 var fares_test:any;
-/*
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText("WMATA Information Hub");
-  expect(linkElement).toBeInTheDocument();
-});
 
-test('renders learn react link', () => {
-  render(<Station  station="Tysons"/>);
-  const linkElement = screen.getByText("Tysons");
-  expect(linkElement).toBeInTheDocument();
-});
-*/
 beforeAll(async() => {
   await backend.delay(2000)
 });
 
-describe("GET / ", () => {
+describe("Backend tests", () => {
   
   test("/api", async () => {
     await backend.delay(500)

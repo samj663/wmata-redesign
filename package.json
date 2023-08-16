@@ -10,7 +10,10 @@
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
     "cli-progress": "^3.12.0",
+    "decompress": "^4.2.1",
     "dotenv": "^16.1.3",
+    "fs": "^0.0.1-security",
+    "gtfs-realtime-bindings": "^1.1.1",
     "http-proxy-middleware": "^2.0.6",
     "linebyline": "^1.3.0",
     "mapbox-gl": "^2.14.1",
@@ -19,11 +22,12 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
+    "request": "^2.88.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "jest --detectOpenHandles --forceExit",
     "test-react-scripts": "react-scripts test",
@@ -56,6 +60,7 @@
     "@jest/globals": "^29.6.2",
     "@types/jest": "^29.5.3",
     "concurrently": "^8.2.0",
+    "react-test-renderer": "^18.2.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1"
   }
