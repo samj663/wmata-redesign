@@ -4,9 +4,17 @@ export default function NextBusTable(props: any) {
   const [busList, setBusList] = useState<any[]>([]);
   const [isLoading, setLoading] = useState(0);
 	const [error, setError] = useState(1);
-  const timer = useRef<number[]>([])
+	const timer = useRef<number[]>([])
 
-  const getNextBus = useCallback(async () => {
+	/**
+	 * These functions are used to keep track of any errors and alerts the
+	 * user outside this component. Since this component can be used without
+	 * these prop functions, we have to check if they were passed througn.
+	 */
+	const set_invalid_stop = props.set_invalid_stop ?  props.set_invalid_stop : null;
+	const set_showBusResults = props.set_showBusResults ? props.set_showBusResults : null;
+
+	const getNextBus = useCallback(async () => {
 		if(!busList.length ) setLoading(1);
 		for(const e of timer.current){
 			clearTimeout(e);
@@ -19,13 +27,13 @@ export default function NextBusTable(props: any) {
 				setBusList(value.nextBus)
 				timer.current.push(window.setTimeout(()=>{getNextBus()}, 10000))
 				setLoading(0);
-				props.set_invalid_stop("")
+				if(set_invalid_stop) set_invalid_stop("")
 				setError(1);
 			}
 			else if(value.error !== undefined){
 				console.log("ERROR FOUND")
-				props.set_invalid_stop("is-invalid")
-				props.set_showBusResults(1)
+				if(set_invalid_stop) set_invalid_stop("is-invalid");
+				if(set_showBusResults) set_showBusResults(1)
 				setError(0)
 		}
 		})
@@ -34,7 +42,7 @@ export default function NextBusTable(props: any) {
 			setLoading(0);
 			throw error;
 		});
-  },[props.StopID,timer, busList.length]);
+  },[props.StopID, timer, busList.length, set_invalid_stop, set_showBusResults]);
 
   useEffect(() => {
 		getNextBus();
