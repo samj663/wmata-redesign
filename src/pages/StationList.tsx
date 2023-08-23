@@ -4,8 +4,9 @@ import Navbar from "./shared-components/Navbar";
 import Map from "./shared-components/Map";
 import Station from './Station';
 import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
+import { API_URL } from '../tokens';
 
-export default function StationList(props : any) {
+export default function StationList() {
   const [stationList, setStationList] = useState([]);
   const [lat, setLat] = useState(38.89834);
   const [lon, setLon] = useState(-77.021851);
@@ -26,14 +27,14 @@ export default function StationList(props : any) {
     </td>
   </tr>;
 
-const listPlaceholder = (t: any, index:number) =>
-<tr key={index}>
-  <td>
-    <div className="placeholder-glow position-relative p-2">
-      <span className="placeholder col-9"></span>
-    </div>
-  </td>
-</tr>;
+  const listPlaceholder = (t: any, index:number) =>
+  <tr key={index}>
+    <td>
+      <div className="placeholder-glow position-relative p-2">
+        <span className="placeholder col-9"></span>
+      </div>
+    </td>
+  </tr>;
 
   useEffect(() => {
     setHeight(elementRef.current.clientHeight);
@@ -50,11 +51,13 @@ const listPlaceholder = (t: any, index:number) =>
 
   useEffect(()=>{
     if(!stationList) setLoading(1)
+    console.log("getting stationList")
     if(station === ""){
       try{
-        fetch(`/api/stationList`)
+        fetch(`${API_URL}/api/stationList`)
         .then(res => res.json())
         .then(value=>{
+          console.log(value);
           setStationList(Array.from(new Set(value.sort())));
           setLoading(0)
         })

@@ -4,8 +4,9 @@ import Navbar from "./shared-components/Navbar";
 import BusMap from './shared-components/BusMap';
 import BusRoute from './BusRoute';
 import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
+import { API_URL } from '../tokens';
 
-export default function BusRouteList(props: any){
+export default function BusRouteList(){
   const [routeList, setRouteList]= useState([]);
   const [route, setRoute] = useState("");
   const [isLoading, setLoading] = useState(1);
@@ -40,9 +41,9 @@ export default function BusRouteList(props: any){
 
   useEffect(()=>{
     if(!routeList) setLoading(1)
-    if(route === ""){
+    if(route === "" && routeList.length === 0){
       try{
-        fetch(`/api/busRouteList`)
+        fetch(`${API_URL}/api/busRouteList`)
         .then(res => res.json())
         .then(value=>{
           setRouteList(Array.from(new Set(value.sort())));
@@ -55,7 +56,7 @@ export default function BusRouteList(props: any){
         setLoading(0)
       }
     }
-  },[route])
+  },[route, routeList])
 
   function handleBusRouteList(){
     return(

@@ -1,10 +1,13 @@
 import React from "react";
+import { API_URL } from "../tokens";
 import { AlertsOffCanvas } from "./shared-components/AlertsOffCanvas";
 import Navbar from "./shared-components/Navbar";
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 import NextBusTable from "./shared-components/NextBusTable";
 
 export default function NextArrivals(props:any) {
+  var {showRail, showBus} = props;
+
   const [station, setStation] = React.useState("");
   const [showResults, setResults] = React.useState(1);
   const [stationList, setStationList] = React.useState([]);
@@ -23,7 +26,7 @@ export default function NextArrivals(props:any) {
 
   async function getNamesAndCodes(){
     var a2 : any = [];
-    await fetch('/api/stationList?get=names')
+    await fetch(`${API_URL}/api/stationList?get=names`)
     .then(res => res.json())
     .then(value=>{ a2 = value; setLoading(0)})
     .catch(function(error) {
@@ -61,15 +64,15 @@ export default function NextArrivals(props:any) {
           <div className="card-header">
             <ul className="nav justify-content-center nav-tabs nav-justified card-header-tabs nav-fill">
               <li className="nav-item">
-                <a className={`nav-link ${props.showRail}`} aria-current="page" href="#rail-next-arrivals" data-bs-toggle="tab">Rail Arrivals</a>
+                <a className={`nav-link ${showRail}`} aria-current="page" href="#rail-next-arrivals" data-bs-toggle="tab">Rail Arrivals</a>
               </li>
               <li className="nav-item">
-                <a className={`nav-link ${props.showBus}`} href="#bus-next-arrival" data-bs-toggle="tab">Bus Arrivals</a>
+                <a className={`nav-link ${showBus}`} href="#bus-next-arrival" data-bs-toggle="tab">Bus Arrivals</a>
               </li>
             </ul>
           </div>
           <div className="card-body tab-content">
-            <div id="rail-next-arrivals" className={`tab-pane fade ${props.showRail} show`}>
+            <div id="rail-next-arrivals" className={`tab-pane fade ${showRail} show`}>
               <div  className="container-fluid text-center">
                 <div className="row align-items-center justify-content-center">
                   <div className="col-xl-4 col-md-12">
@@ -96,7 +99,7 @@ export default function NextArrivals(props:any) {
                 </div>
               </div>
             </div>
-            <div id="bus-next-arrival" className={`tab-pane fade ${props.showBus} show`}>
+            <div id="bus-next-arrival" className={`tab-pane fade ${showBus} show`}>
               <form className="col-12 col-sm-8 col-lg-6 d-flex container text-center"  onSubmit={(e)=>handleSubmit(e)}>
                 <input type="text" className={`form-control m-1 ${invalid_stop}`} id="exampleFormControlInput1" placeholder="" value={stopID} onChange={e=>set_stopID(e.target.value)}></input>
                 <button type="submit" className="btn btn-primary m-1 ">Search</button>

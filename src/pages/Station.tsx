@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from 'react';
+import { API_URL } from '../tokens';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 
 export default function Station(props : any) {
@@ -54,7 +55,7 @@ export default function Station(props : any) {
   
   async function fetchStation(){
     getNamesAndCodes();
-    await fetch(`/api/stationInfo?station=${station}`)
+    await fetch(`${API_URL}/api/stationInfo?station=${station}`)
     .then(res => res.json())
     .then(value=>{
       setStationInfo(value)
@@ -114,7 +115,7 @@ export default function Station(props : any) {
     setLoading(1);
     let output : any = []
     for(const e of lines){
-      await fetch(`/api/alerts?line=${e}`)
+      await fetch(`${API_URL}/api/alerts?line=${e}`)
       .then(res => res.json())
       .then(value=>{
         if(value !== null){
@@ -144,7 +145,7 @@ export default function Station(props : any) {
 
   async function getNamesAndCodes(){
     var a2 : any = [];
-    await fetch('/api/stationList?get=names')
+    await fetch(`${API_URL}/api/stationList?get=names`)
     .then(res => res.json())
     .then(value=>{ a2 = value })
     .catch(function(error) {
@@ -171,7 +172,7 @@ export default function Station(props : any) {
   async function fetchFares(){
     if(stationInfo === undefined) return
     setFareLoading(1)
-    await fetch(`/api/fares?sourcestation=${stationInfo.Code}&destinationstation=${fare}`)
+    await fetch(`${API_URL}/api/fares?sourcestation=${stationInfo.Code}&destinationstation=${fare}`)
     .then(res=>res.json())
     .then(value=>{ setF(value) ; setFareLoading(0)})
     .catch(function(error) {

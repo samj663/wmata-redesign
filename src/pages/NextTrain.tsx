@@ -1,4 +1,5 @@
 import React from "react";
+import { API_URL } from "../tokens";
 import { AlertsOffCanvas } from "./shared-components/AlertsOffCanvas";
 import Navbar from "./shared-components/Navbar";
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
@@ -21,7 +22,7 @@ export default function NextTrain() {
 
   async function getNamesAndCodes(){
     var a2 : any = [];
-    await fetch('/api/stationList?get=names')
+    await fetch(`${API_URL}/api/stationList?get=names`)
     .then(res => res.json())
     .then(value=>{ a2 = value; setLoading(0)})
     .catch(function(error) {

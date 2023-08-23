@@ -1,27 +1,31 @@
-import React, { useState, useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
+import {REACT_APP_MAPBOX_STYLE_MONOCHROME} from "../../tokens"
 
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+
  
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
 
 export default function BusMap(props : any) {
+  var {line_path, direction1_path, route, stops, center_to, lon, lat, markers, zoom} = props
+
   var map : any = useRef(null);
   const mapContainer = useRef(null);
 
   useEffect(()=>{
     if(map.current == null) return;
     map.current.flyTo({
-      center: props.center_to,
+      center: center_to,
       zoom: 15
       })
-  },[props.center_to])
+  },[center_to])
 
   useEffect(()=>{
     if (map.current) return; // initialize map only once
     else{
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: process.env.REACT_APP_MAPBOX_STYLE,
+        style: REACT_APP_MAPBOX_STYLE_MONOCHROME,
         center: [-77.021851 ,38.89834 ],
         zoom: 12
       });
@@ -81,17 +85,17 @@ export default function BusMap(props : any) {
         map.current.resize()
       })
     }
-  },[props.lon, props.lat, props.markers, props.zoom])
+  },[lon, lat, markers, zoom])
 
 
   useEffect(()=>{
     if (!map.current) return; // initialize map only once
     var bounds : any;
-    if(props.line_path === null) return;
+    if(line_path === null) return;
     else if(map.current.getSource('path') !== undefined){
-      map.current.getSource('path').setData(props.line_path.data)
+      map.current.getSource('path').setData(line_path.data)
 
-      const coordinates = props.line_path.data.geometry.coordinates
+      const coordinates = line_path.data.geometry.coordinates
 
       bounds = new mapboxgl.LngLatBounds(coordinates[0],coordinates[0])
 
@@ -100,16 +104,16 @@ export default function BusMap(props : any) {
       map.current.fitBounds(bounds, { padding: 20 });
 
     }
-    if(props.stops === null) return ;
+    if(stops === null) return ;
     else if(map.current.getSource('stops') !== undefined){
-      console.log(props.stops)
-      map.current.getSource('stops').setData(props.stops.data)
+      console.log(stops)
+      map.current.getSource('stops').setData(stops.data)
       map.current.resize()
     }
     map.current.on("click", () => {
       map.current.fitBounds(bounds, { padding: 20 });
     });
-  },[props.line_path, props.direction1_path, props.route, props.stops])
+  },[line_path, direction1_path, route, stops])
 
   return (
     <div ref={mapContainer} className="map-container"></div>

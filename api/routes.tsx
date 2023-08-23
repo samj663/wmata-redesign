@@ -31,6 +31,7 @@ app.get('/api', function(request : any, response : any){
  * @returns json file containing array of train objecs. See "train" interface in interfaces_and_classes.tsx
  */
 app.get('/api/nextarrival', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.station == null){
         response.status(400).json({error: "Provide station"});
     }
@@ -64,6 +65,7 @@ app.get('/api/nextarrival', function(request : any, response : any){
  * @returns json with object that contains fare information. See "fares" interface in interfaces_and_classes.tsx
  */
 app.get('/api/fares', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.sourcestation == null && request.query.destinationstation == null){
         response.status(400).json({error:"Provide source and destination station"});
     }
@@ -82,6 +84,7 @@ app.get('/api/fares', function(request : any, response : any){
  * @return json with array of entrances. See "entrance" interface in interfaces_and_classes.tsx
  */
 app.get('/api/entrances', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.station == null){
         response.status(400).json({error:"Provide station"});
     }
@@ -94,6 +97,7 @@ app.get('/api/entrances', function(request : any, response : any){
 });
 
 app.get('/api/stationInfo', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.station == null){
         response.status(400).json({error:"Provide station"});
     }
@@ -106,6 +110,7 @@ app.get('/api/stationInfo', function(request : any, response : any){
 });
 
 app.get('/api/stationList', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     let code = rail.stationNames.getCode(request.query.station)!;
     let output = rail.stations.get(code)
     if(request.query.get === "codes")response.json(rail.stationNames.codeArray);
@@ -115,6 +120,7 @@ app.get('/api/stationList', function(request : any, response : any){
 });
 
 app.get('/api/alerts', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     let output = []
     if(request.query.line !== undefined){
         for(const e of rail.railAlerts){
@@ -136,10 +142,12 @@ app.get('/api/alerts', function(request : any, response : any){
  * @returns json object. See lastUpdated variable to see what's in the object
  */
 app.get('/api/lastupdate', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     response.json(backend.lastUpdated);
 });
 
 app.get('/api/busStop', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_stops === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -149,6 +157,7 @@ app.get('/api/busStop', function(request : any, response : any){
     else response.json(bus.bus_stops.get(request.query.stopid));
 });
 app.get('/api/busRoute', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -159,6 +168,7 @@ app.get('/api/busRoute', function(request : any, response : any){
 });
 
 app.get('/api/busRouteList', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_route_list === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -172,6 +182,7 @@ app.get('/api/busRouteList', function(request : any, response : any){
 });
 
 app.get('/api/busRoute/direction0', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -182,6 +193,7 @@ app.get('/api/busRoute/direction0', function(request : any, response : any){
 });
 
 app.get('/api/busRoute/direction0/stops', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -192,6 +204,7 @@ app.get('/api/busRoute/direction0/stops', function(request : any, response : any
 });
 
 app.get('/api/busRoute/direction1', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -202,6 +215,7 @@ app.get('/api/busRoute/direction1', function(request : any, response : any){
 });
 
 app.get('/api/busRoute/:route/direction/:directionNum/stops/:onlyStops', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -228,6 +242,7 @@ app.get('/api/busRoute/:route/direction/:directionNum/stops/:onlyStops', functio
 });
 
 app.get('/api/busRoute/direction1/stops', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(backend.bootstrap_status.bus_routes === "RUNNING"){
         response.json({error:"System is booting up. Please try again later."})
     }
@@ -238,15 +253,18 @@ app.get('/api/busRoute/direction1/stops', function(request : any, response : any
 });
 
 app.get('/api/bootstrap', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     response.json(backend.bootstrap_status);
 });
 
 app.get('/api/errorLog', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.key === process.env.ERROR_LOG_KEY) response.json(backend.error_log);
     else response.json({error:"Invalid key"});
 });
 
 app.get('/api/nextBus', async function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     if(request.query.stopid !== undefined){
         await bus.get_next_bus_data(request.query.stopid)
         var info = bus.bus_stops.get(request.query.stopid)
@@ -264,6 +282,7 @@ app.get('/api/nextBus', async function(request : any, response : any){
  * Catchall function to handle invalid endpoints.
  */
 app.get('/api/*', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
     response.json({error:"ummm... that wasn't a valid endpoint"});
 });
 

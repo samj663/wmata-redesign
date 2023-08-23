@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { API_URL } from '../../tokens';
 
-export function AlertsOffCanvas(props:any){
+export function AlertsOffCanvas(){
     const [alerts, setAlerts] = React.useState<any>([])
     React.useEffect(()=>{  
         getAlerts();
@@ -9,7 +9,7 @@ export function AlertsOffCanvas(props:any){
     
       async function getAlerts(){
         let output : any = []
-          await fetch(`/api/alerts`)
+          await fetch(`${API_URL}/api/alerts`)
           .then(res => res.json())
           .then(value=>{
             if(value !== null){

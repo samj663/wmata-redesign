@@ -77,12 +77,12 @@ export async function get_bus_routes(){
       else return true;
     });
 
-    await backend.delay(300)
+    await backend.delay(5000)
     backend.bootstrap_status.bus_route_list = "SUCCESS"
     for(const route of rawBus.Routes){
       var routeResponse = await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route.RouteID}&api_key=${key}`);
       var rawRoute = await routeResponse.json()
-      if(rawRoute.statusCode) if(rawRoute.statusCode == 429) console.log(rawRoute);
+      if(rawRoute.statusCode) if(rawRoute.statusCode == 429) console.log(rawRoute + route.RouteID);
       const temp : busRoute = {
         name: route.Name,
         description: route.LineDescription,
@@ -90,7 +90,7 @@ export async function get_bus_routes(){
         paths: rawRoute
       }
       bus_routes.set(route.RouteID, temp);
-      await backend.delay(150)
+      await backend.delay(250)
     }
   } catch(e:any) {
     backend.bootstrap_status.bus_routes = "ERROR"

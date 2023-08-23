@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef} from 'react';
+import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 
 import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
+mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 export default function Map(props : any) {
   var map : any = useRef(null);
@@ -15,6 +16,7 @@ export default function Map(props : any) {
   var  markerTracker : any = useRef([])
 
   useEffect(()=>{
+    console.log(REACT_APP_MAPBOX_KEY);
     setLng(props.lon);
     setLat(props.lat);
     setMarkers(props.markers);
@@ -24,7 +26,7 @@ export default function Map(props : any) {
     else{
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: process.env.REACT_APP_MAPBOX_STYLE,
+        style: REACT_APP_MAPBOX_STYLE,
         center: [-77.021851 ,38.89834 ],
         zoom: zoom
       });

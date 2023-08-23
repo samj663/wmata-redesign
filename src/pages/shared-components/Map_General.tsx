@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react';
 
-import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { API_URL } from '../../tokens';
 
 export default function NextBusTable(props: any) {
+	var {StopID, } = props
   const [busList, setBusList] = useState<any[]>([]);
   const [isLoading, setLoading] = useState(0);
 	const [error, setError] = useState(1);
@@ -19,7 +21,7 @@ export default function NextBusTable(props: any) {
 		for(const e of timer.current){
 			clearTimeout(e);
 		}
-		fetch(`/api/nextBus?stopid=${props.StopID}`)
+		fetch(`${API_URL}/api/nextBus?stopid=${StopID}`)
 		.then(res => res.json())
 		.then(value=>{
 			console.log("GOT A JSON")
@@ -42,11 +44,11 @@ export default function NextBusTable(props: any) {
 			setLoading(0);
 			throw error;
 		});
-  },[props.StopID, timer, busList.length, set_invalid_stop, set_showBusResults]);
+  },[StopID, timer, busList.length, set_invalid_stop, set_showBusResults]);
 
   useEffect(() => {
 		getNextBus();
-		const element = document.getElementById(props.StopID);
+		const element = document.getElementById(StopID);
     if(element) element.scrollIntoView();
 		var t = timer.current;
 		return()=>{
@@ -54,7 +56,7 @@ export default function NextBusTable(props: any) {
 				clearTimeout(e);
 			}
     }
-  },[props.StopID,timer, getNextBus]);
+  },[StopID,timer, getNextBus]);
   //DestinationName is full station while Destination is abbreviated
 	const trainList = (t: any, index:number) =>
 	<tr key={index}>

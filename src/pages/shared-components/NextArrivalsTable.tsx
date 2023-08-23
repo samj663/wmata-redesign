@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { API_URL } from '../../tokens';
 
 export default function NextArrivalsTable(props: any) {
+	var {station, group} = props;
   const [trains, setTrains] = useState<any[]>([]);
 	const [isLoading, setLoading] = useState(0);
   const timer = useRef<number[]>([])
@@ -10,12 +12,12 @@ export default function NextArrivalsTable(props: any) {
 		for(const e of timer.current){
 			clearTimeout(e);
 		}
-		fetch(`/api/nextarrival?station=${props.station}&group=${props.group}`)
+		fetch(`${API_URL}/api/nextarrival?station=${station}&group=${group}`)
 		.then(res => res.json())
 		.then(value=>{
 			if(value.error === undefined){
 				setTrains(value)
-				timer.current.push(window.setTimeout(()=>{getNextTrain()}, 10000))
+				timer.current.push(window.setTimeout(()=>{getNextTrain()}, 20000))
 			}
 			setLoading(0);
 		})
@@ -26,7 +28,7 @@ export default function NextArrivalsTable(props: any) {
     //	element!.scrollIntoView();
 			throw error;
 		});
-  },[props.group, props.station, timer, trains.length]);
+  },[group, station, timer, trains.length]);
 
   useEffect(() => {
 		getNextTrain();
@@ -38,7 +40,7 @@ export default function NextArrivalsTable(props: any) {
 				clearTimeout(e);
 			}
     }
-  },[props.station, props.group, timer, getNextTrain]);
+  },[station, group, timer, getNextTrain]);
   //DestinationName is full station while Destination is abbreviated
 	const trainList = (t: any, index:number) =>
 	<tr key={index}>

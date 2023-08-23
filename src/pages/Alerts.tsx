@@ -1,4 +1,5 @@
 import React from 'react';
+import { API_URL } from '../tokens';
 import Navbar from "./shared-components/Navbar";
 
 export default function Alerts() {
@@ -12,7 +13,7 @@ export default function Alerts() {
   async function getAlerts(){
     setLoading(1);
     let output : any = []
-      await fetch(`/api/alerts`)
+      await fetch(`${API_URL}/api/alerts`)
       .then(res => res.json())
       .then(value=>{
         if(value !== null){

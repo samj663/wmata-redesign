@@ -29,3 +29,12 @@ yarn-error.log*
 /package-lock.json
 /src/pages/shared-components/Metro_Lines_Regional.json
 /api/gtfs
+/src/tokens.tsx
+/functions
+/.firebase
+.env*
+/proxy
+.firebaserc
+*firebase*
+*.log
+*-old*

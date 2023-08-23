@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, useCallback} from 'react';
+import { API_URL } from '../tokens';
 import NextBusTable from './shared-components/NextBusTable';
 
 export default function BusRoute(props : any){
-	const [routeName, setRouteName] = useState(props.route)
+	var {set_center_to, route, set_active_stops, set_active_path, setRoute} = props
+
+	//const [routeName, setRouteName] = useState(route)
 	const [direction0, setDirection0] = useState(Object);
 	const [direction1, setDirection1] = useState(Object);
 	const [direction0_stops, set_direction0_stops] = useState([]);
@@ -17,9 +20,10 @@ export default function BusRoute(props : any){
 	const [isLoading, setLoading] = useState(1);
 
 	const handleClick = () =>{
-		props.setRoute('');
-		props.set_active_path(null)
+		setRoute('');
+		set_active_path(null)
 	}
+	
 
 	useEffect(() => {
 		setHeight(elementRef.current.clientHeight);
@@ -29,7 +33,7 @@ export default function BusRoute(props : any){
 	<tr key={index}  onClick={() => {
 		if(active_next_bus === t.StopID) set_active_next_bus(0)
 		else set_active_next_bus(t.StopID)
-		props.set_center_to([t.Lon,t.Lat])
+		set_center_to([t.Lon,t.Lat])
 	}}>
 		<td>
 			<div className="d-flex align-items-center position-relative justify-content-start" >
@@ -51,19 +55,14 @@ export default function BusRoute(props : any){
 		</td>
 	</tr>;
 
-	useEffect(() => {
-		setHeight(elementRef.current.clientHeight);
-		fetchRouteInfo()
-	}, [props.route]);
-
-	async function fetchRouteInfo(){
-		await fetch(`/api/busRoute?route=${props.route}`)
+	const fetchRouteInfo = useCallback(async () => {
+		await fetch(`${API_URL}/api/busRoute?route=${route}`)
 		.then(res => res.json())
 		.then(value=>{
 
 			setDirection0(value.paths.Direction0)
 			setDirection1(value.paths.Direction1)
-			setRouteName(value.name)
+	//		setRouteName(value.name)
 			if(value.paths.Direction0 !== null){
 				set_direction0_stops(value.paths.Direction0.Stops);
 				console.log(value.paths.Direction0.Stops)
@@ -94,6 +93,7 @@ export default function BusRoute(props : any){
 								'type': 'Point',
 								'coordinates': [e.Lon,e.Lat]
 							},
+							'properties': {stopID: e.StopID}
 						}
 					)
 				}
@@ -103,10 +103,10 @@ export default function BusRoute(props : any){
 						[e.Lon,e.Lat]
 					)
 				}
-				props.set_active_stops(stops0)
+				set_active_stops(stops0)
 				set_direction0_stops_geojson(stops0)
 				set_direction0_path(path0)
-				props.set_active_path(path0)
+				set_active_path(path0)
 			}
 			else{
 				set_direction0_stops([]);
@@ -162,7 +162,15 @@ export default function BusRoute(props : any){
 			setLoading(0)
 			throw error;
 		});
-	}
+	}, [route, set_active_path, set_active_stops]);
+
+
+	useEffect(() => {
+		setHeight(elementRef.current.clientHeight);
+		fetchRouteInfo()
+	},[fetchRouteInfo]);
+
+
 	function handleBusStopList(direction:any){
 		return(
 			<div className="align-items-start text-center" id="next-train-tables">
@@ -181,16 +189,16 @@ export default function BusRoute(props : any){
 	return(
 		<div className="" style={{height: "100%", backgroundColor: "white"}}>
 			<div ref={elementRef}>
-				<h3 className="text-center p-1 m-0">{routeName}</h3>
+				<h3 className="text-center p-1 m-0">{route}</h3>
 				<div  className="container d-flex sticky-top m-0 p-0" style={{backgroundColor: "white"}}>
 				<button type="button" className="d-inline btn btn-outline-primary btn-sm col-md-2 col-2" onClick={() => handleClick()}>{"Back"}</button>
 				<div className="col-md-6 col-6"></div>
 					<ul className="nav d-inline nav-underline justify-content-start col-md-4 col-4">
 						<li className="nav-item dropdown">
-							<a className="nav-link active dropdown-toggle text-center" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Directions</a>
+							<a className="nav-link active dropdown-toggle text-center" data-bs-toggle="dropdown" role="button" aria-expanded="false">Directions</a>
 							<ul className="dropdown-menu">
-								<a className="dropdown-item active" href="#direction0"  data-bs-toggle="tab" onClick={()=>{props.set_active_path(direction0_path); props.set_active_stops(direction0_stops_geojson)}}>{direction0 ? direction0.DirectionText : ""} TO {direction0 ? direction0.TripHeadsign : ""}</a>
-								<a className="dropdown-item" href="#direction1"  data-bs-toggle="tab" onClick={()=>{props.set_active_path(direction1_path); props.set_active_stops(direction1_stops_geojson)}}>{direction1 ? direction1.DirectionText : ""} TO {direction1 ? direction1.TripHeadsign : ""}</a>
+								<a className="dropdown-item active" href="#direction0"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction0_path); set_active_stops(direction0_stops_geojson)}}>{direction0 ? direction0.DirectionText : ""} TO {direction0 ? direction0.TripHeadsign : ""}</a>
+								<a className="dropdown-item" href="#direction1"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction1_path); set_active_stops(direction1_stops_geojson)}}>{direction1 ? direction1.DirectionText : ""} TO {direction1 ? direction1.TripHeadsign : ""}</a>
 							</ul>
 						</li>
 					</ul>
