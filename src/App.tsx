@@ -13,7 +13,6 @@ import NextBusTable from './pages/shared-components/NextBusTable';
  * @returns Component based on routing
  */
 const App = () => {
-  console.log(process.env.REACT_APP_PROXY_ADDR);
 
   return (
     <Router>

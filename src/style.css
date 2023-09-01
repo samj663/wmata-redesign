@@ -27,9 +27,7 @@
 .App-link {
   color: #61dafb;
 }
-.map-container {
-  height: 100%;
-  }
+
 
 @keyframes App-logo-spin {
   from {
@@ -55,7 +53,7 @@ html, body{
   background-color: white;
   height: 100%;
 }
-
+/*
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -63,7 +61,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+}*/
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -148,14 +146,25 @@ code {
   background-color: rgb(222,144,68);
   color: black;
 }
+
 .circle-table-margin{
   margin-left: auto;
   margin-right:auto;
 }
 
+.map-container {
+  height: 100%;
+  width: auto;
+}
+
+.mapboxgl-canvas-container {
+  height: 100%;
+}
+
 .mapboxgl-canvas {
   height: 100%;
 }
+
 /*
 @media (max-width: 10000px){
   .background-logo{

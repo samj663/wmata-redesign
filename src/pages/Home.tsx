@@ -48,7 +48,7 @@ export default function Home() {
     </div>;
   
   return (
-    <div className=" background-logo-new" style={{height: "100%", zIndex: 0}}>
+    <div className=" background-logo-new" style={{height: "100%", zIndex: 0, backgroundColor: "white"}}>
       <Navbar/>
       <div style={{height: "61px"}}></div>
       <div className="container-fluid text-center" style={{ zIndex: 2}}>

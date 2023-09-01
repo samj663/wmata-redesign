@@ -24,7 +24,6 @@ export default function NextBusTable(props: any) {
 		fetch(`${API_URL}/api/nextBus?stopid=${StopID}`)
 		.then(res => res.json())
 		.then(value=>{
-			console.log("GOT A JSON")
 			if(value.error === undefined){
 				setBusList(value.nextBus)
 				timer.current.push(window.setTimeout(()=>{getNextBus()}, 10000))
@@ -33,7 +32,6 @@ export default function NextBusTable(props: any) {
 				setError(1);
 			}
 			else if(value.error !== undefined){
-				console.log("ERROR FOUND")
 				if(set_invalid_stop) set_invalid_stop("is-invalid");
 				if(set_showBusResults) set_showBusResults(1)
 				setError(0)

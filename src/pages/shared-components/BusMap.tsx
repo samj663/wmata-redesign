@@ -27,8 +27,17 @@ export default function BusMap(props : any) {
         container: mapContainer.current,
         style: REACT_APP_MAPBOX_STYLE_MONOCHROME,
         center: [-77.021851 ,38.89834 ],
-        zoom: 12
+        zoom: 12,
+        attributionControl: false,
+        logoPosition: "top-right"
       });
+
+      let img = document.getElementById('map-tab');
+      if (img){
+        img.addEventListener('click', (event) => {
+          map.current.resize()
+        })
+      }
 
       map.current.on('idle',function(){ map.current.resize() })
 
@@ -106,7 +115,6 @@ export default function BusMap(props : any) {
     }
     if(stops === null) return ;
     else if(map.current.getSource('stops') !== undefined){
-      console.log(stops)
       map.current.getSource('stops').setData(stops.data)
       map.current.resize()
     }

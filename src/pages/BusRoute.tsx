@@ -4,8 +4,6 @@ import NextBusTable from './shared-components/NextBusTable';
 
 export default function BusRoute(props : any){
 	var {set_center_to, route, set_active_stops, set_active_path, setRoute} = props
-
-	//const [routeName, setRouteName] = useState(route)
 	const [direction0, setDirection0] = useState(Object);
 	const [direction1, setDirection1] = useState(Object);
 	const [direction0_stops, set_direction0_stops] = useState([]);
@@ -62,10 +60,8 @@ export default function BusRoute(props : any){
 
 			setDirection0(value.paths.Direction0)
 			setDirection1(value.paths.Direction1)
-	//		setRouteName(value.name)
 			if(value.paths.Direction0 !== null){
 				set_direction0_stops(value.paths.Direction0.Stops);
-				console.log(value.paths.Direction0.Stops)
 				var path0 : any = {
 					'type': 'geojson',
 					'data': {

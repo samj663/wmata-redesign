@@ -3,10 +3,8 @@ import { API_URL } from '../tokens';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 
 export default function Station(props : any) {
-  const [station, setStation] = useState(props.station);
+  var {station, lat, lon} = props
   const [stationInfo, setStationInfo] = useState<any>();
-  const [lat, setLat] = useState(0);
-  const [lon, setLon] = useState(0);
   const [f, setF] = useState<any>({PeakTime: 0, OffPeakTime: 0, SeniorDisabled: 0});
   const [fare, setFare] = useState('');
   const [fareList, setFareList] = useState([]);
@@ -15,6 +13,12 @@ export default function Station(props : any) {
   const [alerts, setAlerts] = useState<any>([]);
   const [isLoading, setLoading] = useState(1);
   const [isFareLoading, setFareLoading] = useState(0);
+
+  const setLon = props.setLon ?  props.setLon : null;
+	const setLat = props.setLat ? props.setLat : null;
+  const setMarkers = props.setMarkers ? props.setMarkers : null;
+  const setZoom = props.setZoom ? props.setZoom : null;
+  const setStation = props.setStation ? props.setStation : null;
 
   const list = (t:any, i:number) =>
     <option key={i} value={t}>{t}</option>
@@ -45,9 +49,9 @@ export default function Station(props : any) {
 
   useEffect(()=>{
   //  window.scrollTo({top: 0, behavior: 'smooth'})
-    setStation(props.station);
+ //   setStation(props.station);
     fetchStation();
-  },[props.station])
+  },[station])
 
   useEffect(()=>{  
     fetchFares();
@@ -59,10 +63,10 @@ export default function Station(props : any) {
     .then(res => res.json())
     .then(value=>{
       setStationInfo(value)
-      props.setLat(value.Lat);
-      props.setLon(value.Lon)
       setLat(value.Lat);
       setLon(value.Lon);
+      lat = value.Lat
+      lon = value.Lon
       setEntrances(value.entrances);
       setLines(value.lines);
 
@@ -97,8 +101,8 @@ export default function Station(props : any) {
             }
         })
       }
-      props.setMarkers(temp);
-      props.setZoom(16.5);
+      setMarkers(temp);
+      setZoom(16.5);
     })
     .catch(function(error) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
@@ -156,9 +160,9 @@ export default function Station(props : any) {
   }
 
   const handleClick = () =>{
-    props.setMarkers(null);
-    props.setZoom(16);
-    props.setStation('');
+    setMarkers(null);
+    setZoom(16);
+    setStation('');
   }
 
   const handleChange=(e:any)=>{

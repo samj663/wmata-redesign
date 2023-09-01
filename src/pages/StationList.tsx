@@ -38,7 +38,10 @@ export default function StationList() {
 
   useEffect(() => {
     setHeight(elementRef.current.clientHeight);
-  }, [height]);
+    window.addEventListener("resize", ()=>{
+      if(elementRef.current!== null) setHeight(elementRef.current.clientHeight);
+    });
+  },[elementRef]);
 
   useEffect(()=>{
     if(!station.length) {
@@ -51,13 +54,11 @@ export default function StationList() {
 
   useEffect(()=>{
     if(!stationList) setLoading(1)
-    console.log("getting stationList")
     if(station === ""){
       try{
         fetch(`${API_URL}/api/stationList`)
         .then(res => res.json())
         .then(value=>{
-          console.log(value);
           setStationList(Array.from(new Set(value.sort())));
           setLoading(0)
         })
@@ -90,13 +91,13 @@ export default function StationList() {
   }
 
   return (
-    <div style={{height: "100%", backgroundColor: "white"}}>
+    <div style={{height:`100%`, backgroundColor: "white"}}>
       <Navbar/>
       <AlertsOffCanvas/>
       <div style={{height: "61px"}}></div>
       <div ref={elementRef}>
         <ul className="nav nav-tabs justify-content-center nav-fill d-md-none  nav-justified">
-          <li className="nav-item">
+          <li id="map-tab" className="nav-item">
             <a className="nav-link" href="#map" data-bs-toggle="tab">Map</a>
           </li>
           <li className="nav-item">
@@ -104,7 +105,7 @@ export default function StationList() {
           </li>
         </ul>
       </div>
-      <div className="tab-content d-flex row m-0 p-0" style={{height: `calc(100% - 71px - ${height}px)`}}>
+      <div className="tab-content d-flex row m-0 p-0" style={{height: `calc(100% - 61px - ${height}px)`}}>
         <div id="map" className="col d-md-block tab-pane col-lg-6 col-md-6 m-0 p-0" style={{height: "100%"}}>
             <div className="m-0 p-0" style={{height: "100%"}}>
               <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
