@@ -64,7 +64,7 @@ export async function bootstrap_get_rail_alerts(){
 
     if(status ==="ERROR"){
         if(bootstrap_retry_counter.rail_alerts >= MAX_RETRY){
-            shutdown("Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_train_data");
+            shutdown("Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_rail_alerts");
         }
         else bootstrap_retry_counter.rail_alerts++;
         console.log("Bus stop caching ran into Error. Trying again in 10 seconds")

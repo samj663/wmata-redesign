@@ -7,7 +7,7 @@ import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
 import { API_URL } from '../tokens';
 
 export default function StationList() {
-  const [stationList, setStationList] = useState([]);
+  const [stationList, setStationList] = useState<any>();
   const [lat, setLat] = useState(38.89834);
   const [lon, setLon] = useState(-77.021851);
   const [zoom, setZoom] = useState(11);
@@ -17,15 +17,21 @@ export default function StationList() {
   const [isLoading, setLoading] = useState(1);
   const elementRef = useRef<any>(null);
 
-  const list = (t: string, index:number) =>
-  <tr key={index}  onClick={() => setStation(t)}>
-    <td>
-      <div className="position-relative p-2">
-        {t}
-        <div className={"small-station-circle"}></div>
+  const list = (t: any, index:number) =>
+  <tr key={index}  onClick={() => setStation(t[0])} style={{cursor: "pointer"}}>
+    <td className="d-flex justify-content-center cursor-pointer">
+      <div className="fw-medium position-relative p-2">
+        {t[0]}
+      </div>
+      <div className="d-flex justify-content-center align-items-center">
+        {t[1].map(lineCircles)}
       </div>
     </td>
   </tr>;
+
+  const lineCircles = (t: any, index:number) =>
+ 
+      <div className={"small-station-circle " + t}></div>
 
   const listPlaceholder = (t: any, index:number) =>
   <tr key={index}>
@@ -56,10 +62,21 @@ export default function StationList() {
     if(!stationList) setLoading(1)
     if(station === ""){
       try{
-        fetch(`${API_URL}/api/stationList`)
+        fetch(`${API_URL}/api/stationList?get=lines`)
         .then(res => res.json())
         .then(value=>{
-          setStationList(Array.from(new Set(value.sort())));
+          var temp = Object.entries(value)
+          temp.sort((x:any,y:any)=>{
+            if(x[0] < y[0]){
+              return -1
+            }
+            if(x[0] > y[0]){
+              return 1
+            }
+            return 0
+          })
+          console.log(Array.from(temp))
+          setStationList(temp);
           setLoading(0)
         })
       }

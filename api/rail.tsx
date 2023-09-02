@@ -42,6 +42,7 @@ export async function get_train_data(){
             trace: e.stack
         }
         backend.error_log.push(error)
+        setTimeout(get_train_data, 20000);
         return "ERROR"
     }
     backend.lastUpdated.next_train = trainResponse.headers.get('date');
@@ -166,6 +167,7 @@ function parseStations(stations: any[], fares: ESMap<string,ESMap<string,fares>>
     var temp_name_to_code = new Map<string,string>();
     var temp_code_array = [];
     var temp_name_array = [];
+    var temp_line_array = new Map<string,string[]>();
     var output = new Map<string, station>();
     if(stations !== null){
         for(const s of stations){
@@ -208,8 +210,9 @@ function parseStations(stations: any[], fares: ESMap<string,ESMap<string,fares>>
             }
         }
         output.set(e,s);
+        temp_line_array.set(s.Name,s.lines);
     }
-    stationNames = new stationCodeNameMap(temp_code_to_name, temp_name_to_code, temp_code_array, temp_name_array);
+    stationNames = new stationCodeNameMap(temp_code_to_name, temp_name_to_code, temp_code_array, temp_name_array, temp_line_array);
     return output;
 }
 

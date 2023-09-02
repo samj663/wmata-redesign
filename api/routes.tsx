@@ -115,6 +115,7 @@ app.get('/api/stationList', function(request : any, response : any){
     let output = rail.stations.get(code)
     if(request.query.get === "codes")response.json(rail.stationNames.codeArray);
     else if(request.query.get === "names")response.json(rail.stationNames.nameArray);
+    else if(request.query.get === "lines") response.json( Object.fromEntries(rail.stationNames.lineArray));
     else if(output === undefined) response.json(rail.stationNames.nameArray);
     else response.json(output);
 });

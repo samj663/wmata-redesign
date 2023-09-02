@@ -5,11 +5,13 @@ export class stationCodeNameMap{
     name: ESMap<string, string>;
     codeArray: string[]
     nameArray: string[];
-    constructor(code: ESMap<string, string>, name: ESMap<string, string>, codeArray: string[], nameArray: string[]){
+    lineArray: Map<string, any>;
+    constructor(code: ESMap<string, string>, name: ESMap<string, string>, codeArray: string[], nameArray: string[], lineArray:Map<string, any>){
         this.code = code;
         this.name = name;
         this.codeArray = codeArray;
         this.nameArray = nameArray;
+        this.lineArray = lineArray;
     }
     get(input: string): string | undefined{
         let c = this.code.get(input);
