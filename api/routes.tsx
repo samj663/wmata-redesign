@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 //--------------------------------------------------------------------
 
 app.get('/api', function(request : any, response : any){
-    response.send('This is the api backend')
+    response.send('This is the DC Metro API backend')
 });
 
 /**
@@ -38,21 +38,22 @@ app.get('/api/nextarrival', function(request : any, response : any){
     else{
         let code = rail.stationNames.getCode(request.query.station)!;
         let output =  rail.trains.get(code)
-        
-        if(rail.stations.get(code) === undefined){
-            response.json({error:"Invalid station"})
-            return;
+        if(output){
+            if(rail.stations.get(code) === undefined){
+                response.json({error:"Invalid station"})
+                return;
+            }
+            if(rail.stations.get(code)?.StationTogether1 !== '' && request.query.includeTransf == 'true'){
+                let temp = rail.trains.get(rail.stations.get(code)!.StationTogether1);
+                if(temp) output = output.concat(temp);
+            }
+                if (request.query.group === "1") response.json(output.filter(x=>x.Group === "1"));
+                else if (request.query.group === "2") response.json(output.filter(x=>x.Group === "2"));
+                else response.json(output);
         }
-        if( rail.stations.get(code)?.StationTogether1 !== ''){
-            let temp = rail.trains.get(rail.stations.get(code)!.StationTogether1);
-            output = output!.concat(temp!);
-        }
-
-        if(output === undefined) response.json({error:"No trains found"});
         else{
-            if (request.query.group === "1") response.json(output.filter(x=>x.Group === "1"));
-            else if (request.query.group === "2") response.json(output.filter(x=>x.Group === "2"));
-            else response.json(rail.trains.get(code));
+            response.json({error:"No trains found at station"})
+            return;
         }
     }
 });
@@ -73,7 +74,7 @@ app.get('/api/fares', function(request : any, response : any){
     let dest = rail.stationNames.getCode(request.query.destinationstation)!;
     let output = rail.stations.get(source)?.fares.get(dest);
 
-    if(output === undefined) response.status(404);
+    if(output === undefined) response.status(404).json({error:"Fare not found"});
 
     else response.json(output);
 });
@@ -276,7 +277,7 @@ app.get('/api/nextBus', async function(request : any, response : any){
             response.json(info)
         }
     }
-    else response.json({error:"Invalid key"});
+    else response.json({error:"Stop not found"});
 });
 
 /**

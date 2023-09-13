@@ -75,7 +75,6 @@ export default function StationList() {
             }
             return 0
           })
-          console.log(Array.from(temp))
           setStationList(temp);
           setLoading(0)
         })
@@ -92,13 +91,6 @@ export default function StationList() {
     return(
       <div className="row align-items-start text-center" id="next-train-tables">
         <table className="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col"  className="p-2">
-                <div className="position-relative p-2">Stations</div>
-              </th>
-            </tr>
-          </thead>
           <tbody>
             {isLoading ? Array.from(Array(10).keys()).map(listPlaceholder) : stationList.map(list)}
           </tbody>
@@ -118,7 +110,7 @@ export default function StationList() {
             <a className="nav-link" href="#map" data-bs-toggle="tab">Map</a>
           </li>
           <li className="nav-item">
-            <a className="nav-link active" aria-current="page" href="#info" data-bs-toggle="tab">Information</a>
+            <a className="nav-link active" aria-current="page" href="#info" data-bs-toggle="tab">Stations</a>
           </li>
         </ul>
       </div>

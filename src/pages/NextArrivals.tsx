@@ -7,7 +7,6 @@ import NextBusTable from "./shared-components/NextBusTable";
 
 export default function NextArrivals(props:any) {
   var {showRail, showBus} = props;
-
   const [station, setStation] = React.useState("");
   const [showResults, setResults] = React.useState(1);
   const [stationList, setStationList] = React.useState([]);
@@ -91,12 +90,7 @@ export default function NextArrivals(props:any) {
                 </div>
               </div>
               <div className="row m-0 mt-4" id="next-train-tables">
-                <div className="col-xl-6 col-md-12">
-                  {showResults? null : <NextArrivalsTable key={station + "1"} station={station} group="1"/>}
-                </div>
-                <div className="col-xl-6 col-md-12">
-                  {showResults? null : <NextArrivalsTable key={station + "2"} station={station} group="2"/>}
-                </div>
+                  {showResults? null : <NextArrivalsTable key={station + "1"} station={station} includeTransf="true"/>}
               </div>
             </div>
             <div id="bus-next-arrival" className={`tab-pane fade ${showBus} show`}>

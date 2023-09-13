@@ -43,13 +43,18 @@ export default function Station(props : any) {
     </div>
 
   useEffect(() => {
-    const element = document.getElementById('station-name-header');
-    element!.scrollIntoView();
+    const element = document.getElementById('info');
+    
+    if(element){
+      console.log("SCROLL")
+      element.scroll({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
   useEffect(()=>{
-  //  window.scrollTo({top: 0, behavior: 'smooth'})
- //   setStation(props.station);
     fetchStation();
   },[station])
 
@@ -194,7 +199,7 @@ export default function Station(props : any) {
 	}
 
   return (
-    <div  id="station-name-header" style={{height: "100%"}} className="p-md-3">
+    <div style={{height: "100%"}} className="p-md-3">
       <div className="d-md-flex  mt-md-0 mt-3 mb-md-0 mb-3">
         <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
           <h1 className="d-flex" >{station}</h1>
@@ -218,12 +223,7 @@ export default function Station(props : any) {
         </div>
       </div>
       <div className="row align-items-start" id="next-train-tables">
-        <div className="col-xl-6 col-md-12">
-          <NextArrivalsTable station={station} group="1"/>
-        </div>
-        <div className="col-xl-6 col-md-12">
-          <NextArrivalsTable station={station} group="2"/>
-        </div>
+          <NextArrivalsTable station={station} includeTransf="true"/>
       </div>
       <div className="container p-sm-4 text-center">
         <div className="row">
