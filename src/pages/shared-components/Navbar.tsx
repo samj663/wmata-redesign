@@ -1,4 +1,4 @@
-import "../../style.css";
+//import "../../style.css";
 import logo from "../../images/traffic-39940_1280.png";
 import React from 'react';
 import { Link } from "react-router-dom";

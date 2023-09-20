@@ -29,7 +29,6 @@ yarn-error.log*
 /package-lock.json
 /src/pages/shared-components/Metro_Lines_Regional.json
 /api/gtfs
-/src/tokens.tsx
 /functions
 /.firebase
 .env*
@@ -38,3 +37,7 @@ yarn-error.log*
 *firebase*
 *.log
 *-old*
+src/React.test.tsx
+babel.config.js
+jest.config.js
+package-lock.json

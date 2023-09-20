@@ -15,6 +15,7 @@ import NextBusTable from './pages/shared-components/NextBusTable';
 const App = () => {
 
   return (
+    <div className="App">
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/*" element={<div>Not a valid path. Will point to a "404 not found" page</div>} />
       </Routes>
     </Router>
+    </div>
   );
 };
 

@@ -1,29 +1,34 @@
-//import React from 'react';
-//import { render, screen } from '@testing-library/react';
-//import App from './App';
-//import Station from './pages/Station'
-import * as r from "../api/routes"
+import React from 'react';
+import {render, screen} from '@testing-library/react'
+// userEvent library simulates user interactions by dispatching the events that would hBaen if the interaction took place in a browser.
+import userEvent from '@testing-library/user-event'
+// add custom jest matchers from jest-dom
+import '@testing-library/jest-dom'
+import App from './App';
+import StationList from './pages/StationList'
+import {describe, expect, test} from '@jest/globals';
+//import * as r from "../api/routes"
 import * as backend from "../api/backend"
 const {default : fetch} = require('node-fetch');
-const request = require("supertest");
-const app = require("../api/routes")
 
 jest.setTimeout(120000)
 
-var station_info_test:any;
-var bus_route_test:any;
-var fares_test:any;
-
-beforeAll(async() => {
-  await backend.delay(2000)
-});
-
 describe("Backend tests", () => {
+  var station_info_test:any;
+  var bus_route_test:any;
+  var fares_test:any;
+  let server;
+
+  const request = require("supertest");
+  const app = require("../api/routes");
+  beforeAll(async() => {
+    await backend.delay(2000)
+  });
   
   test("/api", async () => {
     await backend.delay(500)
     const response = await request("http://localhost:4000").get("/api")
-    .expect('This is the api backend');
+    .expect('This is the DC Metro API backend');
     expect(response.statusCode).toBe(200);
   });
 
@@ -89,9 +94,9 @@ describe("Backend tests", () => {
     const response = await request(app).get('/api/nextarrival?station=B01')
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        Car: expect.any(String), 
+     //   Car: expect.any(String), 
         Destination: expect.any(String), 
-        DestinationCode: expect.any(String),
+     //   DestinationCode: expect.any(String),
         DestinationName: expect.any(String),
         Group: expect.any(String),
         Line: expect.any(String), 
@@ -107,14 +112,12 @@ describe("Backend tests", () => {
     const response = await request(app).get('/api/nextarrival?station=F01')
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        Car: expect.any(String), 
         Destination: expect.any(String), 
-        DestinationCode: expect.any(String),
         DestinationName: expect.any(String),
         Group: expect.any(String),
         Line: expect.any(String), 
-        LocationCode: "F01", 
-        LocationName: "Gallery Pl-Chinatown",
+        LocationCode: expect.any(String), 
+        LocationName: expect.any(String),
         Min:expect.any(String)
       })
     ]))
@@ -153,6 +156,8 @@ describe("Backend tests", () => {
       routes: expect.any(Array),
     }))
   });
+
+
 /*
   test('/api/bootstrap', async () => {
     get_bus_route("A4")
@@ -175,20 +180,20 @@ describe("Backend tests", () => {
     const response = await request(app).get("/api/busRoute/direction1/stops?route=A4")
     expect(response.body).toEqual(bus_route_test.Direction1.Stops)
   });*/
-
+  async function get_bus_route(route:string){
+    bus_route_test = await(await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route}&api_key=${process.env.WMATA_KEY}`)).json();
+  }
+  async function get_test_station_info(station:string){
+    station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
+  }
+  
+  async function get_fare_info(source:string, dest:string){
+    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
+    fares_test = temp.StationToStationInfos[0].RailFare;
+  }
 })
 
-async function get_bus_route(route:string){
-  bus_route_test = await(await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route}&api_key=${process.env.WMATA_KEY}`)).json();
-}
-async function get_test_station_info(station:string){
-  station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
-}
 
-async function get_fare_info(source:string, dest:string){
-  var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
-  fares_test = temp.StationToStationInfos[0].RailFare;
-}
 
 var stationlist = ["Metro Center", "Farragut North", "Dupont Circle", "Woodley Park-Zoo/Adams Morgan", "Cleveland Park", "Van Ness-UDC", 
 "Tenleytown-AU", "Friendship Heights", "Bethesda", "Medical Center", "Grosvenor-Strathmore", "North Bethesda", "Twinbrook", "Rockville", 

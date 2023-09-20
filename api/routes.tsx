@@ -32,6 +32,7 @@ app.get('/api', function(request : any, response : any){
  */
 app.get('/api/nextarrival', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=20');
     if(request.query.station == null){
         response.status(400).json({error: "Provide station"});
     }
@@ -67,6 +68,7 @@ app.get('/api/nextarrival', function(request : any, response : any){
  */
 app.get('/api/fares', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=604800');
     if(request.query.sourcestation == null && request.query.destinationstation == null){
         response.status(400).json({error:"Provide source and destination station"});
     }
@@ -86,6 +88,7 @@ app.get('/api/fares', function(request : any, response : any){
  */
 app.get('/api/entrances', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=604800');
     if(request.query.station == null){
         response.status(400).json({error:"Provide station"});
     }
@@ -99,6 +102,7 @@ app.get('/api/entrances', function(request : any, response : any){
 
 app.get('/api/stationInfo', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=604800');
     if(request.query.station == null){
         response.status(400).json({error:"Provide station"});
     }
@@ -112,6 +116,7 @@ app.get('/api/stationInfo', function(request : any, response : any){
 
 app.get('/api/stationList', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=31557600');
     let code = rail.stationNames.getCode(request.query.station)!;
     let output = rail.stations.get(code)
     if(request.query.get === "codes")response.json(rail.stationNames.codeArray);
@@ -123,6 +128,7 @@ app.get('/api/stationList', function(request : any, response : any){
 
 app.get('/api/alerts', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
+    response.set('Cache-Control', 'public, max-age=600');
     let output = []
     if(request.query.line !== undefined){
         for(const e of rail.railAlerts){

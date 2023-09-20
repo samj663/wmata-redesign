@@ -2,16 +2,15 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { API_URL } from '../../tokens';
 
 export default function NextArrivalsTable(props: any) {
-	var {station, group, includeTransf} = props;
+	var {station, group, includeTransf, lines} = props;
   const [trains, setTrains] = useState<any[]>([]);
-	const [isLoading, setLoading] = useState(0);
+	const [isLoading, setLoading] = useState(1);
   const [stationCode1, setStationCode1] = React.useState("");
   const [stationCode2, setStationCode2] = React.useState("");
   const [isTransf, setIsTransf] = React.useState(false);
   const timer = useRef<number[]>([])
 
   const getNextTrain = useCallback(async () => {
-		if(!trains.length ) setLoading(1);
 		for(const e of timer.current){
 			clearTimeout(e);
 		}
@@ -22,47 +21,48 @@ export default function NextArrivalsTable(props: any) {
 				setTrains(value)
 				timer.current.push(window.setTimeout(()=>{getNextTrain()}, 20000))
 			}
-			setLoading(0);
+		
       setIsTransf(false)
       if(trains.length > 0) { //Checks if station is a transfer station
-        var temp = trains[0].LocationCode
+        var temp = value[0].LocationCode
         setStationCode1(temp)
-        for(const e of trains){
+        for(const e of value){
           if(e.LocationCode !== temp){
             setIsTransf(true);
             setStationCode2(e.LocationCode)
           }
         }
       }
+      setLoading(0);
 		})
 		.catch(function(error) {
 			console.log('There has been a problem with your fetch operation: ' + error.message);
 			setLoading(0);
-	//		const element = document.getElementById('station-name-header');
-    //	element!.scrollIntoView();
       throw error;
     });
-  },[group, station, timer, trains.length]);
+  },[group, station, timer, includeTransf, trains.length]);
 
   useEffect(() => {
+    setLoading(1);
     getNextTrain();
     const element = document.getElementById('station-name-header');
     if(element) element.scrollIntoView();
     var t = timer.current;
+    
     return()=>{
       for(const e of t){
       clearTimeout(e);
 			}
     }
-  },[station, group, timer, getNextTrain]);
+  },[station, group, timer, getNextTrain, includeTransf]);
 
   //DestinationName is full station while Destination is abbreviated
 	const trainList = (t: any, index:number) =>
-	<tr key={index}>
-		<td className="text-center col-1"><div className={"circle-table-margin transfer-station-circle "+t.Line}>{t.Line}</div></td>
-		<td className="col-1">{t.Car}</td>
-		<td className="col-9">{t.DestinationName}</td>
-		<td className="col-1">{t.Min}</td>
+	<tr className="align-center"key={index}>
+		<td className="text-center col-1"><div className={"transfer-station-circle "+t.Line}>{t.Line}</div></td>
+		<td className="col-1 text-center align-center justify-content-center">{t.Car}</td>
+		<td className="col-9 align-center">{t.DestinationName}</td>
+		<td className="col-1 align-center">{t.Min}</td>
 	</tr>
 
 	const placeholder = (index: number) =>

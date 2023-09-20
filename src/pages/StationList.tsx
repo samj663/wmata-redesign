@@ -16,9 +16,10 @@ export default function StationList() {
   const [height, setHeight] = useState(0);
   const [isLoading, setLoading] = useState(1);
   const elementRef = useRef<any>(null);
+  const [lines, setLines] = useState<any>([])
 
   const list = (t: any, index:number) =>
-  <tr key={index}  onClick={() => setStation(t[0])} style={{cursor: "pointer"}}>
+  <tr key={index} onClick={() => {setStation(t[0]); setLines(t[1])}} style={{cursor: "pointer"}}>
     <td className="d-flex justify-content-center cursor-pointer">
       <div className="fw-medium position-relative p-2">
         {t[0]}
@@ -30,7 +31,6 @@ export default function StationList() {
   </tr>;
 
   const lineCircles = (t: any, index:number) =>
- 
       <div className={"small-station-circle " + t}></div>
 
   const listPlaceholder = (t: any, index:number) =>
@@ -122,7 +122,7 @@ export default function StationList() {
         </div>
         <div id="info" className="col tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
           <div className="" style={{height: "100%"}}>
-            {station.length ? <Station  station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
+            {station.length ? <Station lines={lines} station={station} setStation={setStation} setMarkers={setMarkers} setLat={setLat} setLon={setLon} setZoom={setZoom}/>  :  handleStationList()}
           </div>
         </div>
       </div>

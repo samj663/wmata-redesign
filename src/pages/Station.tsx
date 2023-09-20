@@ -1,19 +1,19 @@
-import React, { useState, useEffect} from 'react';
+import { useState, useEffect} from 'react';
 import { API_URL } from '../tokens';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 
 export default function Station(props : any) {
-  var {station, lat, lon} = props
+  var {station, lat, lon, lines} = props
   const [stationInfo, setStationInfo] = useState<any>();
   const [f, setF] = useState<any>({PeakTime: 0, OffPeakTime: 0, SeniorDisabled: 0});
   const [fare, setFare] = useState('');
   const [fareList, setFareList] = useState([]);
-  const [lines, setLines] = useState<any>([]);
   const [entrances, setEntrances] = useState<any>([]);
   const [alerts, setAlerts] = useState<any>([]);
   const [isLoading, setLoading] = useState(1);
   const [isFareLoading, setFareLoading] = useState(0);
 
+  //Checks if functions were passed through props
   const setLon = props.setLon ?  props.setLon : null;
 	const setLat = props.setLat ? props.setLat : null;
   const setMarkers = props.setMarkers ? props.setMarkers : null;
@@ -46,10 +46,8 @@ export default function Station(props : any) {
     const element = document.getElementById('info');
     
     if(element){
-      console.log("SCROLL")
       element.scroll({
         top: 0,
-        behavior: 'smooth'
       });
     }
   }, []);
@@ -73,7 +71,6 @@ export default function Station(props : any) {
       lat = value.Lat
       lon = value.Lon
       setEntrances(value.entrances);
-      setLines(value.lines);
 
       var temp : any = {
         type: 'FeatureCollection',
@@ -210,7 +207,7 @@ export default function Station(props : any) {
             {fareList.length ?
             <button type="button" className="btn btn-outline-primary btn-sm m-1" onClick={() => handleClick()}>{"Back"}</button>
             :
-            <div className="placeholder-glow"><button type="button" className="btn btn-outline-primary btn-sm m-1 placeholder"></button></div>
+            <div className="placeholder-glow"><button type="button" className="btn btn-outline-primary btn-sm m-1 placeholder">{"Back"}</button></div>
             }
           </div>
         </div>

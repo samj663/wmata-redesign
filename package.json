@@ -19,6 +19,7 @@
     "fs": "^0.0.1-security",
     "gtfs-realtime-bindings": "^1.1.1",
     "http-proxy-middleware": "^2.0.6",
+    "jest-environment-jsdom": "^29.7.0",
     "linebyline": "^1.3.0",
     "mapbox-gl": "^2.14.1",
     "node-fetch": "2.6.6",
@@ -39,7 +40,9 @@
     "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
     "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
     "compile": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react",
-    "backend": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react && node api/routes.js"
+    "backend": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react && node api/routes.js",
+    "deploy": "npm run build && firebase deploy --only hosting",
+    "react-test": "react-scripts test -- src/React.test.tsx"
   },
   "eslintConfig": {
     "extends": [
@@ -64,11 +67,15 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.22.19",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-typescript": "^7.22.5",
+    "@babel/preset-env": "^7.22.15",
+    "@babel/preset-typescript": "^7.22.15",
     "@jest/globals": "^29.6.2",
     "@types/jest": "^29.5.3",
+    "babel-jest": "^29.7.0",
     "concurrently": "^8.2.0",
+    "jest-transform-stub": "^2.0.0",
     "react-test-renderer": "^18.2.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1"
