@@ -59,7 +59,7 @@ export default function StationList() {
   },[station,lat, lon, geojson_markers, zoom])
 
   useEffect(()=>{
-    if(!stationList) setLoading(1)
+    setLoading(1)
     if(station === ""){
       try{
         fetch(`${API_URL}/api/stationList?get=lines`)

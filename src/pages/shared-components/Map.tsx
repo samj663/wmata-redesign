@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef} from 'react';
-import ReactDOM from 'react-dom';
+import { useEffect, useRef} from 'react';
+//import ReactDOM from 'react-dom';
 import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 
 import stations from "./Metro_Stations_Regional.json";
@@ -9,14 +9,14 @@ mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 export default function Map(props : any) {
   var map : any = useRef(null);
-  var {lon, lat, markers, zoom,station} = props
+  var {lon, lat, markers, zoom, station} = props
   const mapContainer = useRef(null);
  // const [lng, setLng] = useState(0);
 //  const [lat, setLat] = useState(0);
 //  const [zoom, setZoom] = useState(11);
 //  const [geojson_markers, setMarkers] = useState<any>(null)
   var  markerTracker : any = useRef([])
- 
+
   useEffect(()=>{
  //   setLng(props.lon);
 //    setLat(props.lat);
@@ -91,8 +91,9 @@ export default function Map(props : any) {
       });
 
       if(features.length > 0){
-        lon = features[0].geometry.coordinates[0]
-        lat = features[0].geometry.coordinates[1]
+
+     //   lon = features[0].geometry.coordinates[0]
+       // lat = features[0].geometry.coordinates[1]
       }
       for (const feature of markers!.features) {
         const el = document.createElement('div');
@@ -114,11 +115,8 @@ export default function Map(props : any) {
         'zoom': zoom || 16.5
       });
     });
-  },[lon, lat, markers, station, zoom]);
-  
-  useEffect(()=>{
-    
-  })
+  },[lon, lat, markers, station, zoom,props.station]);
+
   return (
     <div ref={mapContainer} className="map-container"></div>
   );

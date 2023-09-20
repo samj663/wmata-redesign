@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { API_URL } from '../../tokens';
 
 export default function NextArrivalsTable(props: any) {
-	var {station, group, includeTransf, lines} = props;
+	var {station, group, includeTransf} = props;
   const [trains, setTrains] = useState<any[]>([]);
 	const [isLoading, setLoading] = useState(1);
   const [stationCode1, setStationCode1] = React.useState("");

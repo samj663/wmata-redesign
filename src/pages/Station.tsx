@@ -1,9 +1,9 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useCallback} from 'react';
 import { API_URL } from '../tokens';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 
 export default function Station(props : any) {
-  var {station, lat, lon, lines} = props
+  var {station, lines} = props
   const [stationInfo, setStationInfo] = useState<any>();
   const [f, setF] = useState<any>({PeakTime: 0, OffPeakTime: 0, SeniorDisabled: 0});
   const [fare, setFare] = useState('');
@@ -12,6 +12,7 @@ export default function Station(props : any) {
   const [alerts, setAlerts] = useState<any>([]);
   const [isLoading, setLoading] = useState(1);
   const [isFareLoading, setFareLoading] = useState(0);
+  
 
   //Checks if functions were passed through props
   const setLon = props.setLon ?  props.setLon : null;
@@ -51,25 +52,20 @@ export default function Station(props : any) {
       });
     }
   }, []);
-
-  useEffect(()=>{
-    fetchStation();
-  },[station])
-
-  useEffect(()=>{  
-    fetchFares();
-  },[fare])
   
-  async function fetchStation(){
+  const fetchStation = useCallback(async () => {
     getNamesAndCodes();
+    var output = {lat: 0, lon: 0, markers: null, zoom: 0}
     await fetch(`${API_URL}/api/stationInfo?station=${station}`)
     .then(res => res.json())
     .then(value=>{
       setStationInfo(value)
+      output.lat = value.Lat;
+      output.lon = value.Lon;
       setLat(value.Lat);
       setLon(value.Lon);
-      lat = value.Lat
-      lon = value.Lon
+    //  lat = value.Lat
+     // lon = value.Lon
       setEntrances(value.entrances);
 
       var temp : any = {
@@ -79,7 +75,7 @@ export default function Station(props : any) {
             type: 'Feature',
             geometry: {
               type: 'Point',
-              coordinates: [lon, lat]
+              coordinates: [value.Lon, value.Lat]
             },
             properties: {
               type: "station",
@@ -105,32 +101,36 @@ export default function Station(props : any) {
       }
       setMarkers(temp);
       setZoom(16.5);
+      output.zoom = 16.5;
+      output.markers =temp;
     })
     .catch(function(error) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
     });
-  }
+    return output;
+  },[station, setLat, setLon, setMarkers, setZoom])
 
-  useEffect(()=>{  
-    setLoading(1);
-    getAlerts();
-  },[lines])
+  useEffect(()=>{
+    fetchStation();
+  },[fetchStation])
 
-  async function getAlerts(){
+  const getAlerts = useCallback(async () =>{
     setLoading(1);
-    let output : any = []
+    let output: any[] = []
     for(const e of lines){
+      let temp: any[] = [];
       await fetch(`${API_URL}/api/alerts?line=${e}`)
       .then(res => res.json())
       .then(value=>{
         if(value !== null){
           value.forEach((f:any)=>{
-            if(output.find((e:any) => e.IncidentID === f.IncidentID)) return;
-            else output.push(f);
+            if(temp.find((e:any) => e.IncidentID === f.IncidentID)) return;
+            else temp.push(f);
           })
         }
       })
+      output = output.concat(temp)
     }
     let temp:any = []
     for(const e of output){
@@ -147,7 +147,7 @@ export default function Station(props : any) {
     output = temp;
     setAlerts(output)
     setLoading(0);
-  }
+  },[lines])
 
   async function getNamesAndCodes(){
     var a2 : any = [];
@@ -175,7 +175,7 @@ export default function Station(props : any) {
   const linesServed = (value:any, index:any)=>
     <div className={"transfer-station-circle "+value} key={index+value} id={index+value}>{value} </div>;
 
-  async function fetchFares(){
+  const fetchFares = useCallback(async () =>{
     if(stationInfo === undefined) return
     setFareLoading(1)
     await fetch(`${API_URL}/api/fares?sourcestation=${stationInfo.Code}&destinationstation=${fare}`)
@@ -185,7 +185,17 @@ export default function Station(props : any) {
       console.log('There has been a problem with your fetch operation: ' + error.message);
       throw error;
     });
-  }
+  }, [fare, stationInfo])
+
+  useEffect(()=>{  
+    fetchFares();
+  },[fetchFares])
+
+   
+  useEffect(()=>{  
+    setLoading(1);
+    getAlerts();
+  },[getAlerts])
 
   function isThereAlerts(){
 		if(alerts.length > 0) return(alerts.map(alertsList));

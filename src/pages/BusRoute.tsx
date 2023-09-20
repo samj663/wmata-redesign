@@ -191,7 +191,7 @@ export default function BusRoute(props : any){
 				<div className="col-md-6 col-6"></div>
 					<ul className="nav d-inline nav-underline justify-content-start col-md-4 col-4">
 						<li className="nav-item dropdown">
-							<a className="nav-link active dropdown-toggle text-center" data-bs-toggle="dropdown" role="button" aria-expanded="false">Directions</a>
+							<a id="direction-dropdown" className="nav-link active dropdown-toggle text-center" data-bs-toggle="dropdown" role="button" aria-expanded="false" href="direction-dropdown">Directions</a>
 							<ul className="dropdown-menu">
 								<a className="dropdown-item active" href="#direction0"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction0_path); set_active_stops(direction0_stops_geojson)}}>{direction0 ? direction0.DirectionText : ""} TO {direction0 ? direction0.TripHeadsign : ""}</a>
 								<a className="dropdown-item" href="#direction1"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction1_path); set_active_stops(direction1_stops_geojson)}}>{direction1 ? direction1.DirectionText : ""} TO {direction1 ? direction1.TripHeadsign : ""}</a>
