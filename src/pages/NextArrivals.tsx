@@ -57,7 +57,7 @@ export default function NextArrivals(props:any) {
       <AlertsOffCanvas/>
       <div className="text-center">
         <div style={{height: "61px", backgroundColor: "white"}}></div>
-        <h1 className="m-4">Next Arrivals</h1>
+        <h1 id="page-header" aria-label="page header" className="m-4">Next Arrivals</h1>
         <div className="container">
         <div className="card">
           <div className="card-header">

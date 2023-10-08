@@ -1,0 +1,1 @@
+/** Will hold global variables for tests when needed */

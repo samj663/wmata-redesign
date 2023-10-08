@@ -1,10 +1,9 @@
 import {useEffect, useRef} from 'react';
-import {REACT_APP_MAPBOX_STYLE_MONOCHROME} from "../../tokens"
+import {REACT_APP_MAPBOX_STYLE_MONOCHROME, REACT_APP_MAPBOX_KEY} from "../../tokens"
 
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
- 
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
+mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 export default function BusMap(props : any) {
   var {line_path, direction1_path, route, stops, center_to, lon, lat, markers, zoom} = props

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+    <nav id="navbar" className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
       <Link to="/" className="navbar-brand align-text-end">
         <img src={logo} alt="Logo" width="35" height=" 24" className="d-inline-block align-text-center"></img>
@@ -23,7 +23,7 @@ function Navbar() {
               <li><Link to="/Stationlist" className="dropdown-item">Stations</Link></li>
               <li><Link to="/nexttrain" className="dropdown-item">Next Train</Link></li>
               <li><hr className="dropdown-divider"></hr></li>
-              <li><Link to="/" className="dropdown-item disabled" >Something else here</Link></li>
+              <li><Link to="/" className="dropdown-item disabled">Rail Map</Link></li>
             </ul>
           </li>
           <li className="nav-item dropdown">
@@ -34,7 +34,7 @@ function Navbar() {
               <li><Link to="/busroutelist" className="dropdown-item">Routes</Link></li>
               <li><Link to="/nextbus" className="dropdown-item">Next Bus</Link></li>
               <li><hr className="dropdown-divider"></hr></li>
-              <li><Link to="/" className="dropdown-item disabled" >Something else here</Link></li>
+              <li><Link to="/" className="dropdown-item disabled">Bus Map</Link></li>
             </ul>
           </li>
           <li className="nav-item">

@@ -15,7 +15,7 @@ import NextBusTable from './pages/shared-components/NextBusTable';
 const App = () => {
 
   return (
-    <div className="App">
+    <div className="main" style={{height: "100%"}}>
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />

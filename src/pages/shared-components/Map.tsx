@@ -1,5 +1,4 @@
 import { useEffect, useRef} from 'react';
-//import ReactDOM from 'react-dom';
 import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 
 import stations from "./Metro_Stations_Regional.json";
@@ -11,18 +10,9 @@ export default function Map(props : any) {
   var map : any = useRef(null);
   var {lon, lat, markers, zoom, station} = props
   const mapContainer = useRef(null);
- // const [lng, setLng] = useState(0);
-//  const [lat, setLat] = useState(0);
-//  const [zoom, setZoom] = useState(11);
-//  const [geojson_markers, setMarkers] = useState<any>(null)
   var  markerTracker : any = useRef([])
 
   useEffect(()=>{
- //   setLng(props.lon);
-//    setLat(props.lat);
-//    setMarkers(props.markers);
-//    setZoom(props.zoom);
-    
     if (map.current) return; // initialize map only once
     else{
       map.current = new mapboxgl.Map({
@@ -62,8 +52,6 @@ export default function Map(props : any) {
   },[lon, lat, markers, zoom])
 
   useEffect(() => {
-    
- //   setMarkers(props.markers);
     if (!map.current ) return; // wait for map to initialize
     map.current.resize();
     map.current.flyTo({ 
@@ -118,6 +106,6 @@ export default function Map(props : any) {
   },[lon, lat, markers, station, zoom,props.station]);
 
   return (
-    <div ref={mapContainer} className="map-container"></div>
+    <div ref={mapContainer} className="map-container" style={{height: "100%"}}></div>
   );
 }

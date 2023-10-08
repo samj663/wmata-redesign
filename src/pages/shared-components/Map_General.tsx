@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef} from 'react';
+import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
  
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
+mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 /**
  * props.layer
@@ -25,7 +26,7 @@ mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY;
  * {
  *    'id': unique name to identify source
  *    'type': what format the data is in. Will be set to geojson
- *    'data': geojson formated data
+ *    'data': geojson formatted data
  * }
  * @param props 
  * @returns 
@@ -47,7 +48,7 @@ export default function Map_General(props : any) {
     else{
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: process.env.REACT_APP_MAPBOX_STYLE,
+        style: REACT_APP_MAPBOX_STYLE,
         center: [-77.021851 ,38.89834 ],
         zoom: zoom
       });

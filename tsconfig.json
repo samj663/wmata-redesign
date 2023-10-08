@@ -25,7 +25,7 @@
     "src/pages",
     "src/**/*",
     "api"
-  ],
+, "src/tests/App.test.tsx", "jest.config-react.js"  ],
   "exclude": [
     "src/backend.js"
   ]

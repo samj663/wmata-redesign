@@ -140,7 +140,7 @@ export default function NextArrivalsTable(props: any) {
   }
 
   return(
-    <div>
+    <div id="next-arrival-tables">
       {handleTables()}
     </div>
   )

@@ -31,7 +31,7 @@ export default function StationList() {
   </tr>;
 
   const lineCircles = (t: any, index:number) =>
-      <div className={"small-station-circle " + t}></div>
+      <div key={index}className={"small-station-circle " + t}></div>
 
   const listPlaceholder = (t: any, index:number) =>
   <tr key={index}>
