@@ -18,11 +18,10 @@ export default function BusRoute(props : any){
 	const [isLoading, setLoading] = useState(1);
 
 	const handleClick = () =>{
-		setRoute('');
-		set_active_path(null)
+		if(setRoute) setRoute('');
+		if(set_active_path) set_active_path(null)
 	}
 	
-
 	useEffect(() => {
 		setHeight(elementRef.current.clientHeight);
 	  }, [height]);
@@ -31,7 +30,7 @@ export default function BusRoute(props : any){
 	<tr key={index}  onClick={() => {
 		if(active_next_bus === t.StopID) set_active_next_bus(0)
 		else set_active_next_bus(t.StopID)
-		set_center_to([t.Lon,t.Lat])
+		if(set_center_to) set_center_to([t.Lon,t.Lat])
 	}}>
 		<td>
 			<div className="d-flex align-items-center position-relative justify-content-start" >
@@ -99,10 +98,10 @@ export default function BusRoute(props : any){
 						[e.Lon,e.Lat]
 					)
 				}
-				set_active_stops(stops0)
+				if(set_active_stops) set_active_stops(stops0)
 				set_direction0_stops_geojson(stops0)
 				set_direction0_path(path0)
-				set_active_path(path0)
+				if(set_active_path) set_active_path(path0)
 			}
 			else{
 				set_direction0_stops([]);
@@ -182,6 +181,15 @@ export default function BusRoute(props : any){
 			</div>
 		)
 	}
+
+	const direction0_tab = ()=>{
+		if(set_active_path)set_active_path(direction0_path);
+		if(set_active_stops) set_active_stops(direction0_stops_geojson)}
+
+	const direction1_tab = ()=>{
+		if(set_active_path)set_active_path(direction1_path); 
+		if(set_active_stops)set_active_stops(direction1_stops_geojson)}
+
 	return(
 		<div className="" style={{height: "100%", backgroundColor: "white"}}>
 			<div ref={elementRef}>
@@ -193,8 +201,12 @@ export default function BusRoute(props : any){
 						<li className="nav-item dropdown">
 							<a id="direction-dropdown" className="nav-link active dropdown-toggle text-center" data-bs-toggle="dropdown" role="button" aria-expanded="false" href="direction-dropdown">Directions</a>
 							<ul className="dropdown-menu">
-								<a className="dropdown-item active" href="#direction0"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction0_path); set_active_stops(direction0_stops_geojson)}}>{direction0 ? direction0.DirectionText : ""} TO {direction0 ? direction0.TripHeadsign : ""}</a>
-								<a className="dropdown-item" href="#direction1"  data-bs-toggle="tab" onClick={()=>{set_active_path(direction1_path); set_active_stops(direction1_stops_geojson)}}>{direction1 ? direction1.DirectionText : ""} TO {direction1 ? direction1.TripHeadsign : ""}</a>
+								<a className="dropdown-item active" href="#direction0"  data-bs-toggle="tab" onClick={direction0_tab}>
+									{direction0 ? direction0.DirectionText : ""} TO {direction0 ? direction0.TripHeadsign : ""}
+								</a>
+								<a className="dropdown-item" href="#direction1"  data-bs-toggle="tab" onClick={direction1_tab}>
+									{direction1 ? direction1.DirectionText : ""} TO {direction1 ? direction1.TripHeadsign : ""}
+								</a>
 							</ul>
 						</li>
 					</ul>

@@ -9,7 +9,7 @@ import {stationCodeNameMap, train, fares, entrance, station, busStop, busRoute, 
 const {default : fetch} = require('node-fetch');
 const path = require('path');
 
-require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
+require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
 var key = process.env.WMATA_KEY
 export var stationNames : stationCodeNameMap;

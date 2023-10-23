@@ -3,14 +3,15 @@ import {describe, expect, test} from '@jest/globals';
 const {default : fetch} = require('node-fetch');
 import 'jest-extended';
 const request = require("supertest");
-
+const path = require('path');
+require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
 jest.setTimeout(20000)
 
 describe("Backend tests", () => {
   var station_info_test:any;
  // var bus_route_test:any;
   var fares_test:any;
-  const app = require("../../api/routes");
+  const app = require("../../api/build/routes");
 
   beforeAll(async() => {
     let count = 1;
@@ -130,7 +131,6 @@ describe("Backend tests", () => {
   });
 
   test('/api/entrances', async () => {
-    await get_fare_info("F01","N01")
     const response = await request(app).get("/api/entrances?station=A01")
     expect(response.body).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -144,7 +144,6 @@ describe("Backend tests", () => {
   });
 
   test('/api/busStop?stopid=1000031', async () => {
-    await get_fare_info("F01","N01")
     const response = await request(app).get("/api/busStop?stopid=1000031")
     expect(response.body).toEqual(expect.objectContaining({
       name: "MARTIN LUTHER KING JR AVE SW + DARRINGTON ST SW", 

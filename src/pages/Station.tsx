@@ -3,7 +3,8 @@ import { API_URL } from '../tokens';
 import NextArrivalsTable from "./shared-components/NextArrivalsTable";
 
 export default function Station(props : any) {
-  var {station, lines} = props
+  var {station} = props
+  const [lines, setLines] = useState<any>(props.lines)
   const [stationInfo, setStationInfo] = useState<any>();
   const [f, setF] = useState<any>({PeakTime: 0, OffPeakTime: 0, SeniorDisabled: 0});
   const [fare, setFare] = useState('');
@@ -12,7 +13,6 @@ export default function Station(props : any) {
   const [alerts, setAlerts] = useState<any>([]);
   const [isLoading, setLoading] = useState(1);
   const [isFareLoading, setFareLoading] = useState(0);
-  
 
   //Checks if functions were passed through props
   const setLon = props.setLon ?  props.setLon : null;
@@ -60,14 +60,14 @@ export default function Station(props : any) {
     .then(res => res.json())
     .then(value=>{
       setStationInfo(value)
+      setEntrances(value.entrances);
       output.lat = value.Lat;
       output.lon = value.Lon;
-      setLat(value.Lat);
-      setLon(value.Lon);
-    //  lat = value.Lat
-     // lon = value.Lon
-      setEntrances(value.entrances);
-
+      if(setLat) setLat(value.Lat);
+      if(setLon) setLon(value.Lon);
+      if(lines === undefined){
+        setLines(value.lines)
+      }
       var temp : any = {
         type: 'FeatureCollection',
         features: [
@@ -80,7 +80,7 @@ export default function Station(props : any) {
             properties: {
               type: "station",
               title: station,
-              description: "Station Item"
+              description: value.Address.Street + ", " +value.Address.City+ ", " + value.Address.State
             }
           }
         ]
@@ -99,8 +99,8 @@ export default function Station(props : any) {
             }
         })
       }
-      setMarkers(temp);
-      setZoom(16.5);
+      if(setMarkers) setMarkers(temp);
+      if(setZoom) setZoom(16.5);
       output.zoom = 16.5;
       output.markers =temp;
     })
@@ -109,44 +109,45 @@ export default function Station(props : any) {
       throw error;
     });
     return output;
-  },[station, setLat, setLon, setMarkers, setZoom])
+  },[station, setLat, setLon, setMarkers, setZoom, lines])
 
   useEffect(()=>{
     fetchStation();
   },[fetchStation])
 
   const getAlerts = useCallback(async () =>{
-    setLoading(1);
-    let output: any[] = []
-    for(const e of lines){
-      let temp: any[] = [];
-      await fetch(`${API_URL}/api/alerts?line=${e}`)
+    if(lines !== undefined){
+      setLoading(1);
+      let output: any[] = [];
+      
+      let temp1: any[] = [];
+      await fetch(`${API_URL}/api/alerts`)
       .then(res => res.json())
       .then(value=>{
         if(value !== null){
           value.forEach((f:any)=>{
-            if(temp.find((e:any) => e.IncidentID === f.IncidentID)) return;
-            else temp.push(f);
+            if(temp1.find((e:any) => e.IncidentID === f.IncidentID)) return;
+            else temp1.push(f);
           })
         }
       })
-      output = output.concat(temp)
-    }
-    let temp:any = []
-    for(const e of output){
-      let array = e.LinesAffected.split(/;[\s]?/).filter(function(fn:any) { return fn !== ''; })
-      if(array.length > 1){
+
+      output = output.concat(temp1)
+
+      let temp:any = []
+      for(const e of output){
+        let array = e.LinesAffected.split(/;[\s]?/).filter(function(fn:any) { return fn !== ''; })
         for(const f of array){
           let object:any = Object.create(e)
           object.LinesAffected = f+";"
-          temp.push(object);
+          if(lines.includes(f)) temp.push(object);
+          console.log(f)
         }
       }
-      else temp.push(e)
+      output = temp;
+      setAlerts(output)
+      setLoading(0);
     }
-    output = temp;
-    setAlerts(output)
-    setLoading(0);
   },[lines])
 
   async function getNamesAndCodes(){
@@ -162,9 +163,9 @@ export default function Station(props : any) {
   }
 
   const handleClick = () =>{
-    setMarkers(null);
-    setZoom(16);
-    setStation('');
+    if(setMarkers) setMarkers(null);
+    if(setZoom) setZoom(16);
+    if(setStation) setStation('');
   }
 
   const handleChange=(e:any)=>{
@@ -191,18 +192,19 @@ export default function Station(props : any) {
     fetchFares();
   },[fetchFares])
 
-   
   useEffect(()=>{  
     setLoading(1);
     getAlerts();
   },[getAlerts])
 
   function isThereAlerts(){
-		if(alerts.length > 0) return(alerts.map(alertsList));
-    else if(lines.length > 0 && isLoading === 0){
-      return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)
+    if(lines !== undefined){
+      if(alerts.length > 0) return(alerts.map(alertsList));
+      else if(lines.length > 0 && isLoading === 0){
+        return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)
+      }
+      else return([1].map(alertsPlaceholder));
     }
-    else return([1].map(alertsPlaceholder));
 	}
 
   return (
@@ -211,7 +213,7 @@ export default function Station(props : any) {
         <div className="d-flex flex-grow-1 justify-content-start justify-content-md-start align-items-center">
           <h1 className="d-flex" id="page-header">{station}</h1>
           <div className="d-md-flex align-items-center d-none">
-            {lines.map(linesServed)}
+            {lines ? lines.map(linesServed) : null}
           </div>
           <div className="d-flex flex-grow-1 d-md-none justify-content-end align-items-center">
             {fareList.length ?

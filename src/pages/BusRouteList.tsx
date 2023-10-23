@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef} from 'react';
 
 import Navbar from "./shared-components/Navbar";
 import BusMap from './shared-components/BusMap';

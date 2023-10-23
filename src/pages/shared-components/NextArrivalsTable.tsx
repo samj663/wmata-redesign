@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { API_URL } from '../../tokens';
 
 export default function NextArrivalsTable(props: any) {
 	var {station, group, includeTransf} = props;
   const [trains, setTrains] = useState<any[]>([]);
 	const [isLoading, setLoading] = useState(1);
-  const [stationCode1, setStationCode1] = React.useState("");
-  const [stationCode2, setStationCode2] = React.useState("");
-  const [isTransf, setIsTransf] = React.useState(false);
+  const [stationCode1, setStationCode1] = useState("");
+  const [stationCode2, setStationCode2] = useState("");
+  const [isTransf, setIsTransf] = useState(false);
   const timer = useRef<number[]>([])
 
   const getNextTrain = useCallback(async () => {

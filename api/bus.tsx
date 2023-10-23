@@ -10,7 +10,7 @@ import {busRoute, busStop, nextBus, error_template} from "./interfaces_and_class
 const {default : fetch} = require('node-fetch');
 const express = require('express')
 const path = require('path');
-require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
+require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
 const app = express()
 app.use(express.static(path.join(__dirname, 'client/build')));

@@ -11,7 +11,7 @@ import {error_template} from "./interfaces_and_classes"
 import { shutdown } from "./routes";
 const path = require('path');
 
-require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
+require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
 export var error_log :error_template[] = []
 

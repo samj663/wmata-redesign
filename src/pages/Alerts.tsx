@@ -26,14 +26,11 @@ export default function Alerts() {
     let temp:any = []
     for(const e of output){
       let array = e.LinesAffected.split(/;[\s]?/).filter(function(fn:any) { return fn !== ''; })
-      if(array.length > 1){
-        for(const f of array){
-          let object:any = Object.create(e)
-          object.LinesAffected = f+";"
-          temp.push(object);
-        }
+      for(const f of array){
+        let object:any = Object.create(e)
+        object.LinesAffected = f+";"
+        temp.push(object);
       }
-      else temp.push(e)
     }
     output = temp;
     setAlerts(output)
@@ -68,7 +65,6 @@ export default function Alerts() {
       <div style={{height: "61px"}}></div>
       <h1 className="mb-4 text-center">Alerts</h1>
       {isThereAlerts()}
-      {/*!alerts.length ? <h5 className="p-2" style={{backgroundColor: "lightgreen", borderRadius: "15px"}}>No alerts</h5> : alerts.map(alertsList)*/}
     </div>
   );
 }

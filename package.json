@@ -42,10 +42,10 @@
     "test-both": "jest --silent --detectOpenHandles --forceExit --config jest.config-react.js",
     "test-react-scripts": "react-scripts test",
     "eject": "react-scripts eject",
-    "both": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/bus.tsx --jsx react && node api/backend.js\"  \"sleep 5 && npm start\"",
+    "both": "concurrently \"npm run backend\"  \"sleep 5 && npm start\"",
     "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
-    "compile": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react",
-    "backend": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react && node api/routes.js",
+    "compile": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react --outDir api/build",
+    "backend": "npm run compile && node api/build/routes.js",
     "deploy": "npm run build && firebase deploy --only hosting",
     "react-test": "react-scripts test -- src/React.test.tsx"
   },

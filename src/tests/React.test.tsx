@@ -1,9 +1,13 @@
 /**
- * Thus uses the API currenlty in production. Since the server takes a while to boot up,
- * so beforeAll will call
+ * These tests aim to verify if the page loads certain elements and check if
+ * certain features are working as expected. They are not made to check the structure
+ * of the webpage to allow for flexibility.
+ * 
+ * This uses the API currenlty in production. The server takes a while to boot up,
+ * so beforeAll will call it to wake up.
  */
 
-import {render, cleanup, screen, act, waitFor, queryByAttribute, getByLabelText, getByText} from '@testing-library/react'
+import {render, cleanup, screen, act, waitFor, queryByAttribute, getByLabelText, getByText,getAllByText} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import NextArrivalsTable from '../pages/shared-components/NextArrivalsTable';
@@ -11,16 +15,20 @@ import Station from '../pages/Station';
 import App from "../App"
 import {describe, expect, test} from '@jest/globals';
 import NextBusTable from '../pages/shared-components/NextBusTable';
+import StationList from '../pages/StationList';
+import Map from '../pages/shared-components/Map';
+import {AlertsOffCanvas} from '../pages/shared-components/AlertsOffCanvas';
 
 const {default : fetch} = require('node-fetch');
 const getById = queryByAttribute.bind(null, 'id');
+var key = process.env.WMATA_KEY;
 
 jest.setTimeout(600000)
 
 describe("React Tests", () => {
   afterEach(cleanup);
 
-  // Server takes about 5-7 minutes but jest isset to timeout in 10 minutes just in case 
+  // Server takes about 5-7 minutes but jest is set to timeout in 10 minutes just in case 
   beforeAll(async ()=>{
     await fetch("https://wmata-backend.onrender.com/api")
   })
@@ -72,21 +80,66 @@ describe("React Tests", () => {
     })
   })
 
-  test('Next Bus Table Component', async () => {
-    var dom:any;
+  test('Next Bus Table StopID = 1000031', async () => {
+    var dom : any; 
+    var busResponse = await fetch("https://wmata-backend.onrender.com/api/nextBus?stopid=1000031");
+    var rawBus = await busResponse.json();
 
     await act( async () => {
-      dom = render(<NextBusTable stopID="1000031"/>)
+      dom = render(<NextBusTable StopID="1000031"/>)
     });
-    
-    await waitFor(() => {
-      let input = getByText(dom.container, 'Route')
-      expect(input).not.toBeNull
-      input = getByText(dom.container, 'Destination')
-      expect(input).not.toBeNull
-    })
+
+    for(const e of rawBus.nextBus){
+      await waitFor(() => {
+        let input = getAllByText(dom.container, e.RouteID)
+        expect(input).not.toBeNull
+        input = getAllByText(dom.container, e.DirectionText)
+        expect(input).not.toBeNull
+        input = getAllByText(dom.container, e.Minutes)
+        expect(input).not.toBeNull
+      })
+    }
   })
 
+  test('Next Arrivals Table station = Metro Center', async () => {
+    var dom : any; 
+    var busResponse = await fetch("https://wmata-backend.onrender.com/api/nextarrival?station=Metro%20Center");
+    var rawBus = await busResponse.json();
+
+    await act( async () => {
+      dom = render(<NextArrivalsTable station="Metro Center" includeTransf="true"/>)
+    });
+
+    for(const e of rawBus){
+      await waitFor(() => {
+        let input = getAllByText(dom.container, e.Car)
+        expect(input).not.toBeNull
+        input = getAllByText(dom.container, e.DestinationName)
+        expect(input).not.toBeNull
+        input = getAllByText(dom.container, e.Min)
+        expect(input).not.toBeNull
+        input = getAllByText(dom.container, e.Line)
+        expect(input).not.toBeNull
+      })
+    }
+  })
+
+  test('AlertsOffCanvas Component', async () => {
+    var dom : any; 
+    var response = await fetch("https://wmata-backend.onrender.com/api/alerts");
+    var alerts = await response.json();
+
+    await act( async () => {
+      dom = render(<AlertsOffCanvas />)
+    });
+
+    for(const e of alerts){
+      await waitFor(() => {
+        let input = getAllByText(dom.container, e.Description)
+        expect(input).not.toBeNull
+      })
+    }
+  })
 })
 
 export{}

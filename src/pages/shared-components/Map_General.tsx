@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef} from 'react';
 import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
