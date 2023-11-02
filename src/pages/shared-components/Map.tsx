@@ -1,9 +1,8 @@
-import { useEffect, useRef} from 'react';
+import {useState, useEffect, useRef, useCallback} from 'react';
 import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
-
+import { API_URL } from '../../tokens';
 import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
- 
 mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 export default function Map(props : any) {
@@ -11,6 +10,9 @@ export default function Map(props : any) {
   var {lon, lat, markers, zoom, station} = props
   const mapContainer = useRef(null);
   var  markerTracker : any = useRef([])
+  var  trainMarkerTracker : any = useRef([])
+  const timer = useRef<number[]>([])
+  const [liveTrain, setLiveTrain] = useState(true);
 
   useEffect(()=>{
     if (map.current) return; // initialize map only once
@@ -32,7 +34,10 @@ export default function Map(props : any) {
         }
 
       map.current.on('idle',function(){ map.current.resize() })
-      map.current.on("load", () =>{
+      map.current.on("load", async () =>{
+   //     let train_pos = await fetch(`${API_URL}/api/trainpositions`)
+        
+        map.current.addSource('Trains', { 'type': 'geojson', 'data':  null});
         map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
         map.current.addLayer({
           'id': 'station-circles',
@@ -45,11 +50,78 @@ export default function Map(props : any) {
           },
           'filter': ['==', '$type', 'Point']
         });
+    //    console.log(train_pos)
+        map.current.addLayer({
+          'id': 'train_positions',
+          'type': 'circle',
+          'source': 'Trains',
+          "layout": {
+            'icon-image': "train-icon",
+            'icon-rotate': ['get', 'rotation']
+        },
+         /* 'paint': {
+              'circle-radius': 6,
+              'circle-color': [
+                'match',
+                ['get', 'line'],
+                'RED',
+                '#BF0D3E',
+                'BLUE',
+                '#009CDE',
+                'ORANGE',
+                '#ED8B00',
+                'YELLOW',
+                '#FFD100',
+                'GREEN',
+                '#00B140',
+                'SILVER',
+                '#919D9D',
+                * other * '#ccc'
+                ],
+              'circle-stroke-width': 5
+          },*/
+          'filter': ['==', '$type', 'Point']
+        });
         map.current.resize();
-       
+    //    getTrainPos();
       })
     }
   },[lon, lat, markers, zoom])
+
+  /**
+   * Gets live train information from the api and generates markers for each
+   * one on the map. Will run every 5 seconds.
+   */
+  const getTrainPos = useCallback(async () => {
+		for(const e of timer.current){
+			clearTimeout(e);
+		}
+		fetch(`${API_URL}/api/trainpositions`)
+		.then(res => res.json())
+		.then(value=>{
+			if(value.error === undefined){
+        if(trainMarkerTracker.current.length > 0){
+          for (var i = trainMarkerTracker.current.length -1; i>=0; i--){
+            trainMarkerTracker.current[i].remove();
+          }
+          trainMarkerTracker.current = [];
+        }
+        
+        for (const feature of value.features){
+          const el = document.createElement('div');
+          el.className = 'train-icon';
+          var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
+          t.setRotation(feature.properties.rotation)
+          trainMarkerTracker.current.push(t);
+        }
+				timer.current.push(window.setTimeout(()=>{getTrainPos()}, 5000))
+			}
+		})
+		.catch(function(error) {
+			console.log('There has been a problem with your fetch operation: ' + error.message);
+      throw error;
+    });
+  },[timer]);
 
   useEffect(() => {
     if (!map.current ) return; // wait for map to initialize
@@ -114,7 +186,36 @@ export default function Map(props : any) {
     });*/
   },[lon, lat, markers, station, zoom,props.station]);
 
+  const handleChange = (e:any) =>{
+    setLiveTrain(e.target.checked);
+  }
+  useEffect(() => {
+    if(liveTrain === false){
+      console.log("Hello")
+      for(const e of timer.current){
+        clearTimeout(e);
+      }
+      if(trainMarkerTracker.current.length > 0){
+        for (var i = trainMarkerTracker.current.length -1; i>=0; i--){
+          trainMarkerTracker.current[i].remove();
+        }
+        trainMarkerTracker.current = [];
+      }
+    } 
+    else{
+      getTrainPos();
+    }
+  },[liveTrain, getTrainPos])
+
   return (
-    <div ref={mapContainer} className="map-container" style={{height: "100%"}}></div>
+    <div  style={{height: "100%",position:"relative"}}>
+      <div className="m-3 bottom-0 end-0 position-absolute shadow bg-body-tertiary rounded-pill" style={{zIndex:"1"}}>
+        <div className="justify-content-center mt-1 mb-1 ms-2 me-2 form-check-reverse form-switch" >
+          <input onChange={handleChange} checked={liveTrain} className="form-check-input" type="checkbox" role="switch" id="showLiveTrains"></input>
+          <label className=" form-check-label"htmlFor="showLiveTrains"> Show Live Trains </label>
+        </div>
+      </div>
+      <div ref={mapContainer} className="map-container" style={{height: "100%"}}></div>
+    </div>
   );
 }

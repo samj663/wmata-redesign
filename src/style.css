@@ -114,27 +114,27 @@ code {
   align-items: center; 
   display: flex;
 }
-.BL{
+.BL, .BLUE{
   background-color: rgb(4,106,164);
   color:white;
 }
-.RD{
+.RD, .RED{
   background-color: rgb(191,53,62);
   color:white;
 }
-.YL{
+.YL, .YELLOW{
   background-color: rgb(244,207,77);
   color: black;
 }
-.GR{
+.GR, .GREEN{
   background-color: rgb(25,154,82);
   color:white;
 }
-.SV{
+.SV, .SILVER{
   background-color: rgb(153,155,150);
   color: black;
 }
-.OR{
+.OR, .ORANGE{
   background-color: rgb(222,144,68);
   color: black;
 }
@@ -217,6 +217,39 @@ code {
 }
 
 .mapboxgl-popup-content { 
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif; 
+  padding: 20px;
+  border-radius: 10%;
+  cursor: pointer;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.train-icon {
+  background-image: url('./images/Arrows\ Down\ circular.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+/*
+.train-icon{
+  height: 30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-right: 2.5px;
+  border-radius: 50%;
+  font-size: 16px;
+  background-color: lightgray;
+  color:white;
+  font-weight: bold;
+  justify-content: center;
+  text-justify: center;
+  text-align: center;
+  align-items: center; 
+  display: flex;
+}*/
+
+.show-live-tra{ 
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif; 
   padding: 20px;
   border-radius: 10%;

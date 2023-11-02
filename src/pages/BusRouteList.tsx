@@ -27,10 +27,10 @@ export default function BusRouteList(){
   </tr>;
 
   const listPlaceholder = (t: any, index:number) =>
-  <tr key={index}>
-    <td>
-      <div className="placeholder-glow position-relative p-2">
-        <span className="placeholder col-9"></span>
+  <tr key={index} >
+    <td className="align-middle">
+      <div className="align-items-center placeholder-glow" >
+        <span className="align-items-center placeholder col-7" style={{height: "17px"}}></span>
       </div>
     </td>
   </tr>;
@@ -63,9 +63,9 @@ export default function BusRouteList(){
 
   function handleBusRouteList(){
     return(
-      <div className="row align-items-start text-center overflow-auto" id="next-train-tables" style={{height: "100%"}}>
-        <table className="table table-hover">
-          <thead>
+      <div className="row align-items-start text-center" id="next-train-tables" style={{height: "100%"}}>
+        <table className="table table-hover" style={{height: "100%"}}>
+        <thead>
             <tr>
               <th scope="col">
                 <div className="position-relative">Metrobus Routes</div>
@@ -73,6 +73,7 @@ export default function BusRouteList(){
             </tr>
           </thead>
           <tbody>
+            {/*Array.from(Array(10).keys()).map(listPlaceholder)*/}
             {isLoading ? Array.from(Array(10).keys()).map(listPlaceholder) : routeList.map(list)}
           </tbody>
         </table>
@@ -90,7 +91,7 @@ export default function BusRouteList(){
             <a className="nav-link" href="#map" data-bs-toggle="tab">Map</a>
           </li>
           <li className="nav-item">
-            <a className="nav-link active" aria-current="page" href="#info" data-bs-toggle="tab">Information</a>
+            <a className="nav-link active" aria-current="page" href="#info" data-bs-toggle="tab">Bus Routes</a>
           </li>
         </ul>
       </div>
@@ -100,7 +101,7 @@ export default function BusRouteList(){
               <BusMap line_path={active_path} markers={null} stops={active_stops} center_to={center_to} route={route} Layers={[]}/>
           </div>
         </div>
-        <div id="info" className="col tab-pane active show col-lg-6 col-md-6" style={{height: "100%"}}>
+        <div id="info" className="col tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
           {route.length ? <BusRoute set_center_to={set_center_to} set_active_stops={set_active_stops} set_active_path={set_active_path} route={route} setRoute={setRoute}/>  :  handleBusRouteList()}
         </div>
       </div>

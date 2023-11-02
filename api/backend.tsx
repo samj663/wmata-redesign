@@ -18,14 +18,15 @@ export var error_log :error_template[] = []
 export var lastUpdated = {
     next_train: null, 
     stations_fares_entrances: null, 
-    alerts: null};
+    alerts: null
+};
 
 export var bootstrap_status = { 
     bus_routes: "RUNNING",
     bus_route_list: "RUNNING",
     bus_stops: "RUNNING",
-  //  rail_stations: "RUNNING",
     next_train: "RUNNING",
+    train_positions: "RUNNING",
     stations_fares_entrances: "RUNNING",
     rail_alerts: "RUNNING"
 };
@@ -39,11 +40,11 @@ const MAX_RETRY = 5;
 export var bootstrap_retry_counter ={
     bus_routes: 0,
     bus_stops: 0,
-   // rail_stations: 0,
     next_train: 0,
     stations_fares_entrances: 0,
-    rail_alerts: 0
-}
+    rail_alerts: 0,
+    train_positions: 0
+};
 
 /**
  * Starts up backend system and manage when to get next arrival data
@@ -52,10 +53,10 @@ export async function main(){
     bootstrap_get_rail_alerts();
     bootstrap_get_data();
     bootstrap_get_train_data();
-
     bootstrap_bus_stops();
     bootstrap_bus_routes();
-}
+    bootstrap_train_positions();
+};
 
 export async function bootstrap_get_rail_alerts(){
     bootstrap_status.rail_alerts = "RUNNING"
@@ -129,6 +130,21 @@ export async function bootstrap_bus_routes(){
         else bootstrap_retry_counter.bus_routes++;
         console.log("Bus routes caching ran into Error. Trying again in 10 seconds")
         setTimeout(bootstrap_bus_routes, 10000);
+    }
+}
+
+export async function bootstrap_train_positions(){
+    bootstrap_status.train_positions = "RUNNING"
+    var status = await rail.get_train_positions()
+    bootstrap_status.train_positions = status
+
+    if(status ==="ERROR"){
+        if(bootstrap_retry_counter.train_positions >= MAX_RETRY){
+            shutdown("Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_bus_routes");
+        }
+        else bootstrap_retry_counter.train_positions++;
+        console.log("Bus routes caching ran into Error. Trying again in 10 seconds")
+        setTimeout(bootstrap_train_positions, 5000);
     }
 }
 

@@ -141,7 +141,7 @@ export default function Station(props : any) {
           let object:any = Object.create(e)
           object.LinesAffected = f+";"
           if(lines.includes(f)) temp.push(object);
-          console.log(f)
+     //     console.log(f)
         }
       }
       output = temp;

@@ -114,6 +114,12 @@ app.get('/api/stationInfo', function(request : any, response : any){
     }
 });
 
+app.get('/api/trainpositions', function(request : any, response : any){
+    response.set('Access-Control-Allow-Origin', '*');
+ //   response.set('Cache-Control', 'public, max-age=5000');
+    response.json(rail.train_positions);
+});
+
 app.get('/api/stationList', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
     response.set('Cache-Control', 'public, max-age=31557600');
