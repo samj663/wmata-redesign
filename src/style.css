@@ -231,6 +231,49 @@ code {
   height: 40px;
   cursor: pointer;
 }
+
+.train-icon-RED {
+  background-image: url('./images/Arrow\ Circular\ RD.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.train-icon-ORANGE{
+  background-image: url('./images/Arrow\ Circular\ OR.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.train-icon-BLUE {
+  background-image: url('./images/Arrow\ Circular\ BL.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.train-icon-YELLOW {
+  background-image: url('./images/Arrow\ Circular\ YL.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.train-icon-GREEN {
+  background-image: url('./images/Arrow\ Circular\ GR.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.train-icon-SILVER {
+  background-image: url('./images/Arrow\ Circular\ SV.png');
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
 /*
 .train-icon{
   height: 30px;
@@ -248,11 +291,11 @@ code {
   align-items: center; 
   display: flex;
 }*/
-
+/*
 .show-live-tra{ 
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif; 
   padding: 20px;
   border-radius: 10%;
   cursor: pointer;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
-}
+}*/

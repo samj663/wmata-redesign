@@ -5,12 +5,12 @@ import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
-export default function Map(props : any) {
+export default function MapComp(props : any) {
   var map : any = useRef(null);
   var {lon, lat, markers, zoom, station} = props
   const mapContainer = useRef(null);
   var  markerTracker : any = useRef([])
-  var  trainMarkerTracker : any = useRef([])
+  var  trainMarkerMap : any = useRef(new Map())
   const timer = useRef<number[]>([])
   const [liveTrain, setLiveTrain] = useState(true);
 
@@ -35,7 +35,6 @@ export default function Map(props : any) {
 
       map.current.on('idle',function(){ map.current.resize() })
       map.current.on("load", async () =>{
-   //     let train_pos = await fetch(`${API_URL}/api/trainpositions`)
         
         map.current.addSource('Trains', { 'type': 'geojson', 'data':  null});
         map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
@@ -50,7 +49,6 @@ export default function Map(props : any) {
           },
           'filter': ['==', '$type', 'Point']
         });
-    //    console.log(train_pos)
         map.current.addLayer({
           'id': 'train_positions',
           'type': 'circle',
@@ -59,31 +57,9 @@ export default function Map(props : any) {
             'icon-image': "train-icon",
             'icon-rotate': ['get', 'rotation']
         },
-         /* 'paint': {
-              'circle-radius': 6,
-              'circle-color': [
-                'match',
-                ['get', 'line'],
-                'RED',
-                '#BF0D3E',
-                'BLUE',
-                '#009CDE',
-                'ORANGE',
-                '#ED8B00',
-                'YELLOW',
-                '#FFD100',
-                'GREEN',
-                '#00B140',
-                'SILVER',
-                '#919D9D',
-                * other * '#ccc'
-                ],
-              'circle-stroke-width': 5
-          },*/
           'filter': ['==', '$type', 'Point']
         });
         map.current.resize();
-    //    getTrainPos();
       })
     }
   },[lon, lat, markers, zoom])
@@ -100,19 +76,31 @@ export default function Map(props : any) {
 		.then(res => res.json())
 		.then(value=>{
 			if(value.error === undefined){
-        if(trainMarkerTracker.current.length > 0){
-          for (var i = trainMarkerTracker.current.length -1; i>=0; i--){
-            trainMarkerTracker.current[i].remove();
-          }
-          trainMarkerTracker.current = [];
-        }
-        
         for (const feature of value.features){
-          const el = document.createElement('div');
-          el.className = 'train-icon';
-          var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).addTo(map.current);
-          t.setRotation(feature.properties.rotation)
-          trainMarkerTracker.current.push(t);
+          if(trainMarkerMap.current.get(feature.properties.id) === undefined){
+            const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+              `<h6>${feature.properties.line} Line Train</h6>
+              <div> Destination: -not available-</div>
+              <div> Train Info: ${feature.properties.licensePlate[0]} Car</div>`)
+
+            const el = document.createElement('div');
+            if(["RED","ORANGE","YELLOW","GREEN","BLUE","SILVER"].includes(feature.properties.line)){
+              el.className = 'train-icon-' + feature.properties.line;
+            }
+            else el.className = 'train-icon'; 
+            var t = new mapboxgl.Marker(el)
+              .setLngLat(feature.geometry.coordinates)
+              .addTo(map.current)
+              .setPopup(popup)
+              .setRotation(feature.properties.rotation)
+            trainMarkerMap.current.set(feature.properties.id,t)
+          }
+          else{
+
+            trainMarkerMap.current.get(feature.properties.id)
+              .setLngLat(feature.geometry.coordinates)
+              .setRotation(feature.properties.rotation);
+          }
         }
 				timer.current.push(window.setTimeout(()=>{getTrainPos()}, 5000))
 			}
@@ -144,21 +132,6 @@ export default function Map(props : any) {
 
         map.current.setLayoutProperty('station-circles', 'visibility', 'none');
 
-      /* This finds station coordinates within geojson and uses them instead
-       * of the one provided by WMATA. I did this because the geojson seems 
-       * to propvide a location thats more in the middle of the entrance 
-       * locations
-       */
-    /*  const features = map.current.querySourceFeatures('Stations', {
-        sourceLayer: "station-circles",
-        filter: ['==', 'NAME', props.station]
-      });
-
-      if(features.length > 0){
-
-     //   lon = features[0].geometry.coordinates[0]
-       // lat = features[0].geometry.coordinates[1]
-      }*/
       for (const feature of markers!.features) {
 
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
@@ -191,16 +164,13 @@ export default function Map(props : any) {
   }
   useEffect(() => {
     if(liveTrain === false){
-      console.log("Hello")
       for(const e of timer.current){
         clearTimeout(e);
       }
-      if(trainMarkerTracker.current.length > 0){
-        for (var i = trainMarkerTracker.current.length -1; i>=0; i--){
-          trainMarkerTracker.current[i].remove();
-        }
-        trainMarkerTracker.current = [];
-      }
+      trainMarkerMap.current.forEach((values:any, keys:any)=>{
+        values.remove();
+        trainMarkerMap.current.delete(keys);
+      })
     } 
     else{
       getTrainPos();
@@ -210,12 +180,14 @@ export default function Map(props : any) {
   return (
     <div  style={{height: "100%",position:"relative"}}>
       <div className="m-3 bottom-0 end-0 position-absolute shadow bg-body-tertiary rounded-pill" style={{zIndex:"1"}}>
-        <div className="justify-content-center mt-1 mb-1 ms-2 me-2 form-check-reverse form-switch" >
-          <input onChange={handleChange} checked={liveTrain} className="form-check-input" type="checkbox" role="switch" id="showLiveTrains"></input>
-          <label className=" form-check-label"htmlFor="showLiveTrains"> Show Live Trains </label>
+        <div className="justify-content-center mt-1 mb-1 ms-2 me-2 form-check-reverse form-switch" style={{ cursor:"pointer"}} >
+          <input style={{ cursor:"pointer"}}  onChange={handleChange} checked={liveTrain} className="form-check-input" type="checkbox" role="switch" id="showLiveTrains"></input>
+          <label style={{ cursor:"pointer"}}  className=" form-check-label"htmlFor="showLiveTrains"> Show Live Trains </label>
         </div>
       </div>
       <div ref={mapContainer} className="map-container" style={{height: "100%"}}></div>
     </div>
   );
 }
+
+export {MapComp as Map}

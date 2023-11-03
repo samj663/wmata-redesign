@@ -44,3 +44,4 @@ package-lock.json
 old_files
 package-lock.json
 api/*build*
+*.afphoto
