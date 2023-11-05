@@ -301,7 +301,7 @@ app.get('/api/*', function(request : any, response : any){
     response.json({error:"ummm... that wasn't a valid endpoint"});
 });
 
-export const server :any = app.listen(process.env.BACKEND_PORT ,() => {
+export const server :any = app.listen(process.env.BACKEND_PORT || 4000 ,() => {
         backend.main();
         console.log(`Example app listening on port ${process.env.BACKEND_PORT}`);
     });

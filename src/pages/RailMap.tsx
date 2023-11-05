@@ -1,13 +1,8 @@
-import React, { useState, useEffect, useRef} from 'react';
-
 import Navbar from "./shared-components/Navbar";
 import Map from "./shared-components/Map";
-import Station from './Station';
 import { AlertsOffCanvas } from './shared-components/AlertsOffCanvas';
-import { API_URL } from '../tokens';
 
 export default function RailMap() {
-
   return (
     <div style={{height:`100%`, backgroundColor: "white"}}>
       <Navbar/>
@@ -19,7 +14,6 @@ export default function RailMap() {
               <Map lat={38.89834} lon={-77.021851} zoom={11} markers={null} station=""/>
           </div>
         </div>
-
       </div>
     </div>
   );

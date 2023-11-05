@@ -1,25 +1,25 @@
 # WMATA Redesign
 
-This is a Web Application that serves real time information about the DC Metro system. Using WMATA's developer API, this app atempts to make next train arrvals, interactive maps, and system alerts more accesible and easier to read than WMATA's website. This was built with TypeScript, React, Express, and Bootstrap.
+This is a Web Application that serves real time information about the DC Metro system. Using WMATA's developer API, this app atempts to make next train arrvals, interactive maps, and system alerts more accesible and easier to read than WMATA's website. This project was entirely built with TypeScript, React.js, Express.js, and Bootstrap. Tesing was done using Jest and React Testing Library.
 
 ## Project Status
 
-This is currently in development and has no planned release date. However, I do plan on working on it throught the summer.
+A live demo is available at https://dcmetro.samueljohnson.dev. The backend takes 3 to 5 minutes to boot up because of the limitations of the hosting platform so it will take awhile for some information to popup.
 
 **List of Features currently implemented**
 
 1. Rail station information, alerts, fares, and train arrivals
-2. Interactive map that shows rail lines, stations, and entraces
-3. Next train arrivals page
+2. Interactive map that shows rail lines, stations, and entrances
+3. Next train and bus arrivals page
 4. Alerts page (Only shows rail alerts for now)
+5. Information popups for elements on the interactive rail map
+6. Interactive map page to explore rail system system
+7. Bus arrivals, stops, and route information
 
 **List of Features to be implemented in the future**
 
-1. Bus arrivals, stops, alerts, and map data
-2. Popups for elements on the interactive maps
-3. Separate interactive map page to explore the system
-4. Search function to easily access different parts of the app
-5. Visual redesign to adhere to WMATA's design principles
+1. WMATA GTFS api integration to provide schedule data
+2. Visual redesign to adhere to WMATA's design principles
 
 ## Screenshots
 
@@ -37,9 +37,10 @@ You will need your own WMATA api key to run the backend. You can signup for an a
 
 ```
 WMATA_KEY=<your api key>
-REACT_APP_PROXY_ADDR='http://localhost:4000' (or wherever you're hosting the backend)
-REACT_APP_MAPBOX_KEY=<your api key>
-REACT_APP_MAPBOX_STYLE='mapbox://styles/samuelj246/clj0ed7g7018v01qi7k96f2oe' (Or you can put your own style)
+BACKEND_PORT= 4000 (If using localhost for backend, this should be the same port as in the proxt address below)
+REACT_APP_PROXY_ADDR= 'http://localhost:4000' (or wherever you're hosting the backend)
+REACT_APP_MAPBOX_KEY= <your api key>
+REACT_APP_MAPBOX_STYLE= <address of mapbox style you want to use>
 ```
 
 After that, you should be able to run the commands below and start using the app.
