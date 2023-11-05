@@ -34,10 +34,10 @@ export default function StationList() {
       <div key={index}className={"small-station-circle " + t}></div>
 
   const listPlaceholder = (t: any, index:number) =>
-  <tr key={index}>
-    <td>
-      <div className="placeholder-glow position-relative p-2">
-        <span className="placeholder col-9"></span>
+  <tr key={index} >
+    <td className="align-middle">
+      <div className="align-items-center placeholder-glow" >
+        <span className="align-items-center placeholder col-7" style={{height: "17px"}}></span>
       </div>
     </td>
   </tr>;
@@ -89,9 +89,10 @@ export default function StationList() {
 
   function handleStationList(){
     return(
-      <div className="row align-items-start text-center" id="next-train-tables">
-        <table className="table table-hover">
+      <div className="row align-items-start text-center" id="next-train-tables" style={{height: "100%"}}>
+        <table className="table table-hover" style={{height: "100%"}}>
           <tbody>
+          {/*Array.from(Array(10).keys()).map(listPlaceholder)*/}
             {isLoading ? Array.from(Array(10).keys()).map(listPlaceholder) : stationList.map(list)}
           </tbody>
         </table>
@@ -117,7 +118,7 @@ export default function StationList() {
       <div className="tab-content d-flex row m-0 p-0" style={{height: `calc(100% - 61px - ${height}px)`}}>
         <div id="map" className="col d-md-block tab-pane col-lg-6 col-md-6 m-0 p-0" style={{height: "100%"}}>
             <div className="m-0 p-0" style={{height: "100%"}}>
-              <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
+              <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station} setStation={setStation}/>
           </div>
         </div>
         <div id="info" className="col tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>

@@ -65,9 +65,9 @@ export default function Station(props : any) {
       output.lon = value.Lon;
       if(setLat) setLat(value.Lat);
       if(setLon) setLon(value.Lon);
-      if(lines === undefined){
+
         setLines(value.lines)
-      }
+      
       var temp : any = {
         type: 'FeatureCollection',
         features: [
@@ -109,7 +109,7 @@ export default function Station(props : any) {
       throw error;
     });
     return output;
-  },[station, setLat, setLon, setMarkers, setZoom, lines])
+  },[station, setLat, setLon, setMarkers, setZoom])
 
   useEffect(()=>{
     fetchStation();
@@ -141,7 +141,7 @@ export default function Station(props : any) {
           let object:any = Object.create(e)
           object.LinesAffected = f+";"
           if(lines.includes(f)) temp.push(object);
-          console.log(f)
+     //     console.log(f)
         }
       }
       output = temp;
@@ -199,6 +199,9 @@ export default function Station(props : any) {
 
   function isThereAlerts(){
     if(lines !== undefined){
+      if(isLoading === 1){
+        return([1].map(alertsPlaceholder));
+      }
       if(alerts.length > 0) return(alerts.map(alertsList));
       else if(lines.length > 0 && isLoading === 0){
         return(<p className="p-2 text-center" style={{backgroundColor: "lightgray", borderRadius: "15px", fontSize: "20px"}}>No alerts</p>)

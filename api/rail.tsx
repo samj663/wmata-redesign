@@ -8,6 +8,7 @@ import { ESMap } from "typescript";
 import {stationCodeNameMap, train, fares, entrance, station, busStop, busRoute, error_template} from "./interfaces_and_classes"
 const {default : fetch} = require('node-fetch');
 const path = require('path');
+var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
 
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
@@ -16,6 +17,7 @@ export var stationNames : stationCodeNameMap;
 export var trains : ESMap<string, train[]>;
 export var stations: ESMap<string, station>;
 export var railAlerts: any;
+export var train_positions:any;
 
 /**
  * Gets real time train predictions from WMATA's API
@@ -119,6 +121,51 @@ export async function get_rail_alerts(){
     setTimeout(get_rail_alerts, 60000);
     return "SUCCESS"
 }
+
+export async function get_train_positions(){
+    var geojson:any = {
+      "type": "FeatureCollection",
+      "name": "train_positions",
+      "features":[]
+    }
+    try{
+        const res = await fetch(`https://api.wmata.com/gtfs/rail-gtfsrt-vehiclepositions.pb?api_key=${key}`)
+        var b = Buffer.from(await res.arrayBuffer())
+        var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
+    
+        feed.entity.forEach(function(entity:any) {
+        if (entity.vehicle.position) {
+            geojson.features.push(
+            { "type": "Feature",
+                "properties": {
+                "line": entity.vehicle.trip.routeId, 
+                "id": entity.vehicle.vehicle.id,
+                "label": entity.vehicle.vehicle.label,
+                "licensePlate": entity.vehicle.vehicle.licensePlate,
+                "rotation":entity.vehicle.position.bearing
+                },
+                "geometry":{
+                "type": "Point",
+                "coordinates": [entity.vehicle.position.longitude, entity.vehicle.position.latitude] }
+            })
+        }});
+    } catch(e:any){
+        backend.bootstrap_status.train_positions = "ERROR"
+        console.log("---- ERROR has been caught. Check Log ----")
+        console.log(e)
+        var error:error_template ={
+            timestamp: Date.now().toString(),
+            function: "get_train_positions",
+            error: e.message,
+            trace: e.stack
+        }
+        backend.error_log.push(error)
+        return "ERROR"
+    }
+    setTimeout(get_train_positions, 5000);
+    train_positions = geojson;
+    return "SUCCESS"
+  }
 
 function parseEntrances(entrances : any[]): ESMap<string,entrance[]>{
     var output = new Map();

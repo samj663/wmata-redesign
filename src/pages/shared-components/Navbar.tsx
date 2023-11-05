@@ -21,7 +21,7 @@ function Navbar() {
               <li><Link to="/Stationlist" className="dropdown-item">Stations</Link></li>
               <li><Link to="/nexttrain" className="dropdown-item">Next Train</Link></li>
               <li><hr className="dropdown-divider"></hr></li>
-              <li><Link to="/" className="dropdown-item disabled">Rail Map</Link></li>
+              <li><Link to="/railmap" className="dropdown-item">Rail Map</Link></li>
             </ul>
           </li>
           <li className="nav-item dropdown">
@@ -41,7 +41,7 @@ function Navbar() {
             </Link>
           </li>
           <li className="nav-item">
-            <button className="nav-link" data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas">Alerts</button>
+            <div className="nav-link cursor-pointer"  data-bs-toggle="offcanvas" data-bs-target="#alertsoffcanvas" aria-controls="alertsoffcanvas" style={{cursor: "pointer"}}>Alerts</div>
           </li>
         </ul>
       </div>
