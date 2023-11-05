@@ -6,6 +6,7 @@ import NextArrivals from './pages/NextArrivals';
 import Alerts from './pages/Alerts';
 import StationList from './pages/StationList';
 import BusRouteList from './pages/BusRouteList';
+import RailMap from './pages/RailMap';
 //import BusRoute from './pages/BusRoute';
 //import NextBusTable from './pages/shared-components/NextBusTable';
 //import Station from './pages/Station'
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/nextbus" element={<NextArrivals showBus={"active"} showRail={""}/>} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/busroutelist" element={<BusRouteList />} />
+        <Route path="/railmap" element={<RailMap />} />
         <Route path="/*" element={<div>Not a valid path. Will point to a "404 not found" page</div>} />
       </Routes>
     </Router>

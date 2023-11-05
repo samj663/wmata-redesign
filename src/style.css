@@ -60,11 +60,11 @@ code {
 }
 
 .marker {
-  background-image: url('./images/WMATA_Metro_Logo_small.svg.png');
+  background-image: url('./images/station-marker.png');
   background-size: cover;
   width: 40px;
   height: 40px;
-
+  z-index:1;
   cursor: pointer;
 }
 .escalator-marker {
@@ -223,12 +223,16 @@ code {
   cursor: pointer;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
 }
+.mapboxgl-popup{
+  z-index: 4;
+}
 
 .train-icon {
   background-image: url('./images/Arrows\ Down\ circular.png');
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 
@@ -237,6 +241,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 .train-icon-ORANGE{
@@ -244,6 +249,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 .train-icon-BLUE {
@@ -251,6 +257,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 .train-icon-YELLOW {
@@ -258,6 +265,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 .train-icon-GREEN {
@@ -265,6 +273,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 .train-icon-SILVER {
@@ -272,6 +281,7 @@ code {
   background-size: cover;
   width: 40px;
   height: 40px;
+  z-index:2;
   cursor: pointer;
 }
 /*

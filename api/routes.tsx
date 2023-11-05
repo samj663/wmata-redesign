@@ -104,7 +104,9 @@ app.get('/api/stationInfo', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
     response.set('Cache-Control', 'public, max-age=604800');
     if(request.query.station == null){
-        response.status(400).json({error:"Provide station"});
+        let temp :any= []
+        rail.stations.forEach((e :any)=> temp.push(e))
+        response.json(temp);
     }
     else{
         let code = rail.stationNames.getCode(request.query.station)!;
@@ -116,7 +118,6 @@ app.get('/api/stationInfo', function(request : any, response : any){
 
 app.get('/api/trainpositions', function(request : any, response : any){
     response.set('Access-Control-Allow-Origin', '*');
- //   response.set('Cache-Control', 'public, max-age=5000');
     response.json(rail.train_positions);
 });
 

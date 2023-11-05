@@ -1,18 +1,51 @@
 import {useState, useEffect, useRef, useCallback} from 'react';
 import {REACT_APP_MAPBOX_KEY, REACT_APP_MAPBOX_STYLE} from "../../tokens"
 import { API_URL } from '../../tokens';
-import stations from "./Metro_Stations_Regional.json";
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = REACT_APP_MAPBOX_KEY;
 
 export default function MapComp(props : any) {
   var map : any = useRef(null);
   var {lon, lat, markers, zoom, station} = props
+  const {setStation} = props;
   const mapContainer = useRef(null);
   var  markerTracker : any = useRef([])
   var  trainMarkerMap : any = useRef(new Map())
+  var  stationMarkerTracker : any = useRef([])
   const timer = useRef<number[]>([])
   const [liveTrain, setLiveTrain] = useState(true);
+  
+  const stationMarkers = useCallback(async () => {
+    if (!map.current ) return; // wait for map to initialize
+    map.current.resize();  
+    fetch(`${API_URL}/api/stationInfo`)
+		.then(res => res.json())
+		.then(value=>{
+			if(value.error === undefined){
+        for (const station of value){
+            const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+              `<h6>${station.Name}</h6>
+              <div>${station.Address.Street +", " +station.Address.City+", " + station.Address.State+", " + station.Address.Zip}</div>`)
+            const el = document.createElement('div');
+            el.className = 'marker'; 
+            var t = new mapboxgl.Marker(el)
+              .setLngLat([station.Lon, station.Lat])
+              .addTo(map.current)
+              .setPopup(popup)
+
+            t.getElement().addEventListener('click', () => {
+              if(setStation) setStation(station.Name)
+            });
+
+            stationMarkerTracker.current.push(t)
+          }
+        }
+		})
+		.catch(function(error) {
+			console.log('There has been a problem with your fetch operation: ' + error.message);
+      throw error;
+    });
+  },[setStation]);
 
   useEffect(()=>{
     if (map.current) return; // initialize map only once
@@ -35,20 +68,8 @@ export default function MapComp(props : any) {
 
       map.current.on('idle',function(){ map.current.resize() })
       map.current.on("load", async () =>{
-        
+        stationMarkers();
         map.current.addSource('Trains', { 'type': 'geojson', 'data':  null});
-        map.current.addSource('Stations', { 'type': 'geojson', 'data': stations });
-        map.current.addLayer({
-          'id': 'station-circles',
-          'type': 'circle',
-          'source': 'Stations',
-          'paint': {
-              'circle-radius': 6,
-              'circle-color': '#ffffff',
-              'circle-stroke-width': 5
-          },
-          'filter': ['==', '$type', 'Point']
-        });
         map.current.addLayer({
           'id': 'train_positions',
           'type': 'circle',
@@ -62,7 +83,7 @@ export default function MapComp(props : any) {
         map.current.resize();
       })
     }
-  },[lon, lat, markers, zoom])
+  },[lon, lat, markers, zoom, stationMarkers])
 
   /**
    * Gets live train information from the api and generates markers for each
@@ -96,7 +117,6 @@ export default function MapComp(props : any) {
             trainMarkerMap.current.set(feature.properties.id,t)
           }
           else{
-
             trainMarkerMap.current.get(feature.properties.id)
               .setLngLat(feature.geometry.coordinates)
               .setRotation(feature.properties.rotation);
@@ -114,10 +134,6 @@ export default function MapComp(props : any) {
   useEffect(() => {
     if (!map.current ) return; // wait for map to initialize
     map.current.resize();
-    map.current.flyTo({ 
-      'center': [lon,lat], 
-      'zoom': zoom || 16.5
-    });
     
     if(markerTracker.current.length > 0 && !markers){
       map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
@@ -133,11 +149,9 @@ export default function MapComp(props : any) {
         map.current.setLayoutProperty('station-circles', 'visibility', 'none');
 
       for (const feature of markers!.features) {
-
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
           `<h6> ${feature.properties.title}</h6>
-          <div>${feature.properties.description}</div>`)
-
+           <div>${feature.properties.description}</div>`)
         const el = document.createElement('div');
         if(feature.properties.type === "Elevator"){
             el.className = 'elevator-marker';
@@ -145,20 +159,25 @@ export default function MapComp(props : any) {
         else if(feature.properties.type === "Escalator"){
             el.className = 'escalator-marker';
         }
-        else el.className = 'marker';
-        var t = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(popup).addTo(map.current);
+        else continue;
+        var t = new mapboxgl.Marker(el)
+          .setLngLat(feature.geometry.coordinates)
+          .setPopup(popup) 
+          .addTo(map.current);
         markerTracker.current.push(t);
       }
     }
-   
-/*  map.current.on("click", () => {
-      map.current.flyTo({ 
-        'center': [lon,lat], 
-        'zoom': zoom || 16.5
-      });
-    });*/
+
   },[lon, lat, markers, station, zoom,props.station]);
 
+  useEffect(()=>{
+    map.current.flyTo({ 
+      'center': [lon,lat], 
+      'zoom': zoom || 16.5
+    });
+
+  },[lon,lat, zoom])
+  
   const handleChange = (e:any) =>{
     setLiveTrain(e.target.checked);
   }
@@ -181,8 +200,8 @@ export default function MapComp(props : any) {
     <div  style={{height: "100%",position:"relative"}}>
       <div className="m-3 bottom-0 end-0 position-absolute shadow bg-body-tertiary rounded-pill" style={{zIndex:"1"}}>
         <div className="justify-content-center mt-1 mb-1 ms-2 me-2 form-check-reverse form-switch" style={{ cursor:"pointer"}} >
-          <input style={{ cursor:"pointer"}}  onChange={handleChange} checked={liveTrain} className="form-check-input" type="checkbox" role="switch" id="showLiveTrains"></input>
-          <label style={{ cursor:"pointer"}}  className=" form-check-label"htmlFor="showLiveTrains"> Show Live Trains </label>
+          <input style={{ cursor:"pointer"}} onChange={handleChange} checked={liveTrain} className="form-check-input" type="checkbox" role="switch" id="showLiveTrains"></input>
+          <label style={{ cursor:"pointer"}} className=" form-check-label"htmlFor="showLiveTrains"> Show Live Trains </label>
         </div>
       </div>
       <div ref={mapContainer} className="map-container" style={{height: "100%"}}></div>

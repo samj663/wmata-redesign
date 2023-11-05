@@ -118,7 +118,7 @@ export default function StationList() {
       <div className="tab-content d-flex row m-0 p-0" style={{height: `calc(100% - 61px - ${height}px)`}}>
         <div id="map" className="col d-md-block tab-pane col-lg-6 col-md-6 m-0 p-0" style={{height: "100%"}}>
             <div className="m-0 p-0" style={{height: "100%"}}>
-              <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station}/>
+              <Map lat={lat} lon={lon} zoom={zoom} markers={geojson_markers} station={station} setStation={setStation}/>
           </div>
         </div>
         <div id="info" className="col tab-pane active show col-lg-6 col-md-6 overflow-auto" style={{height: "100%"}}>
