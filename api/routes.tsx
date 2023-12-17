@@ -9,6 +9,8 @@ import * as bus from "./bus"
 const express = require('express')
 const path = require('path');
 export const app = express()
+const https = require("https");
+const fs = require("fs");
 
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -310,6 +312,18 @@ export var shutdown = function (message: string){
     console.log(message)
     server.close();
 }
+
+/*
+const server = https.createServer({
+    key: fs.readFileSync("api/dc-metro-api-key.pem"),
+    cert: fs.readFileSync("api/cert.pem"),
+  },
+  app);
+
+server.listen(4000, () => {
+    backend.main();
+  console.log(`App listening on https://localhost:${4000}`);
+});
 /*
 app.get('/api/queue', function(request : any, response : any){
     let output = []

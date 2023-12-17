@@ -5,7 +5,6 @@
 
 import { ESMap } from "typescript";
 import * as backend from "./backend"
-const cliProgress = require('cli-progress');
 import {busRoute, busStop, nextBus, error_template} from "./interfaces_and_classes"
 const {default : fetch} = require('node-fetch');
 const express = require('express')

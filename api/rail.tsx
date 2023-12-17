@@ -160,6 +160,7 @@ export async function get_train_positions(){
             trace: e.stack
         }
         backend.error_log.push(error)
+        setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function. 
         return "ERROR"
     }
     setTimeout(get_train_positions, 5000);

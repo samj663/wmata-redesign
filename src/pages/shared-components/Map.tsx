@@ -27,16 +27,15 @@ export default function MapComp(props : any) {
               `<h6>${station.Name}</h6>
               <div>${station.Address.Street +", " +station.Address.City+", " + station.Address.State+", " + station.Address.Zip}</div>`)
             const el = document.createElement('div');
-            el.className = 'marker'; 
+            el.className = 'station-marker'; 
             var t = new mapboxgl.Marker(el)
               .setLngLat([station.Lon, station.Lat])
               .addTo(map.current)
               .setPopup(popup)
 
             t.getElement().addEventListener('click', () => {
-              if(setStation) setStation(station.Name)
+              if(setStation) setStation(station.Name);
             });
-
             stationMarkerTracker.current.push(t)
           }
         }
@@ -135,8 +134,7 @@ export default function MapComp(props : any) {
     if (!map.current ) return; // wait for map to initialize
     map.current.resize();
     
-    if(markerTracker.current.length > 0 && !markers){
-      map.current.setLayoutProperty('station-circles', 'visibility', 'visible');
+    if(markerTracker.current.length > 0){
       for (var i = markerTracker.current.length -1; i>=0; i--){
           markerTracker.current[i].remove();
       }
@@ -145,8 +143,6 @@ export default function MapComp(props : any) {
     }
     if(markers === null || props.station === "") return;
     else{
-
-        map.current.setLayoutProperty('station-circles', 'visibility', 'none');
 
       for (const feature of markers!.features) {
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
@@ -168,7 +164,7 @@ export default function MapComp(props : any) {
       }
     }
 
-  },[lon, lat, markers, station, zoom,props.station]);
+  },[lon, lat, markers, station, zoom, props.station]);
 
   useEffect(()=>{
     map.current.flyTo({ 
