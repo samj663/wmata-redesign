@@ -5,6 +5,7 @@
 
 import * as backend from "./backend"
 import { ESMap } from "typescript";
+import {sql} from "./database"
 import {stationCodeNameMap, train, fares, entrance, station, busStop, busRoute, error_template} from "./interfaces_and_classes"
 const {default : fetch} = require('node-fetch');
 const path = require('path');
@@ -132,9 +133,12 @@ export async function get_train_positions(){
         const res = await fetch(`https://api.wmata.com/gtfs/rail-gtfsrt-vehiclepositions.pb?api_key=${key}`)
         var b = Buffer.from(await res.arrayBuffer())
         var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
-    
+        let trip_ids = feed.entity.map((x:any) => {return x.vehicle.trip.tripId})
+        let trip_headsigns = await sql ` 
+            select trip_id, trip_headsign from trips where trip_id in ${sql (trip_ids)}`
         feed.entity.forEach(function(entity:any) {
         if (entity.vehicle.position) {
+            let destination = trip_headsigns.filter((x:any) => {return x.trip_id == entity.vehicle.trip.tripId})[0]
             geojson.features.push(
             { "type": "Feature",
                 "properties": {
@@ -142,7 +146,8 @@ export async function get_train_positions(){
                 "id": entity.vehicle.vehicle.id,
                 "label": entity.vehicle.vehicle.label,
                 "licensePlate": entity.vehicle.vehicle.licensePlate,
-                "rotation":entity.vehicle.position.bearing
+                "rotation":entity.vehicle.position.bearing,
+                "destination": (destination != undefined) ? destination.trip_headsign : "not available" 
                 },
                 "geometry":{
                 "type": "Point",

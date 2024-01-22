@@ -23,22 +23,22 @@ export default function MapComp(props : any) {
 		.then(value=>{
 			if(value.error === undefined){
         for (const station of value){
-            const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-              `<h6>${station.Name}</h6>
-              <div>${station.Address.Street +", " +station.Address.City+", " + station.Address.State+", " + station.Address.Zip}</div>`)
-            const el = document.createElement('div');
-            el.className = 'station-marker'; 
-            var t = new mapboxgl.Marker(el)
-              .setLngLat([station.Lon, station.Lat])
-              .addTo(map.current)
-              .setPopup(popup)
+          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<h6>${station.Name}</h6>
+            <div>${station.Address.Street +", " +station.Address.City+", " + station.Address.State+", " + station.Address.Zip}</div>`)
+          const el = document.createElement('div');
+          el.className = 'station-marker'; 
+          var t = new mapboxgl.Marker(el)
+            .setLngLat([station.Lon, station.Lat])
+            .addTo(map.current)
+            .setPopup(popup)
 
-            t.getElement().addEventListener('click', () => {
-              if(setStation) setStation(station.Name);
-            });
-            stationMarkerTracker.current.push(t)
-          }
+          t.getElement().addEventListener('click', () => {
+            if(setStation) setStation(station.Name);
+          });
+          stationMarkerTracker.current.push(t)
         }
+      }
 		})
 		.catch(function(error) {
 			console.log('There has been a problem with your fetch operation: ' + error.message);
@@ -58,12 +58,12 @@ export default function MapComp(props : any) {
         logoPosition: "top-right"
       });
       
-        let img = document.getElementById('map-tab');
-        if (img){
-          img.addEventListener('click', (event) => {
-            map.current.resize()
-          })
-        }
+      let img = document.getElementById('map-tab');
+      if (img){
+        img.addEventListener('click', (event) => {
+          map.current.resize()
+        })
+      }
 
       map.current.on('idle',function(){ map.current.resize() })
       map.current.on("load", async () =>{
@@ -100,8 +100,8 @@ export default function MapComp(props : any) {
           if(trainMarkerMap.current.get(feature.properties.id) === undefined){
             const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
               `<h6>${feature.properties.line} Line Train</h6>
-              <div> Destination: -not available-</div>
-              <div> Train Info: ${feature.properties.licensePlate[0]} Car</div>`)
+              <div> Destination: ${feature.properties.destination}</div>
+              <div> Cars: ${feature.properties.licensePlate[0]}</div>`)
 
             const el = document.createElement('div');
             if(["RED","ORANGE","YELLOW","GREEN","BLUE","SILVER"].includes(feature.properties.line)){
@@ -171,12 +171,12 @@ export default function MapComp(props : any) {
       'center': [lon,lat], 
       'zoom': zoom || 16.5
     });
-
   },[lon,lat, zoom])
   
   const handleChange = (e:any) =>{
     setLiveTrain(e.target.checked);
   }
+  
   useEffect(() => {
     if(liveTrain === false){
       for(const e of timer.current){

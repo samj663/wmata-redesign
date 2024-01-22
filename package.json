@@ -4,7 +4,6 @@
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
-    "@google-cloud/secret-manager": "^5.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,8 +12,6 @@
     "@types/react-dom": "^18.2.4",
     "buffer": "^6.0.3",
     "child_process": "^1.0.2",
-    "cli-progress": "^3.12.0",
-    "crypto-browserify": "^3.12.0",
     "decompress": "^4.2.1",
     "dotenv": "^16.1.3",
     "fs": "^0.0.1-security",
@@ -33,7 +30,6 @@
     "react-map-gl": "^7.1.6",
     "react-router-dom": "^6.11.2",
     "react-scripts": "^5.0.1",
-    "request": "^2.88.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
@@ -46,8 +42,8 @@
     "test-react-scripts": "react-scripts test",
     "eject": "react-scripts eject",
     "both": "concurrently \"npm run backend\"  \"sleep 5 && npm start\"",
-    "both-routes": "concurrently \"tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
-    "compile": "tsc api/backend.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react --outDir api/build",
+    "both-routes": "concurrently \"tsc api/backend.tsx api/database.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api//rail.tsx --jsx react && node api/routes.js\"  \"sleep 5 && npm start\"",
+    "compile": "tsc api/backend.tsx api/database.tsx api/interfaces_and_classes.tsx api/routes.tsx api/bus.tsx api/rail.tsx --jsx react --outDir api/build",
     "backend": "npm run compile && node api/build/routes.js",
     "deploy": "npm run build && firebase deploy --only hosting",
     "react-test": "react-scripts test -- src/React.test.tsx"
