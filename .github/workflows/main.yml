@@ -32,5 +32,5 @@ jobs:
       env: # Set the secret as an input
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
         BACKEND_PORT: 4000
-      run: npm run test-both
+      run: npm run test-api && npm run test-react
       
