@@ -102,12 +102,12 @@ export async function bootstrap_get_train_data() {
   bootstrap_status.next_train = status;
 
   if (status === "ERROR") {
-    if (bootstrap_retry_counter.next_train >= MAX_RETRY) {
+    /*if (bootstrap_retry_counter.next_train >= MAX_RETRY) {
       shutdown(
         "Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_train_data",
       );
-    } else bootstrap_retry_counter.next_train++;
-    console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
+    } else bootstrap_retry_counter.next_train++;*/
+    console.log("get_train_data() ran into Error. Trying again in 10 seconds");
     setTimeout(bootstrap_get_train_data, 10000);
   }
 }

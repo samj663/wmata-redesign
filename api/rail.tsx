@@ -407,10 +407,10 @@ export async function get_rail_alerts_gtft_rt() {
       trace: e.stack,
     };
     backend.error_log.push(error);
-    setTimeout(get_rail_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
+    setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   railAlerts = output;
-  setTimeout(get_rail_alerts_gtft_rt, 5000);
+  setTimeout(get_rail_alerts_gtft_rt, 60000);
   return "SUCCESS";
 }
