@@ -60,7 +60,6 @@ export async function get_next_bus_data(stopID: string) {
       stop.nextBus = rawBus.Predictions;
       stop.lastUpdated = Date.now();
       queueCounter--;
-      console.log(rawBus.Predictions);
       return "SUCCESS";
     }
   } catch (e: any) {
