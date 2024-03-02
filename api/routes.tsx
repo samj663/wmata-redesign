@@ -205,6 +205,29 @@ app.get("/api/busStop", function (request: any, response: any) {
     });
   } else response.json(bus.bus_stops.get(request.query.stopid));
 });
+
+app.get("/api/nearestbusstop", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  if (backend.bootstrap_status.bus_stops === "RUNNING") {
+    response.json({ error: "System is booting up. Please try again later." });
+  } else if (backend.bootstrap_status.bus_stops === "ERROR") {
+    response.json({
+      error:
+        "System ran into error fetching bus stops. Please try again later.",
+    });
+  } else {
+    if(request.query.lat || request.query.lon || request.query.radius){
+      response.json({
+        error:
+          "Parameters weren't given.",
+      });
+    }
+    else{
+      response.json(bus.get_nearest_bus_stops(request.query.lat, request.query.lon, request.query.radius));
+    }
+  };
+});
+
 app.get("/api/busRoute", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   if (backend.bootstrap_status.bus_routes === "RUNNING") {
