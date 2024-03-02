@@ -216,7 +216,7 @@ app.get("/api/nearestbusstop", function (request: any, response: any) {
         "System ran into error fetching bus stops. Please try again later.",
     });
   } else {
-    if(request.query.lat || request.query.lon || request.query.radius){
+    if(request.query.lat == undefined || request.query.lon == undefined || request.query.radius == undefined){
       response.json({
         error:
           "Parameters weren't given.",
