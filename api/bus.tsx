@@ -172,7 +172,8 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
           id: key,
           name: value.name,
           lat: value.lat,
-          lon: value.lon
+          lon: value.lon,
+          distance: d
         })
       }
     })
