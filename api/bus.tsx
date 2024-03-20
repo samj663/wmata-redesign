@@ -99,6 +99,7 @@ export async function get_next_bus_database(stopID: string) {
   if(bus_schedule.get(stopID) == undefined){
     buses = await database.get_next_bus(stopID)
     bus_schedule.set(stopID, buses)
+    console.log(buses)
   }
   else{
     buses = bus_schedule.get(stopID)
