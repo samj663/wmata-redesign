@@ -94,27 +94,27 @@ function compareTime(time2: string, time1:string){
 export async function get_next_bus_database(stopID: string) {
   let s = bus_stops.get(stopID);
   if (s === undefined) return;
-  let newBuses:nextBus[] = []
+  let newBuses:any[] = []
   var buses;
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
     bus_schedule.set(stopID, buses)
-    console.log(buses)
+   // console.log(buses)
   }
   else{
     buses = bus_schedule.get(stopID)
   }
-  console.log("Next Bus for StopID #" + stopID)
+  //console.log("Next Bus for StopID #" + stopID)
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     let time = compareTime(bus.departure_time, current_date);
     if(time > 0 && time < 60)
     newBuses.push({
-      route: bus.route_id,
-      min: time,
-      directionText: bus.headsign_direction,
-      directionNum: "-1",
-      vehicleID: "-1"
+      RouteID: bus.route_id,
+      Minutes: time,
+      DirectionText: bus.headsign_direction,
+      TripID: "-1",
+      VehicleID: "-1"
     })
   }
   var stop = bus_stops.get(stopID);
