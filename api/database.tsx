@@ -7,7 +7,7 @@ const fs = require('fs');
 const decompress = require("decompress");
 const {default : fetch} = require('node-fetch');
 
-
+/*
 const render_config :object= {
   host      : process.env.render_host,   // Postgres ip address[s] or domain name[s]
   port      : process.env.render_port,   // Postgres server port[s]
@@ -15,9 +15,9 @@ const render_config :object= {
   username  : process.env.render_user,   // Username of database user
   password  : process.env.render_pass,   // Password of database user
   ssl       : true
-}
+}*/
 
-export const sql = postgres(render_config);
+export const sql = postgres(process.env.render_url, {ssl: true});
 //console.log(sql)
 /*
 async function get_next_scheduled_trains(station_code : string, direction :number){
