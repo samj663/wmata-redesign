@@ -163,13 +163,14 @@ export async function get_train_positions() {
     let trip_ids = feed.entity.map((x: any) => {
       return x.vehicle.trip.tripId;
     });
+    /*
     let trip_headsigns = await sql`
-            select trip_id, trip_headsign from trips where trip_id in ${sql(trip_ids)}`;
+            select trip_id, trip_headsign from trips where trip_id in ${sql(trip_ids)}`;*/
     feed.entity.forEach(function (entity: any) {
       if (entity.vehicle.position) {
-        let destination = trip_headsigns.filter((x: any) => {
+       let destination = undefined /*trip_headsigns.filter((x: any) => {
           return x.trip_id == entity.vehicle.trip.tripId;
-        })[0];
+        })[0];*/
         geojson.features.push({
           type: "Feature",
           properties: {
@@ -178,10 +179,11 @@ export async function get_train_positions() {
             label: entity.vehicle.vehicle.label,
             licensePlate: entity.vehicle.vehicle.licensePlate,
             rotation: entity.vehicle.position.bearing,
-            destination:
+          /*  destination:
               destination != undefined
                 ? destination.trip_headsign
-                : "not available",
+                : "not available",*/
+                destination: "not available"
           },
           geometry: {
             type: "Point",

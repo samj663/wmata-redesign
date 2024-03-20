@@ -5,6 +5,7 @@
 
 import { ESMap } from "typescript";
 import * as backend from "./backend";
+import * as database from "./database";
 import {
   busRoute,
   busStop,
@@ -74,6 +75,44 @@ export async function get_next_bus_data(stopID: string) {
     };
     backend.error_log.push(error);
     return "ERROR";
+  }
+}
+function compareTime(time2: string, time1:string){
+  let array1 = time1.split(":")
+  let array2 = time2.split(":")
+  let output = [0,0,0]
+  for(var i = 0; i < array1.length ; i++){
+    
+    output[i] = parseInt(array2[i]) - parseInt(array1[i]);
+    console.log(output[i])
+  }
+  for(var i = 1; i < output.length ; i++){
+    output[i] = output[i] +  (output[i - 1] * 60)
+  }
+  return Math.floor(output[2] / 60)
+}
+
+export async function get_next_bus_database(stopID: string) {
+  let time = Date.now();
+  let s = bus_stops.get(stopID);
+  if (s === undefined) return;
+  let buses = await database.get_next_bus(stopID)
+  let newBuses:nextBus[] = []
+
+  let current_date = new Date().toLocaleTimeString('it-IT').toString()
+  for (const bus of buses) {
+    newBuses.push({
+      route: bus.route_id,
+      min: compareTime(bus.departure_time, current_date),
+      directionText: bus.headsign_direction,
+      directionNum: "-1",
+      vehicleID: "-1"
+    })
+  }
+  var stop = bus_stops.get(stopID);
+  if (stop) {
+    stop.nextBus = newBuses
+    stop.lastUpdated = Date.now();
   }
 }
 
