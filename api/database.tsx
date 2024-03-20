@@ -17,7 +17,7 @@ const render_config :object= {
   ssl       : true
 }*/
 
-export const sql = postgres(process.env.render_url, {ssl: true});
+export const sql = postgres(process.env.render_url);
 //console.log(sql)
 /*
 async function get_next_scheduled_trains(station_code : string, direction :number){
@@ -52,10 +52,15 @@ export async function get_next_bus(stop_id: string){
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
 
-  return await sql`
+  try{
+    let output = await sql`
     SELECT * FROM bus_stop_times where
     stop_code = ${stop_id} 
-    ORDER BY departure_time`;
+    ORDER BY departure_time`
+    return output;
+  } catch {
+    return []
+  }
 }
 /*
 
