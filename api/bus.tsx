@@ -30,6 +30,7 @@ export var bus_routes: ESMap<string, busRoute>;
 export var bus_route_list: any;
 export var bus_route_list_special: any;
 export var bus_alerts: any;
+export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
 
 /**
  * When this is 0, run api call instantly.
@@ -91,17 +92,25 @@ function compareTime(time2: string, time1:string){
 }
 
 export async function get_next_bus_database(stopID: string) {
- // let time = Date.now();
   let s = bus_stops.get(stopID);
   if (s === undefined) return;
-  let buses = await database.get_next_bus(stopID)
   let newBuses:nextBus[] = []
+  var buses;
+  if(bus_schedule.get(stopID) == undefined){
+    buses = await database.get_next_bus(stopID)
+    bus_schedule.set(stopID, buses)
+  }
+  else{
+    buses = bus_schedule.get(stopID)
+  }
   console.log("Next Bus for StopID #" + stopID)
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
+    let time = compareTime(bus.departure_time, current_date);
+    if(time > 0 && time < 60)
     newBuses.push({
       route: bus.route_id,
-      min: compareTime(bus.departure_time, current_date),
+      min: time,
       directionText: bus.headsign_direction,
       directionNum: "-1",
       vehicleID: "-1"

@@ -51,15 +51,22 @@ export async function get_next_bus(stop_id: string){
   let startTimestamp = start_time.getTime()
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
- // console.log(sql)
+
   return await sql`
+    SELECT * FROM bus_stop_times where
+    stop_code = ${stop_id} 
+    ORDER BY departure_time`;
+}
+/*
+
+return await sql`
     SELECT * FROM bus_stop_times where
     stop_code = ${stop_id} and
     departure_time > ${start_time.toLocaleTimeString('it-IT').toString()} and
     departure_time < ${end_time.toLocaleTimeString('it-IT').toString()}
     ORDER BY departure_time`;
-}
-/*
+
+
 Result(2) [
   {
     route_id: '52',
