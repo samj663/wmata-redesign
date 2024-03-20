@@ -35,8 +35,8 @@ export var bus_alerts: any;
  * When this is 0, run api call instantly.
  * If its greater than 1, setTimeout by "x" milliseconds times the number of quene counter
  */
-export var queueCounter: number = 0;
-
+//export var queueCounter: number = 0;
+/*
 export async function get_next_bus_data(stopID: string) {
   let time = Date.now();
   let s = bus_stops.get(stopID);
@@ -76,15 +76,13 @@ export async function get_next_bus_data(stopID: string) {
     backend.error_log.push(error);
     return "ERROR";
   }
-}
+}*/
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
   let output = [0,0,0]
   for(var i = 0; i < array1.length ; i++){
-    
     output[i] = parseInt(array2[i]) - parseInt(array1[i]);
-    console.log(output[i])
   }
   for(var i = 1; i < output.length ; i++){
     output[i] = output[i] +  (output[i - 1] * 60)
@@ -93,12 +91,12 @@ function compareTime(time2: string, time1:string){
 }
 
 export async function get_next_bus_database(stopID: string) {
-  let time = Date.now();
+ // let time = Date.now();
   let s = bus_stops.get(stopID);
   if (s === undefined) return;
   let buses = await database.get_next_bus(stopID)
   let newBuses:nextBus[] = []
-
+  console.log("Next Bus for StopID #" + stopID)
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     newBuses.push({
@@ -113,6 +111,7 @@ export async function get_next_bus_database(stopID: string) {
   if (stop) {
     stop.nextBus = newBuses
     stop.lastUpdated = Date.now();
+    return "SUCCESS";
   }
 }
 
