@@ -135,14 +135,17 @@ export async function get_next_bus_database(stopID: string) {
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     let time = compareTime(bus.departure_time, current_date);
-    if(time > 0 && time < 45)
-    newBuses.push({
-      RouteID: bus.route_id,
-      Minutes: time,
-      DirectionText: bus.headsign_direction,
-      TripID: bus.trip_id,
-      VehicleID: bus.vehicle_id
-    })
+    if(time > 0 && time < 45){
+      newBuses.push({
+        RouteID: bus.route_id,
+        Minutes: time,
+        DirectionText: bus.headsign_direction,
+        TripID: bus.trip_id,
+        VehicleID: bus.vehicle_id
+      })
+      console.log(bus.vehicle_id)
+    }
+    
   }
   var stop = bus_stops.get(stopID);
   if (stop) {
