@@ -99,29 +99,33 @@ function compareTime(time2: string, time1:string){
 }
 
 export async function get_next_bus_database(stopID: string) {
-  
+  let time = Date.now()
   let s = bus_stops.get(stopID);
+  var wasUpdated = false
   if (s === undefined) return;
   let newBuses:any[] = []
   var buses;
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
+    wasUpdated = true;
     bus_schedule.set(stopID, buses)
     console.log("Updating buses: 1")
   }
   else{
-    let time = Date.now()
     if (s.lastUpdated == null) {
       buses = await database.get_next_bus(stopID)
+      wasUpdated = true;
       bus_schedule.set(stopID, buses)
       console.log("Updating buses: 2")
     }
     else{
-      if ((time - s.lastUpdated ) < 20000) {
+      console.log(time + " : " + s.lastUpdated)
+      if ((time - s.lastUpdated ) < 200000) {
         buses = bus_schedule.get(stopID)
       }
       else{
         buses = await database.get_next_bus(stopID)
+        wasUpdated = true;
         bus_schedule.set(stopID, buses)
         console.log("Updating buses: 3")
       }
@@ -143,7 +147,7 @@ export async function get_next_bus_database(stopID: string) {
   var stop = bus_stops.get(stopID);
   if (stop) {
     stop.nextBus = newBuses
-    stop.lastUpdated = Date.now();
+    if(wasUpdated) stop.lastUpdated = time;
     return "SUCCESS";
   }
 }
