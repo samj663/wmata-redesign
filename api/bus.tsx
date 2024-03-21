@@ -135,11 +135,12 @@ export async function get_next_bus_database(stopID: string) {
   }
   
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
+  console.log(new Date().toLocaleTimeString("en-US"))
   for (const bus of buses) {
     
     let time = compareTime(bus.departure_time, current_date);
     if(time > 0 && time < 45){
-      console.log("time: " + time + " : "+bus.departure_time + " : " + bus.trip_id + " : " +bus.vehicle_id)
+  //    console.log("time: " + time + " : "+bus.departure_time + " : " + bus.trip_id + " : " +bus.vehicle_id)
       newBuses.push({
         RouteID: bus.route_id,
         Minutes: time,
