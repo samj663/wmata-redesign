@@ -107,22 +107,27 @@ export async function get_next_bus_database(stopID: string) {
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
     bus_schedule.set(stopID, buses)
+    console.log("Updating buses: 1")
   }
   else{
     let time = Date.now()
-    if (s?.lastUpdated == null) {
+    if (s.lastUpdated == null) {
       buses = await database.get_next_bus(stopID)
+      bus_schedule.set(stopID, buses)
+      console.log("Updating buses: 2")
     }
     else{
-      if (time - s.lastUpdated < 5000) {
+      if ((time - s.lastUpdated ) < 5000) {
         buses = bus_schedule.get(stopID)
       }
       else{
         buses = await database.get_next_bus(stopID)
         bus_schedule.set(stopID, buses)
+        console.log("Updating buses: 3")
       }
     }
   }
+  
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     let time = compareTime(bus.departure_time, current_date);
