@@ -16,6 +16,7 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 app.use(express.static(path.join(__dirname, "client/build")));
+app.use(require('express-status-monitor')());
 //--------------------------------------------------------------------
 //         Below is all the GET endpoint functions
 //         Note: any parameters defined for each funciton
@@ -368,8 +369,6 @@ app.get("/api/errorLog", function (request: any, response: any) {
 app.get("/api/nextBus", async function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   if (request.query.stopid !== undefined) {
-    //await bus.get_next_bus_data(request.query.stopid);
-    await bus.get_next_bus_database(request.query.stopid);
     var info = bus.bus_stops.get(request.query.stopid);
     if (info === undefined) {
       response.json({ error: "Stop not found" });

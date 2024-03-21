@@ -11,7 +11,7 @@ var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 
 export var sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
 
-// Not in use. Database only stores bus information
+// Not in use. Database only stores bus information for now.
 async function get_next_scheduled_trains(station_code : string, direction :number){
     var today = new Date();
     var time = today.getHours() + ":" + String(today.getMinutes()).padStart(2, '0') + ":" + String(today.getSeconds()).padStart(2,'0');
@@ -34,7 +34,7 @@ async function get_next_scheduled_trains(station_code : string, direction :numbe
     `
 }
 
-// Not in use. Database only stores bus information
+// Not in use. Database only stores bus information for now
 async function get_train_position_destinations(trains:any){
   let temp = trains.map((x:any) => {return x.vehicle.trip.tripId});
   return temp
@@ -53,17 +53,19 @@ export async function get_next_bus(stop_id: string){
   return output;
 }
 
-export async function get_multiple_next_bus(stop_id: string[]){
+export async function get_all_next_bus(){
   let start_time = new Date()
   let startTimestamp = start_time.getTime()
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
 
   var output =  await sql`
-  SELECT * FROM bus_stop_times where
-  stop_code in ${ sql(stop_id) } 
-  ORDER BY departure_time
+  SELECT stop_code, route_id, departure_time, headsign_direction, vehicle_id FROM public.bus_stop_times
+  where departure_time > ${start_time.toLocaleTimeString('it-IT').toString()} and
+  departure_time < ${end_time.toLocaleTimeString('it-IT').toString()}
+  ORDER BY stop_code, departure_time
   `
+  //console.log(new Date().toString(), " : Fetched Bus Data")
   return output;
 }
 
@@ -99,11 +101,8 @@ export async function update_bus_data() {
         }
       })
     });
-  // console.log(insert.length)
     if (count > 0){
-      
       for (var i = count ; i > 0 && insert.length > 0; i - 700){
-      // console.log("ADDED DATA")
         await sql`
           update bus_stop_times set departure_time = update_data.time, vehicle_id = (update_data.vehicle)::int
           from (values ${sql(insert)}) as update_data (tripID, time, vehicle, sequence, stopID)
@@ -119,7 +118,6 @@ export async function update_bus_data() {
           insert = insert.slice(700)
       }
     }
-    //console.log("Updated bus info")
   } catch(e: any) {
     console.log("---- ERROR has been caught. Check Log ----");
     console.log(e);
@@ -131,6 +129,6 @@ export async function update_bus_data() {
     };
     backend.error_log.push(error);
   }
-  setTimeout(update_bus_data, 30000);
-  //console.log("Updated bus info")
+  setTimeout(update_bus_data, 20000);
+ // console.log(new Date().toString() +": Updated database info")
 }

@@ -32,59 +32,6 @@ export var bus_route_list_special: any;
 export var bus_alerts: any;
 export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
 
-/**
- * When this is 0, run api call instantly.
- * If its greater than 1, setTimeout by "x" milliseconds times the number of quene counter
- */
-export var queueCounter: number = 0;
-
-/**
- * Retrieves next bus information from provided stopID.
- * Note: Not in use. The rate limit of WMATA's api won't allow refreshing
- * data in a timely manner
- * @param stopID the id number of a stop
- * @returns "SUCCESS" if it ran successfully. "ERROR" otherwise
- */
-export async function get_next_bus_data(stopID: string) {
-  let time = Date.now();
-  let s = bus_stops.get(stopID);
-  if (s === undefined) return;
-  if (s?.lastUpdated !== undefined && s?.lastUpdated !== null) {
-    if (time - s.lastUpdated < 20000) return;
-  }
-
-  queueCounter++;
-  await backend.delay(queueCounter * 100);
-
-  try {
-    var busResponse = await fetch(
-      `https://api.wmata.com/NextBusService.svc/json/jPredictions?StopID=${stopID}&api_key=${key}`,
-    );
-    var rawBus = await busResponse.json();
-    if (rawBus === undefined) {
-      throw new Error("Proper data structure wasn't found within json file");
-    }
-    var stop = bus_stops.get(stopID);
-    if (stop) {
-      stop.nextBus = rawBus.Predictions;
-      stop.lastUpdated = Date.now();
-      queueCounter--;
-      return "SUCCESS";
-    }
-  } catch (e: any) {
-    backend.bootstrap_status.rail_alerts = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_next_bus",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);
-    return "ERROR";
-  }
-}
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
@@ -97,58 +44,48 @@ function compareTime(time2: string, time1:string){
   }
   return Math.floor(output[2] / 60)
 }
-
-export async function get_next_bus_database(stopID: string) {
-  let time = Date.now()
-  let s = bus_stops.get(stopID);
-  var wasUpdated = false
-  if (s === undefined) return;
-  let newBuses:any[] = []
-  var buses;
-  if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
-    buses = await database.get_next_bus(stopID)
-    wasUpdated = true;
-    bus_schedule.set(stopID, buses)
-  }
-  else{
-    if (s.lastUpdated == null) {
-      buses = await database.get_next_bus(stopID)
-      wasUpdated = true;
-      bus_schedule.set(stopID, buses)
-    }
-    else{
-      console.log(time + " : " + s.lastUpdated)
-      if ((time - s.lastUpdated ) < 100000) {
-        buses = bus_schedule.get(stopID)
-      }
-      else{
-        buses = await database.get_next_bus(stopID)
-        wasUpdated = true;
-        bus_schedule.set(stopID, buses)
-      }
-    }
-  }
   
-  let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-  console.log(current_date)
-  for (const bus of buses) {
-    let time = compareTime(bus.departure_time, current_date);
-    if(time > 0 && time < 45){
-      newBuses.push({
-        RouteID: bus.route_id,
-        Minutes: time,
-        DirectionText: bus.headsign_direction,
-        TripID: bus.trip_id,
-        VehicleID: bus.vehicle_id
-      })
+export async function update_bus_data() {
+  let timestamp = Date.now()
+  try{
+    let buses = await database.get_all_next_bus()
+
+    if(buses.length > 0){
+      var current_stop = buses[0].stop_code
+      var current_array: any[] = []
+      let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      for (const bus of buses) {
+        if(bus.stop_code !== current_stop){
+          var stop = bus_stops.get(current_stop);
+          if (stop) {
+            stop.nextBus = Array.from(current_array)
+            stop.lastUpdated = timestamp;
+          }
+          current_stop = bus.stop_code
+          current_array = []
+        }
+        let time = compareTime(bus.departure_time, current_date);
+        current_array.push({
+          RouteID: bus.route_id,
+          Minutes: time,
+          DirectionText: bus.headsign_direction,
+          TripID: "",
+          VehicleID: bus.vehicle_id
+        })
+      }
     }
+  } catch(e: any) {
+    console.log("---- ERROR has been caught. Check Log ----");
+    console.log(e);
+    var error: error_template = {
+      timestamp: Date.now().toString(),
+      function: "update_bus_data",
+      error: e.message,
+      trace: e.stack,
+    };
+    backend.error_log.push(error);
   }
-  var stop = bus_stops.get(stopID);
-  if (stop) {
-    stop.nextBus = newBuses
-    if(wasUpdated) stop.lastUpdated = time;
-    return "SUCCESS";
-  }
+  setTimeout(update_bus_data, 15000);
 }
 
 export async function get_bus_routes() {
