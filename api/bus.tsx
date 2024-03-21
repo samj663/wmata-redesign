@@ -134,8 +134,8 @@ export async function get_next_bus_database(stopID: string) {
     }
   }
   
-  let current_date = new Date().toLocaleTimeString('it-IT').toString()
-  console.log(new Date().toLocaleTimeString("en-US"))
+  let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+  console.log(current_date)
   for (const bus of buses) {
     
     let time = compareTime(bus.departure_time, current_date);
