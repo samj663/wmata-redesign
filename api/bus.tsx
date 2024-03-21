@@ -107,7 +107,7 @@ export async function get_next_bus_database(stopID: string) {
   var buses;
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
-    console.log(buses)
+  //  console.log(buses)
     wasUpdated = true;
     bus_schedule.set(stopID, buses)
     console.log("Updating buses: 1")
@@ -115,7 +115,7 @@ export async function get_next_bus_database(stopID: string) {
   else{
     if (s.lastUpdated == null) {
       buses = await database.get_next_bus(stopID)
-      console.log(buses)
+    //  console.log(buses)
       wasUpdated = true;
       bus_schedule.set(stopID, buses)
       console.log("Updating buses: 2")
