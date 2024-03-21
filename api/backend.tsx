@@ -6,6 +6,7 @@
 
 import * as bus from "./bus";
 import * as rail from "./rail";
+import * as database from "./database";
 import "./routes";
 import { error_template } from "./interfaces_and_classes";
 import { shutdown } from "./routes";
@@ -60,6 +61,7 @@ export async function main() {
   bootstrap_bus_routes();
   bootstrap_train_positions();
   bootstrap_get_bus_alerts();
+  database.update_bus_data();
 }
 //get_bus_alerts_gtft_rt()
 export async function bootstrap_get_rail_alerts() {

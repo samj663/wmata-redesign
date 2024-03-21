@@ -117,7 +117,7 @@ export async function get_next_bus_database(stopID: string) {
       console.log("Updating buses: 2")
     }
     else{
-      if ((time - s.lastUpdated ) < 50000) {
+      if ((time - s.lastUpdated ) < 20000) {
         buses = bus_schedule.get(stopID)
       }
       else{
@@ -131,13 +131,13 @@ export async function get_next_bus_database(stopID: string) {
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     let time = compareTime(bus.departure_time, current_date);
-    if(time > 0 && time < 60)
+    if(time > 0 && time < 45)
     newBuses.push({
       RouteID: bus.route_id,
       Minutes: time,
       DirectionText: bus.headsign_direction,
-      TripID: "-1",
-      VehicleID: "-1"
+      TripID: bus.trip_id,
+      VehicleID: bus.vehicle_id
     })
   }
   var stop = bus_stops.get(stopID);
@@ -147,6 +147,7 @@ export async function get_next_bus_database(stopID: string) {
     return "SUCCESS";
   }
 }
+
 
 export async function get_bus_routes() {
   try {
