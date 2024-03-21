@@ -3,7 +3,7 @@ const path = require('path');
 require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
-export const sql = postgres(process.env.render_url);
+export const sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl});
 
 // Not in use. Database only stores bus information
 async function get_next_scheduled_trains(station_code : string, direction :number){
@@ -39,13 +39,12 @@ export async function get_next_bus(stop_id: string){
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
 
-  try{
+  
     let output = await sql`
     SELECT * FROM bus_stop_times where
     stop_code = ${stop_id} 
     ORDER BY departure_time`
+    console.log(output)
     return output;
-  } catch {
-    return []
-  }
+
 }
