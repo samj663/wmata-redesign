@@ -117,7 +117,7 @@ export async function get_next_bus_database(stopID: string) {
       console.log("Updating buses: 2")
     }
     else{
-      if ((time - s.lastUpdated ) < 5000) {
+      if ((time - s.lastUpdated ) < 50000) {
         buses = bus_schedule.get(stopID)
       }
       else{
