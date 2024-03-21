@@ -36,8 +36,15 @@ export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
  * When this is 0, run api call instantly.
  * If its greater than 1, setTimeout by "x" milliseconds times the number of quene counter
  */
-//export var queueCounter: number = 0;
-/*
+export var queueCounter: number = 0;
+
+/**
+ * Retrieves next bus information from provided stopID.
+ * Note: Not in use. The rate limit of WMATA's api won't allow refreshing
+ * data in a timely manner
+ * @param stopID the id number of a stop
+ * @returns "SUCCESS" if it ran successfully. "ERROR" otherwise
+ */
 export async function get_next_bus_data(stopID: string) {
   let time = Date.now();
   let s = bus_stops.get(stopID);
@@ -77,7 +84,7 @@ export async function get_next_bus_data(stopID: string) {
     backend.error_log.push(error);
     return "ERROR";
   }
-}*/
+}
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
@@ -92,6 +99,7 @@ function compareTime(time2: string, time1:string){
 }
 
 export async function get_next_bus_database(stopID: string) {
+  
   let s = bus_stops.get(stopID);
   if (s === undefined) return;
   let newBuses:any[] = []
@@ -99,12 +107,20 @@ export async function get_next_bus_database(stopID: string) {
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
     bus_schedule.set(stopID, buses)
-   // console.log(buses)
   }
   else{
-    buses = bus_schedule.get(stopID)
+    let time = Date.now()
+    if (s?.lastUpdated !== undefined && s?.lastUpdated !== null) {
+      if (time - s.lastUpdated < 5000) {
+        buses = bus_schedule.get(stopID)
+      }
+      else{
+        buses = await database.get_next_bus(stopID)
+        bus_schedule.set(stopID, buses)
+      }
+    }
+    
   }
-  //console.log("Next Bus for StopID #" + stopID)
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
     let time = compareTime(bus.departure_time, current_date);
@@ -145,8 +161,9 @@ export async function get_bus_routes() {
         `https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route.RouteID}&api_key=${key}`,
       );
       var rawRoute = await routeResponse.json();
-      if (rawRoute.statusCode)
+      if (rawRoute.statusCode){
         if (rawRoute.statusCode == 429) console.log(rawRoute + route.RouteID);
+      }
       const temp: busRoute = {
         name: route.Name,
         description: route.LineDescription,
@@ -239,33 +256,23 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
   }
   return output;
 }
-function distance(lat1: number,
-  lat2: number, lon1:number, lon2:number)
-{
+function distance(lat1: number, lat2: number, lon1:number, lon2:number){
+  lon1 =  lon1 * Math.PI / 180;
+  lon2 = lon2 * Math.PI / 180;
+  lat1 = lat1 * Math.PI / 180;
+  lat2 = lat2 * Math.PI / 180;
 
-// The math module contains a function
-// named toRadians which converts from
-// degrees to radians.
-lon1 =  lon1 * Math.PI / 180;
-lon2 = lon2 * Math.PI / 180;
-lat1 = lat1 * Math.PI / 180;
-lat2 = lat2 * Math.PI / 180;
+  // Haversine formula 
+  let dlon = lon2 - lon1; 
+  let dlat = lat2 - lat1;
+  let a = Math.pow(Math.sin(dlat / 2), 2)
+  + Math.cos(lat1) * Math.cos(lat2)
+  * Math.pow(Math.sin(dlon / 2),2);
 
-// Haversine formula 
-let dlon = lon2 - lon1; 
-let dlat = lat2 - lat1;
-let a = Math.pow(Math.sin(dlat / 2), 2)
-+ Math.cos(lat1) * Math.cos(lat2)
-* Math.pow(Math.sin(dlon / 2),2);
+  let c = 2 * Math.asin(Math.sqrt(a));
+  let r = 6371;
 
-let c = 2 * Math.asin(Math.sqrt(a));
-
-// Radius of earth in kilometers. Use 3956 
-// for miles
-let r = 6371;
-
-// calculate the result
-return(c * r);
+  return(c * r);
 }
 
 export async function get_bus_alerts_gtft_rt() {
