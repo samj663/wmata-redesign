@@ -110,7 +110,10 @@ export async function get_next_bus_database(stopID: string) {
   }
   else{
     let time = Date.now()
-    if (s?.lastUpdated !== undefined && s?.lastUpdated !== null) {
+    if (s?.lastUpdated == null) {
+      buses = await database.get_next_bus(stopID)
+    }
+    else{
       if (time - s.lastUpdated < 5000) {
         buses = bus_schedule.get(stopID)
       }
@@ -119,7 +122,6 @@ export async function get_next_bus_database(stopID: string) {
         bus_schedule.set(stopID, buses)
       }
     }
-    
   }
   let current_date = new Date().toLocaleTimeString('it-IT').toString()
   for (const bus of buses) {
