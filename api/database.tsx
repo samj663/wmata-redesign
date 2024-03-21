@@ -45,9 +45,6 @@ export async function get_next_bus(stop_id: string){
   stop_code = ${stop_id} 
   ORDER BY departure_time
   `
-  for (const e of output){
-    console.log(e.departure_time + " : " + e.trip_id + " : " +e.vehicle_id)
-  }
   return output;
 }
 
