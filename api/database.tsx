@@ -3,6 +3,7 @@ import {
   error_template
 } from "./interfaces_and_classes";
 const postgres = require('postgres')
+const { default: fetch } = require("node-fetch");
 const path = require('path');
 require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
@@ -118,6 +119,7 @@ export async function update_bus_data() {
           insert = insert.slice(700)
       }
     }
+    //console.log("Updated bus info")
   } catch(e: any) {
     console.log("---- ERROR has been caught. Check Log ----");
     console.log(e);
