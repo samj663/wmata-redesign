@@ -3,7 +3,7 @@ const path = require('path');
 require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 
-export const sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl});
+export var sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
 
 // Not in use. Database only stores bus information
 async function get_next_scheduled_trains(station_code : string, direction :number){
