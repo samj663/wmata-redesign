@@ -107,18 +107,14 @@ export async function get_next_bus_database(stopID: string) {
   var buses;
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
-  //  console.log(buses)
     wasUpdated = true;
     bus_schedule.set(stopID, buses)
-    console.log("Updating buses: 1")
   }
   else{
     if (s.lastUpdated == null) {
       buses = await database.get_next_bus(stopID)
-    //  console.log(buses)
       wasUpdated = true;
       bus_schedule.set(stopID, buses)
-      console.log("Updating buses: 2")
     }
     else{
       console.log(time + " : " + s.lastUpdated)
@@ -129,7 +125,6 @@ export async function get_next_bus_database(stopID: string) {
         buses = await database.get_next_bus(stopID)
         wasUpdated = true;
         bus_schedule.set(stopID, buses)
-        console.log("Updating buses: 3")
       }
     }
   }
@@ -137,10 +132,8 @@ export async function get_next_bus_database(stopID: string) {
   let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
   console.log(current_date)
   for (const bus of buses) {
-    
     let time = compareTime(bus.departure_time, current_date);
     if(time > 0 && time < 45){
-  //    console.log("time: " + time + " : "+bus.departure_time + " : " + bus.trip_id + " : " +bus.vehicle_id)
       newBuses.push({
         RouteID: bus.route_id,
         Minutes: time,
@@ -157,7 +150,6 @@ export async function get_next_bus_database(stopID: string) {
     return "SUCCESS";
   }
 }
-
 
 export async function get_bus_routes() {
   try {
