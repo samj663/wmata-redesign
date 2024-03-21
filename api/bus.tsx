@@ -122,12 +122,11 @@ export async function get_next_bus_database(stopID: string) {
     }
     else{
       console.log(time + " : " + s.lastUpdated)
-      if ((time - s.lastUpdated ) < 200000) {
+      if ((time - s.lastUpdated ) < 100000) {
         buses = bus_schedule.get(stopID)
       }
       else{
         buses = await database.get_next_bus(stopID)
-        console.log(buses)
         wasUpdated = true;
         bus_schedule.set(stopID, buses)
         console.log("Updating buses: 3")
@@ -146,9 +145,7 @@ export async function get_next_bus_database(stopID: string) {
         TripID: bus.trip_id,
         VehicleID: parseInt(bus.vehicle_id)
       })
-    //  console.log(bus.vehicle_id)
     }
-    
   }
   var stop = bus_stops.get(stopID);
   if (stop) {

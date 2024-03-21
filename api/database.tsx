@@ -40,10 +40,13 @@ export async function get_next_bus(stop_id: string){
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
 
-  return await sql`
+  var output =  await sql`
   SELECT * FROM bus_stop_times where
   stop_code = ${stop_id} 
-  ORDER BY departure_time`;
+  ORDER BY departure_time
+  `
+  console.log(output.vehicle_id)
+  return output;
 }
 
 export async function update_bus_data() {
