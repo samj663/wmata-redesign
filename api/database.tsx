@@ -14,7 +14,7 @@ async function get_next_scheduled_trains(station_code : string, direction :numbe
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
-    console.log(time)
+    //console.log(time)
     return await sql `
       select * from stop_times
       inner join trips on trips.trip_id = stop_times.trip_id
@@ -77,7 +77,7 @@ export async function update_bus_data() {
       }
     })
   });
-  console.log(insert.length)
+ // console.log(insert.length)
   if (count > 0){
     
     for (var i = count ; i > 0 && insert.length > 0; i - 700){

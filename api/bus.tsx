@@ -107,6 +107,7 @@ export async function get_next_bus_database(stopID: string) {
   var buses;
   if(bus_schedule.get(stopID) == undefined || bus_schedule.get(stopID) == null){
     buses = await database.get_next_bus(stopID)
+    console.log(buses)
     wasUpdated = true;
     bus_schedule.set(stopID, buses)
     console.log("Updating buses: 1")
@@ -114,6 +115,7 @@ export async function get_next_bus_database(stopID: string) {
   else{
     if (s.lastUpdated == null) {
       buses = await database.get_next_bus(stopID)
+      console.log(buses)
       wasUpdated = true;
       bus_schedule.set(stopID, buses)
       console.log("Updating buses: 2")
@@ -125,6 +127,7 @@ export async function get_next_bus_database(stopID: string) {
       }
       else{
         buses = await database.get_next_bus(stopID)
+        console.log(buses)
         wasUpdated = true;
         bus_schedule.set(stopID, buses)
         console.log("Updating buses: 3")
@@ -141,9 +144,9 @@ export async function get_next_bus_database(stopID: string) {
         Minutes: time,
         DirectionText: bus.headsign_direction,
         TripID: bus.trip_id,
-        VehicleID: bus.vehicle_id
+        VehicleID: parseInt(bus.vehicle_id)
       })
-      console.log(bus.vehicle_id)
+    //  console.log(bus.vehicle_id)
     }
     
   }
