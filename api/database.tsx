@@ -61,8 +61,8 @@ export async function get_all_next_bus(){
 
   var output =  await sql`
   SELECT stop_code, route_id, departure_time, headsign_direction, vehicle_id FROM public.bus_stop_times
-  where departure_time > ${start_time.toLocaleTimeString('it-IT').toString()} and
-  departure_time < ${end_time.toLocaleTimeString('it-IT').toString()}
+  where departure_time > ${start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()} and
+  departure_time < ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
   ORDER BY stop_code, departure_time
   `
   console.log(new Date().toString(), " : Fetched Bus Data")

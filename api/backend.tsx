@@ -54,7 +54,7 @@ export var bootstrap_retry_counter = {
  * Starts up backend system and manage when to get next arrival data
  */
 export async function main() {
-  //bootstrap_get_rail_alerts();
+  bootstrap_get_rail_alerts();
   bootstrap_get_data();
   bootstrap_get_train_data();
   bootstrap_bus_stops();
