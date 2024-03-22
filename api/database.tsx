@@ -65,7 +65,7 @@ export async function get_all_next_bus(){
   departure_time < ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
   ORDER BY stop_code, departure_time
   `
-  console.log(new Date().toLocaleString('it-IT',{timeZone: 'America/New_York'}).toString(), ": Fetched Bus Data")
+  console.log("Fetched Bus Data")
   return output;
 }
 
@@ -118,6 +118,7 @@ export async function update_bus_data() {
           insert = insert.slice(700)
       }
     }
+    console.log("Updated database info")
   } catch(e: any) {
     console.log("---- ERROR has been caught. Check Log ----");
     console.log(e);
@@ -129,6 +130,5 @@ export async function update_bus_data() {
     };
     backend.error_log.push(error);
   }
-  setTimeout(update_bus_data, 20000);
-  console.log(new Date().toLocaleString('it-IT',{timeZone: 'America/New_York'}).toString() +": Updated database info")
+  setTimeout(update_bus_data, 15000);
 }

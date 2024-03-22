@@ -9,8 +9,8 @@ import * as bus from "./bus";
 const express = require("express");
 const path = require("path");
 export const app = express();
-const https = require("https");
-const fs = require("fs");
+//const https = require("https");
+//const fs = require("fs");
 
 require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
@@ -254,7 +254,7 @@ app.get("/api/busRouteList", function (request: any, response: any) {
     response.json(bus.bus_route_list);
   }
 });
-
+/*
 app.get("/api/busRoute/direction0", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   if (backend.bootstrap_status.bus_routes === "RUNNING") {
@@ -353,7 +353,7 @@ app.get(
       );
   },
 );
-
+*/
 app.get("/api/bootstrap", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.json(backend.bootstrap_status);

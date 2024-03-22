@@ -9,7 +9,6 @@ import * as database from "./database";
 import {
   busRoute,
   busStop,
-  nextBus,
   error_template,
 } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
@@ -28,9 +27,9 @@ var key = process.env.WMATA_KEY;
 export var bus_stops: ESMap<string, busStop>;
 export var bus_routes: ESMap<string, busRoute>;
 export var bus_route_list: any;
-export var bus_route_list_special: any;
+//export var bus_route_list_special: any;
 export var bus_alerts: any;
-export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
+//export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
 
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
