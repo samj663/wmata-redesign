@@ -61,7 +61,7 @@ export async function main() {
   bootstrap_bus_routes();
   bootstrap_train_positions();
   bootstrap_get_bus_alerts();
-  //database.update_bus_data();
+  database.update_bus_data();
   bus.update_bus_data()
 }
 //get_bus_alerts_gtft_rt()
