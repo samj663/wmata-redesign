@@ -65,7 +65,7 @@ export async function get_all_next_bus(){
   departure_time < ${end_time.toLocaleTimeString('it-IT').toString()}
   ORDER BY stop_code, departure_time
   `
-  //console.log(new Date().toString(), " : Fetched Bus Data")
+  console.log(new Date().toString(), " : Fetched Bus Data")
   return output;
 }
 
