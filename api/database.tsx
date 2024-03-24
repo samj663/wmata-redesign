@@ -119,7 +119,6 @@ export async function get_all_next_bus(){
   let startTimestamp = start_time.getTime()
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
-
   let output = await sql`select stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
   FROM bus_stop_times, bus_trips, bus_stops WHERE
   bus_trips.service_id = ${today_service} and
@@ -129,12 +128,14 @@ export async function get_all_next_bus(){
   bus_stop_times.departure_time <= ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
   order by bus_stops.stop_code, bus_stop_times.departure_time`
   sql.end()
+  //console.log(output[0])
   return output
 }
 
 export async function update_bus_data() {
+  let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
   try{
-    let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+    
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
@@ -168,13 +169,15 @@ export async function update_bus_data() {
         ])
       })
     });
+    var updated_count = 0
     for(var i = 0 ; i < time_updates.length; i = i+ 700){
       let end = i + 700
-      await sql`
+      let t = await sql`
         UPDATE bus_stop_times SET departure_time = update_data.time
         FROM (values ${sql(time_updates.slice(i, end))}) as update_data (tripID, time, sequence, stopID)
         WHERE bus_stop_times.trip_id = update_data.tripID and bus_stop_times.stop_id = update_data.stopID and bus_stop_times.stop_sequence = (update_data.sequence)::int 
         RETURNING bus_stop_times.trip_id`
+        updated_count += t.length
     }
     for(var i = 0 ; i < vehicle_updates.length; i = i+ 700){
       await sql`
@@ -183,10 +186,11 @@ export async function update_bus_data() {
         WHERE bus_trips.trip_id = update_data.tripID
         RETURNING bus_trips.trip_id`
     }
-    console.log("Updated database info")
-    sql.end()
+    console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
+    
   } catch(e: any) {
     console.error(e);
   }
+  sql.end()
   setTimeout(update_bus_data, 20000);
 }

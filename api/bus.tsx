@@ -46,7 +46,7 @@ export async function update_bus_data() {
   let timestamp = Date.now()
   try{
     let buses = await database.get_all_next_bus()
-
+   // console.log(buses.length)
     if(buses.length > 0){
       var current_stop = buses[0].stop_code
       var current_array: any[] = []
@@ -65,12 +65,13 @@ export async function update_bus_data() {
         current_array.push({
           RouteID: bus.route_id,
           Minutes: time,
-          DirectionText: bus.trip_headsign,
+          DirectionText: bus.trip_headsign ? bus.trip_headsign : "",
           TripID: bus.trip_id,
           VehicleID: bus.vehicle_id
         })
       }
     }
+    console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
   } catch(e: any) {
     //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
@@ -106,7 +107,7 @@ export async function get_bus_routes() {
       );
       var rawRoute = await routeResponse.json();
       if (rawRoute.statusCode){
-        if (rawRoute.statusCode == 429) console.log(rawRoute + route.RouteID);
+        //if (rawRoute.statusCode == 429) console.log(rawRoute + route.RouteID);
       }
       const temp: busRoute = {
         name: route.Name,
