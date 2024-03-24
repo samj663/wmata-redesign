@@ -65,7 +65,7 @@ export async function update_bus_data() {
         current_array.push({
           RouteID: bus.route_id,
           Minutes: time,
-          DirectionText: bus.headsign_direction,
+          DirectionText: bus.trip_headsign,
           TripID: bus.trip_id,
           VehicleID: bus.vehicle_id
         })
