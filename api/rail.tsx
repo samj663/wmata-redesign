@@ -5,7 +5,7 @@
 
 import * as backend from "./backend";
 import { ESMap } from "typescript";
-import { sql } from "./database";
+//import { sql } from "./database";
 import {
   stationCodeNameMap,
   train,
@@ -48,15 +48,15 @@ export async function get_train_data() {
     }
     trains = parseTrains(rawTrains.Trains);
   } catch (e: any) {
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(trainResponse);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(trainResponse);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_train_data",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     setTimeout(get_train_data, 20000);
     return "ERROR";
   }
@@ -97,18 +97,18 @@ export async function get_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
-    console.log("---- ERROR has been caught. Check Log ----");
+    //console.log("---- ERROR has been caught. Check Log ----");
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
 
-    console.log(e);
+    console.error(e);
 
-    var error: error_template = {
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_data",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     return "ERROR";
   }
   backend.bootstrap_status.stations_fares_entrances = "SUCCESS";
@@ -134,15 +134,15 @@ export async function get_rail_alerts() {
     backend.lastUpdated.alerts = date;
   } catch (e: any) {
     backend.bootstrap_status.rail_alerts = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_rail_alerts",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     return "ERROR";
   }
   backend.bootstrap_status.rail_alerts = "SUCCESS";
@@ -189,15 +189,15 @@ export async function get_train_positions() {
     });
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_train_positions",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
@@ -393,14 +393,14 @@ export async function get_rail_alerts_gtft_rt() {
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
     console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_rail_alerts_gtft_rt",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.
     return "ERROR";
   }

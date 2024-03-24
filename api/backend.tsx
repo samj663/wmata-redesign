@@ -16,7 +16,7 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 
-export var error_log: error_template[] = [];
+//export var error_log: error_template[] = [];
 
 export var lastUpdated = {
   next_train: null,

@@ -9,10 +9,23 @@ require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 
-export var sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+const config: object = {
+  host: process.env.local_host, // Postgres ip address[s] or domain name[s]
+  port: process.env.local_port, // Postgres server port[s]
+  database: process.env.local_db, // Name of database to connect to
+  username: process.env.local_user, // Username of database user
+  password: process.env.local_pass, // Password of database user
+};
+
+//const sql = postgres(config);
+//export const sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
 
 // Not in use. Database only stores bus information for now.
 async function get_next_scheduled_trains(station_code : string, direction :number){
+  const sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+  try{
+    
+    //let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
     var today = new Date();
     var time = today.getHours() + ":" + String(today.getMinutes()).padStart(2, '0') + ":" + String(today.getSeconds()).padStart(2,'0');
     var time2 = (today.getHours() + 1) + ":" + String(today.getMinutes()).padStart(2, '0') + ":" + String(today.getSeconds()).padStart(2,'0');
@@ -32,6 +45,10 @@ async function get_next_scheduled_trains(station_code : string, direction :numbe
       order by arrival_time
       limit 10
     `
+  } catch(e:any) {
+    console.error(e)
+  }
+  sql.end()
 }
 
 // Not in use. Database only stores bus information for now
@@ -39,96 +56,137 @@ async function get_train_position_destinations(trains:any){
   let temp = trains.map((x:any) => {return x.vehicle.trip.tripId});
   return temp
 }
-export async function get_next_bus(stop_id: string){
-  let start_time = new Date()
-  let startTimestamp = start_time.getTime()
-  let timeExtent = 45 * 60 * 1000
-  let end_time = new Date(startTimestamp + timeExtent)
 
-  var output =  await sql`
-  SELECT * FROM bus_stop_times where
-  stop_code = ${stop_id} 
-  ORDER BY departure_time
-  `
-  return output;
+export async function get_next_bus(stop_id: string){
+  try{
+    let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+    let start_time = new Date()
+    let startTimestamp = start_time.getTime()
+    let timeExtent = 45 * 60 * 1000
+    let end_time = new Date(startTimestamp + timeExtent)
+
+    var output =  await sql`
+    SELECT * FROM bus_stop_times where
+    stop_code = ${stop_id} 
+    ORDER BY departure_time
+    `
+    sql.end()
+    return output;
+  } catch(e:any)  {
+    console.error(e)
+  }
+}
+
+async function service_id_today(){
+  let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+  let date = new Date().toLocaleDateString("af-ZA").replace(/-/g,"")
+  let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
+  var output;
+  if(service_exception.length > 0){
+    return service_exception[0].service_id
+  }
+  let day = new Date().getDay() 
+
+  if(day == 0){
+    output = (await sql`select service_id from bus_calendar where sunday = 1 limit 1`)[0].service_id
+  }
+  else if(day == 1){
+    output = (await sql`select service_id from bus_calendar where monday = 1 limit 1`)[0].service_id
+  }
+  else if(day == 2){
+    output = (await sql`select service_id from bus_calendar where tuesday = 1 limit 1`)[0].service_id
+  }
+  else if(day == 3){
+    output = (await sql`select service_id from bus_calendar where wednesday = 1 limit 1`)[0].service_id
+  }
+  else if(day == 4){
+    output = (await sql`select service_id from bus_calendar where thursday = 1 limit 1`)[0].service_id
+  }
+  else if(day == 5){
+    output = (await sql`select service_id from bus_calendar where friday = 1 limit 1`)[0].service_id
+  }
+  else{
+    output = (await sql`select service_id from bus_calendar where saturday = 1 limit 1`)[0].service_id
+  }
+  sql.end()
+  return output
 }
 
 export async function get_all_next_bus(){
+  let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
+  let today_service = await service_id_today()
   let start_time = new Date()
   let startTimestamp = start_time.getTime()
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
 
-  var output =  await sql`
-  SELECT stop_code, route_id, departure_time, headsign_direction, vehicle_id FROM public.bus_stop_times
-  where departure_time > ${start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()} and
-  departure_time < ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
-  ORDER BY stop_code, departure_time
-  `
-  console.log("Fetched Bus Data")
-  return output;
+  let output = await sql`select stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
+  FROM bus_stop_times, bus_trips, bus_stops WHERE
+  bus_trips.service_id = ${today_service} and
+  bus_trips.trip_id = bus_stop_times.trip_id and
+  bus_stops.stop_id = bus_stop_times.stop_id and
+  bus_stop_times.departure_time >= ${start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()} and 
+  bus_stop_times.departure_time <= ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
+  order by bus_stops.stop_code, bus_stop_times.departure_time`
+  sql.end()
+  return output
 }
 
 export async function update_bus_data() {
   try{
+    let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
-    //stoptimeupdate:
-    //time: add three 0's to make it proper date? The time number is short for some reason
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
     var b = Buffer.from(blob);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
-    var insert:any = []
-    var count = 0
+    var vehicle_updates:any = []
+    var time_updates: any =[]
     feed.entity.forEach(function (entity:any) {
+      vehicle_updates.push([
+        entity.tripUpdate.trip.tripId,
+        parseInt(entity.tripUpdate.vehicle.id)
+      ])
       entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
+        var t;
+        var time;
         if(e.departure != null){
-          let t = parseInt(e.departure.time + "000")
-          let time = new Date(t);
-        
-          if(entity.tripUpdate.trip.tripId != undefined || time != undefined ||
-            entity.tripUpdate.vehicle.id != undefined ||
-            e.stopSequence != undefined ||e.stopId != undefined ){
-            count += 1
-            insert.push([
-              entity.tripUpdate.trip.tripId,
-              time.toLocaleTimeString('it-IT').toString(),
-              parseInt(entity.tripUpdate.vehicle.id),
-              parseInt(e.stopSequence),
-              e.stopId,
-            ])
-          }
+          // Multiplied by 1000 to convert from seconds to milliseconds
+          t = ( parseInt(e.departure.time)) * 1000 
+          time = new Date(t);
         }
+        else{
+          // Multiplied by 1000 to convert from seconds to milliseconds
+          t = ( parseInt(e.arrival.time)) * 1000
+          time = new Date(t);
+        }
+        time_updates.push([
+          entity.tripUpdate.trip.tripId,
+          time.toLocaleTimeString('it-IT').toString(),
+          parseInt(e.stopSequence),
+          e.stopId
+        ])
       })
     });
-    if (count > 0){
-      for (var i = count ; i > 0 && insert.length > 0; i - 700){
-        await sql`
-          update bus_stop_times set departure_time = update_data.time, vehicle_id = (update_data.vehicle)::int
-          from (values ${sql(insert)}) as update_data (tripID, time, vehicle, sequence, stopID)
-          where bus_stop_times.trip_id = update_data.tripID and bus_stop_times.stop_id = update_data.stopID and bus_stop_times.stop_sequence = (update_data.sequence)::int 
-          returning bus_stop_times.trip_id
-          `
-          await sql`
-          update bus_stop_times set vehicle_id = (update_data.vehicle)::int
-          from (values ${sql(insert)}) as update_data (tripID, time, vehicle, sequence, stopID)
-          where bus_stop_times.trip_id = update_data.tripID
-          returning bus_stop_times.trip_id
-          `
-          insert = insert.slice(700)
-      }
+    for(var i = 0 ; i < time_updates.length; i = i+ 700){
+      let end = i + 700
+      await sql`
+        UPDATE bus_stop_times SET departure_time = update_data.time
+        FROM (values ${sql(time_updates.slice(i, end))}) as update_data (tripID, time, sequence, stopID)
+        WHERE bus_stop_times.trip_id = update_data.tripID and bus_stop_times.stop_id = update_data.stopID and bus_stop_times.stop_sequence = (update_data.sequence)::int 
+        RETURNING bus_stop_times.trip_id`
+    }
+    for(var i = 0 ; i < vehicle_updates.length; i = i+ 700){
+      await sql`
+        UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int 
+        FROM (values ${sql(vehicle_updates)}) as update_data (tripID, vehicle_id)
+        WHERE bus_trips.trip_id = update_data.tripID
+        RETURNING bus_trips.trip_id`
     }
     console.log("Updated database info")
+    sql.end()
   } catch(e: any) {
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_bus_routes",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);
+    console.error(e);
   }
-  setTimeout(update_bus_data, 15000);
+  setTimeout(update_bus_data, 20000);
 }

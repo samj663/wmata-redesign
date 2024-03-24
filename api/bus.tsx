@@ -27,9 +27,7 @@ var key = process.env.WMATA_KEY;
 export var bus_stops: ESMap<string, busStop>;
 export var bus_routes: ESMap<string, busRoute>;
 export var bus_route_list: any;
-//export var bus_route_list_special: any;
 export var bus_alerts: any;
-//export var bus_schedule: ESMap<string, any[]> = new Map<string, any[]>();
 
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
@@ -68,23 +66,23 @@ export async function update_bus_data() {
           RouteID: bus.route_id,
           Minutes: time,
           DirectionText: bus.headsign_direction,
-          TripID: "",
+          TripID: bus.trip_id,
           VehicleID: bus.vehicle_id
         })
       }
     }
   } catch(e: any) {
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "update_bus_data",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
   }
-  setTimeout(update_bus_data, 15000);
+  setTimeout(update_bus_data, 20000);
 }
 
 export async function get_bus_routes() {
@@ -122,15 +120,15 @@ export async function get_bus_routes() {
   } catch (e: any) {
     backend.bootstrap_status.bus_routes = "ERROR";
     backend.bootstrap_status.bus_route_list = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_bus_routes",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     return "ERROR";
   }
   console.log("finished caching bus routes!");
@@ -158,15 +156,15 @@ export async function get_bus_stops() {
     }
   } catch (e: any) {
     backend.bootstrap_status.bus_stops = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_bus_stops",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     return "ERROR";
   }
   console.log("Bus stops cached!");
@@ -190,15 +188,15 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
     })
 
   } catch (e: any) {
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_nearest_bus_stops",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
   }
   return output;
 }
@@ -249,20 +247,19 @@ export async function get_bus_alerts_gtft_rt() {
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
-    console.log(e);
-    var error: error_template = {
+    //console.log("---- ERROR has been caught. Check Log ----");
+    console.error(e);
+    /*var error: error_template = {
       timestamp: Date.now().toString(),
       function: "get_rail_alerts_gtft_rt",
       error: e.message,
       trace: e.stack,
     };
-    backend.error_log.push(error);
+    backend.error_log.push(error);*/
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   bus_alerts = output;
-  //  console.log(bus_alerts);
   setTimeout(get_bus_alerts_gtft_rt, 5000);
   return "SUCCESS";
 }

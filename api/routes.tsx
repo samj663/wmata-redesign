@@ -358,13 +358,13 @@ app.get("/api/bootstrap", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.json(backend.bootstrap_status);
 });
-
+/*
 app.get("/api/errorLog", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   if (request.query.key === process.env.ERROR_LOG_KEY)
     response.json(backend.error_log);
   else response.json({ error: "Invalid key" });
-});
+});*/
 
 app.get("/api/nextBus", async function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
