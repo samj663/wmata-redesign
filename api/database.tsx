@@ -153,17 +153,17 @@ export async function update_bus_data() {
         var time;
         if(e.departure != null){
           // Multiplied by 1000 to convert from seconds to milliseconds
-          t = ( parseInt(e.departure.time)) * 1000 
+          t =  parseInt(e.departure.time + "000")
           time = new Date(t);
         }
         else{
           // Multiplied by 1000 to convert from seconds to milliseconds
-          t = ( parseInt(e.arrival.time)) * 1000
+          t = parseInt(e.arrival.time + "000")
           time = new Date(t);
         }
         time_updates.push([
           entity.tripUpdate.trip.tripId,
-          time.toLocaleTimeString('it-IT').toString(),
+          time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString(),
           parseInt(e.stopSequence),
           e.stopId
         ])
