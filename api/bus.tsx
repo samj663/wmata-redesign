@@ -62,7 +62,7 @@ export async function update_bus_data() {
           current_array = []
         }
         let time = compareTime(bus.departure_time, current_date);
-        if(time <= 0) time = 0
+        if(time < 0) continue;
         current_array.push({
           RouteID: bus.route_id,
           Minutes: time,
@@ -74,15 +74,7 @@ export async function update_bus_data() {
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
   } catch(e: any) {
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "update_bus_data",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
   }
   setTimeout(update_bus_data, 20000);
 }
