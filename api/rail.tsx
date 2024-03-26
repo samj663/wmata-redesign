@@ -5,16 +5,12 @@
 
 import * as backend from "./backend";
 import { ESMap } from "typescript";
-//import { sql } from "./database";
 import {
   stationCodeNameMap,
   train,
   fares,
   entrance,
   station,
-  busStop,
-  busRoute,
-  error_template,
 } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
 const path = require("path");
@@ -48,15 +44,7 @@ export async function get_train_data() {
     }
     trains = parseTrains(rawTrains.Trains);
   } catch (e: any) {
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(trainResponse);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_train_data",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     setTimeout(get_train_data, 20000);
     return "ERROR";
   }
@@ -97,18 +85,10 @@ export async function get_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
-    //console.log("---- ERROR has been caught. Check Log ----");
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
 
     console.error(e);
-
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_data",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
+    setTimeout(get_train_data, 100000);
     return "ERROR";
   }
   backend.bootstrap_status.stations_fares_entrances = "SUCCESS";

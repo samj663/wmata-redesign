@@ -32,6 +32,9 @@ export var bus_alerts: any;
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
+  if((parseInt(array2[0]) - 24 ) >= parseInt(array1[0])){
+    array2[0] = (parseInt(array2[0]) - 24 ).toString()
+  }
   let output = [0,0,0]
   for(var i = 0; i < array1.length ; i++){
     output[i] = parseInt(array2[i]) - parseInt(array1[i]);
@@ -62,6 +65,7 @@ export async function update_bus_data() {
           current_array = []
         }
         let time = compareTime(bus.departure_time, current_date);
+        if(time <= 0) time = 0
         current_array.push({
           RouteID: bus.route_id,
           Minutes: time,
@@ -106,9 +110,6 @@ export async function get_bus_routes() {
         `https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route.RouteID}&api_key=${key}`,
       );
       var rawRoute = await routeResponse.json();
-      if (rawRoute.statusCode){
-        //if (rawRoute.statusCode == 429) console.log(rawRoute + route.RouteID);
-      }
       const temp: busRoute = {
         name: route.Name,
         description: route.LineDescription,
@@ -121,15 +122,7 @@ export async function get_bus_routes() {
   } catch (e: any) {
     backend.bootstrap_status.bus_routes = "ERROR";
     backend.bootstrap_status.bus_route_list = "ERROR";
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_bus_routes",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     return "ERROR";
   }
   console.log("finished caching bus routes!");
@@ -151,21 +144,13 @@ export async function get_bus_stops() {
         lon: stop.Lon,
         routes: stop.Routes,
         lastUpdated: null,
-        nextBus: null,
+        nextBus: [],
       };
       bus_stops.set(stop.StopID, temp);
     }
   } catch (e: any) {
     backend.bootstrap_status.bus_stops = "ERROR";
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_bus_stops",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     return "ERROR";
   }
   console.log("Bus stops cached!");
@@ -187,17 +172,8 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
         })
       }
     })
-
   } catch (e: any) {
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_nearest_bus_stops",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
   }
   return output;
 }
@@ -230,12 +206,10 @@ export async function get_bus_alerts_gtft_rt() {
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
-      //    console.log(entity.alert);
       entity.alert.informedEntity.forEach(function (e: any) {
         line.push(e.routeId);
       });
 
-      //  console.log(entity.alert.headerText.translation[0].text)
       output.push({
         alertId: entity.id,
         line: line,
@@ -248,15 +222,7 @@ export async function get_bus_alerts_gtft_rt() {
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_rail_alerts_gtft_rt",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
