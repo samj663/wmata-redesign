@@ -99,6 +99,8 @@ export async function get_all_next_bus(){
   let startTimestamp = start_time.getTime()
   let timeExtent = 45 * 60 * 1000
   let end_time = new Date(startTimestamp + timeExtent)
+  console.log(start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString())
+  console.log(end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString())
   let output = await sql`
     SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
     FROM bus_stop_times, bus_trips, bus_stops WHERE
