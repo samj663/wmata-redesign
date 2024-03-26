@@ -90,6 +90,8 @@ async function service_id_today(){
   return output
 }
 
+// TODO: Account for when late night servce spills into next days's service. It's not guaranteed
+// that late night service is the same for each day.
 export async function get_all_next_bus(){
   let sql = postgres(process.env.render_url, {ssl: process.env.enable_ssl == "1" ? true : false});
   let today_service = await service_id_today()
@@ -136,9 +138,10 @@ export async function update_bus_data() {
           t = parseInt(e.arrival.time + "000")
           time = new Date(t);
         }
+        let temp = time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()//val[2].length == 7 ?"0" +val[2]:val[2]
         time_updates.push([
           entity.tripUpdate.trip.tripId,
-          time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString(),
+          temp.length == 7 ? "0" + temp:temp,
           parseInt(e.stopSequence),
           e.stopId
         ])
@@ -163,7 +166,7 @@ export async function update_bus_data() {
     }
     console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
   } catch(e: any) {
-    console.warn(`Database Info Failed To Update`)
+    console.warn(`Database Info Failed To Update --`)
     console.error(e);
   }
   sql.end()

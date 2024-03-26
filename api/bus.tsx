@@ -32,9 +32,6 @@ export var bus_alerts: any;
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
-  if((parseInt(array2[0]) - 24 ) >= parseInt(array1[0])){
-    array2[0] = (parseInt(array2[0]) - 24 ).toString()
-  }
   let output = [0,0,0]
   for(var i = 0; i < array1.length ; i++){
     output[i] = parseInt(array2[i]) - parseInt(array1[i]);
