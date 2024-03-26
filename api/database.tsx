@@ -101,14 +101,16 @@ export async function get_all_next_bus(){
   let end_time = new Date(startTimestamp + timeExtent)
   console.log(start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString())
   console.log(end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString())
+  let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+  let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
   let output = await sql`
     SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
     FROM bus_stop_times, bus_trips, bus_stops WHERE
     bus_trips.service_id = ${today_service} and
     bus_trips.trip_id = bus_stop_times.trip_id and
     bus_stops.stop_id = bus_stop_times.stop_id and
-    bus_stop_times.departure_time >= ${start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()} and 
-    bus_stop_times.departure_time <= ${end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()}
+    bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
+    bus_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
     ORDER BY bus_stops.stop_code, bus_stop_times.departure_time`
   sql.end()
   return output
