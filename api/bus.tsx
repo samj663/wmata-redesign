@@ -41,7 +41,23 @@ function compareTime(time2: string, time1:string){
   }
   return Math.floor(output[2] / 60)
 }
-  
+
+function clear_old_data(){
+  bus_stops.forEach((key: any, value: any)=>{
+    if(value.lastUpdated !== null){
+      if ((Date.now() - value.lastUpdated ) > 600000){
+        console.log(value)
+        value.nextBus = []
+        value.lastUpdated = Date.now()
+      }
+      bus_stops.set(key, value)
+    }
+  })
+}
+/**
+ * TODO: Create a method to flush out old bus data. It seems like when the last scheduled bus
+ * arrived and leaves the stop, the data isn't removed because theres no new data to populate the field
+ */
 export async function update_bus_data() {
   let timestamp = Date.now()
   try{
@@ -73,6 +89,7 @@ export async function update_bus_data() {
       }
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
+    clear_old_data()
   } catch(e: any) {
     console.error(e);
   }
