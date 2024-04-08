@@ -254,117 +254,11 @@ app.get("/api/busRouteList", function (request: any, response: any) {
     response.json(bus.bus_route_list);
   }
 });
-/*
-app.get("/api/busRoute/direction0", function (request: any, response: any) {
-  response.set("Access-Control-Allow-Origin", "*");
-  if (backend.bootstrap_status.bus_routes === "RUNNING") {
-    response.json({ error: "System is booting up. Please try again later." });
-  } else if (backend.bootstrap_status.bus_routes === "ERROR") {
-    response.json({
-      error:
-        "System ran into error fetching bus routes. Please try again later.",
-    });
-  } else
-    response.json(bus.bus_routes.get(request.query.route)?.paths.Direction0);
-});
 
-app.get(
-  "/api/busRoute/direction0/stops",
-  function (request: any, response: any) {
-    response.set("Access-Control-Allow-Origin", "*");
-    if (backend.bootstrap_status.bus_routes === "RUNNING") {
-      response.json({ error: "System is booting up. Please try again later." });
-    } else if (backend.bootstrap_status.bus_routes === "ERROR") {
-      response.json({
-        error:
-          "System ran into error fetching bus routes. Please try again later.",
-      });
-    } else
-      response.json(
-        bus.bus_routes.get(request.query.route)?.paths.Direction0.Stops,
-      );
-  },
-);
-
-app.get("/api/busRoute/direction1", function (request: any, response: any) {
-  response.set("Access-Control-Allow-Origin", "*");
-  if (backend.bootstrap_status.bus_routes === "RUNNING") {
-    response.json({ error: "System is booting up. Please try again later." });
-  } else if (backend.bootstrap_status.bus_routes === "ERROR") {
-    response.json({
-      error:
-        "System ran into error fetching bus routes. Please try again later.",
-    });
-  } else
-    response.json(bus.bus_routes.get(request.query.route)?.paths.Direction1);
-});
-
-app.get(
-  "/api/busRoute/:route/direction/:directionNum/stops/:onlyStops",
-  function (request: any, response: any) {
-    response.set("Access-Control-Allow-Origin", "*");
-    if (backend.bootstrap_status.bus_routes === "RUNNING") {
-      response.json({ error: "System is booting up. Please try again later." });
-    } else if (backend.bootstrap_status.bus_routes === "ERROR") {
-      response.json({
-        error:
-          "System ran into error fetching bus routes. Please try again later.",
-      });
-    } else {
-      if (request.params.directionNum === "0") {
-        if (request.params.onlyStops === "true") {
-          response.json(
-            bus.bus_routes.get(request.params.route)?.paths.Direction0.Stops,
-          );
-        } else
-          response.json(
-            bus.bus_routes.get(request.params.route)?.paths.Direction0,
-          );
-      } else if (request.params.directionNum === "1") {
-        if (request.params.onlyStops === "true") {
-          response.json(
-            bus.bus_routes.get(request.params.route)?.paths.Direction1.Stops,
-          );
-        } else
-          response.json(
-            bus.bus_routes.get(request.params.route)?.paths.Direction1,
-          );
-      } else {
-        response.json(bus.bus_routes.get(request.params.route));
-      }
-    }
-  },
-);
-
-app.get(
-  "/api/busRoute/direction1/stops",
-  function (request: any, response: any) {
-    response.set("Access-Control-Allow-Origin", "*");
-    if (backend.bootstrap_status.bus_routes === "RUNNING") {
-      response.json({ error: "System is booting up. Please try again later." });
-    } else if (backend.bootstrap_status.bus_routes === "ERROR") {
-      response.json({
-        error:
-          "System ran into error fetching bus routes. Please try again later.",
-      });
-    } else
-      response.json(
-        bus.bus_routes.get(request.query.route)?.paths.Direction1.Stops,
-      );
-  },
-);
-*/
 app.get("/api/bootstrap", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.json(backend.bootstrap_status);
 });
-/*
-app.get("/api/errorLog", function (request: any, response: any) {
-  response.set("Access-Control-Allow-Origin", "*");
-  if (request.query.key === process.env.ERROR_LOG_KEY)
-    response.json(backend.error_log);
-  else response.json({ error: "Invalid key" });
-});*/
 
 app.get("/api/nextBus", async function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
@@ -378,12 +272,332 @@ app.get("/api/nextBus", async function (request: any, response: any) {
   } else response.json({ error: "Stop not found" });
 });
 
+/*
+    Below are rewrites of endpoints above to make them more clear.
+    These will be the new endpoints when all other projects are updated to use them.
+*/
+
+app.get("/", function (request: any, response: any) {
+  response.send("This is the DC Metro API backend");
+});
+
 /**
- * Catchall function to handle invalid endpoints.
+ * Gets next arrivals of a given station
+ * @param station The station you want to get the next arrivals from
+ * @param group what group of trains you want to get. Accepted inputs are "1" and "2" Note: In WMATA's api,
+ * trains are put in 2 groups to denote what tracks they are one. However, it doesn't correlate to the physical
+ * track number.
+ * @returns json file containing array of train objecs. See "train" interface in interfaces_and_classes.tsx
  */
+app.get("/rail/arrival/:station/:group", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=20");
+  if (request.params.station == null) {
+    response.status(400).json({ error: "Provide station" });
+  } else {
+    let code = rail.stationNames.getCode(request.params.station)!;
+    let output = rail.trains.get(code);
+    if (output) {
+      if (rail.stations.get(code) === undefined) {
+        response.json({ error: "Invalid station" });
+        return;
+      }
+      if (request.params.group === "1")
+        response.json(output.filter((x) => x.Group === "1"));
+      else if (request.params.group === "2")
+        response.json(output.filter((x) => x.Group === "2"));
+      else response.json(output);
+    } else {
+      response.json({ error: "No trains found at station" });
+      return;
+    }
+  }
+});
+
+/**
+ * Gets next arrivals of a given station that includes arrivals from transfer stations
+ * @param station The station you want to get the next arrivals from
+ * @param group what group of trains you want to get. Accepted inputs are "1" and "2". Put any other value to include both groups
+ * Note: In WMATA's api, trains are put in 2 groups to denote what tracks they are one. However, it doesn't correlate to the physical
+ * track number.
+ * @returns json file containing array of train objecs. See "train" interface in interfaces_and_classes.tsx
+ */
+app.get("/rail/arrival/:station/:group/transf", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=20");
+  if (request.params.station == null) {
+    response.status(400).json({ error: "Provide station" });
+  } else {
+    let code = rail.stationNames.getCode(request.params.station)!;
+    let output = rail.trains.get(code);
+    if (output) {
+      if (rail.stations.get(code) === undefined) {
+        response.json({ error: "Invalid station" });
+        return;
+      }
+      if (rail.stations.get(code)?.StationTogether1 !== "") {
+        let temp = rail.trains.get(rail.stations.get(code)!.StationTogether1);
+        if (temp) output = output.concat(temp);
+      }
+      if (request.params.group === "1")
+        response.json(output.filter((x) => x.Group === "1"));
+      else if (request.params.group === "2")
+        response.json(output.filter((x) => x.Group === "2"));
+      else response.json(output);
+    } else {
+      response.json({ error: "No trains found at station" });
+      return;
+    }
+  }
+});
+
+/**
+ * NOTE: WMATA stopped using off-peak fares and simplified it to only using peak-fares all weekday until 9:30pm.
+ * Gets the fare information from one station to another. The fare is determined on how far you
+ * travel so it will depend on which station you start and end at
+ * @param source The origin station
+ * @param dest The destination station
+ * @returns json with object that contains fare information. See "fares" interface in interfaces_and_classes.tsx
+ */
+app.get("/rail/fares/:source/to/:dest", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=604800");
+  if (request.params.source == null || request.params.dest == null) {
+    response.status(400).json({ 
+      error: "Provide source and destination station" 
+    });
+  }
+  let source = rail.stationNames.getCode(request.params.source)!;
+  let dest = rail.stationNames.getCode(request.params.dest)!;
+  let output = rail.stations.get(source)?.fares.get(dest);
+
+  if (output === undefined)
+    response.status(404).json({ error: "Fare not found" });
+  else response.json(output);
+});
+
+/**
+ * Gets all entrances from a certain station
+ * @param station What station you want to get the entrances from.
+ * @return json with array of entrances. See "entrance" interface in interfaces_and_classes.tsx
+ */
+app.get("/rail/entrances/:station", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=604800");
+  if (request.params.station == null) {
+    response.status(400).json({ error: "Provide station" });
+  } else {
+    let code = rail.stationNames.getCode(request.parsms.station)!;
+    let output = rail.stations.get(code)?.entrances;
+    if (output === undefined) response.status(404);
+    else response.json(output);
+  }
+});
+
+app.get("/rail/trainpositions", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.json(rail.train_positions);
+});
+
+app.get("/rail/stations/list/:get?", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=31557600");
+  let code = rail.stationNames.getCode(request.params.station)!;
+  let output = rail.stations.get(code);
+  if (request.params.get === "codes") response.json(rail.stationNames.codeArray);
+  else if (request.params.get === "names")
+    response.json(rail.stationNames.nameArray);
+  else if (request.params.get === "lines")
+    response.json(Object.fromEntries(rail.stationNames.lineArray));
+  else if (output === undefined) response.json(rail.stationNames.nameArray);
+  else response.json(output);
+});
+
+app.get("/rail/stations/:station?", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=604800");
+  if (request.params.station == null) {
+    let temp: any = [];
+    rail.stations.forEach((e: any) => temp.push(e));
+    response.json(temp);
+  } else {
+    let code = rail.stationNames.getCode(request.params.station)!;
+    let output = rail.stations.get(code);
+    if (output === undefined) response.status(404);
+    else response.json(output);
+  }
+});
+
+app.get("/rail/alerts", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=600");
+  let output = [];
+  if (request.query.line !== undefined) {
+    for (const e of rail.railAlerts) {
+      let temp = e.LinesAffected.split(/;[\s]?/).filter(function (fn: any) {
+        return fn !== "";
+      });
+      if (temp.includes(request.query.line)) {
+        output.push(e);
+      }
+    }
+    response.json(output);
+    return;
+  } else {
+    response.json(rail.railAlerts);
+  }
+});
+
+app.get("/bus/alerts", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=600");
+  let output = [];
+  if (request.query.line !== undefined) {
+    for (const e of bus.bus_alerts) {
+      let temp = e.LinesAffected.split(/;[\s]?/).filter(function (fn: any) {
+        return fn !== "";
+      });
+      if (temp.includes(request.query.line)) {
+        output.push(e);
+      }
+    }
+    response.json(output);
+    return;
+  } else {
+    response.json(bus.bus_alerts);
+  }
+});
+
+app.get("/bus/arrival/:stopid", async function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  if (request.query.stopid !== undefined) {
+    var info = bus.bus_stops.get(request.params.stopid);
+    if (info === undefined) {
+      response.json({ error: "Stop not found" });
+    } else {
+      response.json(info);
+    }
+  } else response.json({ error: "Stop not found" });
+});
+
+app.get("/bus/nearby/:lat/:lon/:radius", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  if (backend.bootstrap_status.bus_stops === "RUNNING") {
+    response.json({ error: "System is booting up. Please try again later." });
+  } else if (backend.bootstrap_status.bus_stops === "ERROR") {
+    response.json({
+      error:
+        "System ran into error fetching bus stops. Please try again later.",
+    });
+  } else {
+    if(request.params.lat == undefined || request.params.lon == undefined || request.params.radius == undefined){
+      response.json({
+        error:
+          "Parameters weren't given.",
+      });
+    }
+    else{
+      response.json(bus.get_nearest_bus_stops(request.params.lat, request.params.lon, request.params.radius));
+    }
+  };
+});
+
+app.get("/bus/stop/:stopid", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  if (backend.bootstrap_status.bus_stops === "RUNNING") {
+    response.json({ error: "System is booting up. Please try again later." });
+  } 
+  else if (backend.bootstrap_status.bus_stops === "ERROR") {
+    response.json({
+      error:
+        "System ran into error fetching bus stops. Please try again later.",
+    });
+  } 
+  else {
+    response.json(bus.bus_stops.get(request.params.stopid))
+  }
+});
+
+app.get("/bus/routes/:route?/:direction?", function (request: any, response: any) {
+    response.set("Access-Control-Allow-Origin", "*");
+    if (backend.bootstrap_status.bus_routes === "RUNNING") {
+      response.json({ error: "System is booting up. Please try again later." });
+    } 
+    else if (backend.bootstrap_status.bus_routes === "ERROR") {
+      response.json({
+        error:
+          "System ran into error fetching bus routes. Please try again later.",
+      });
+    } 
+    else {
+      if(request.params.route){
+        if(request.params.direction == "1"){
+          response.json(bus.bus_routes.get(request.params.route)?.paths.Direction1);
+        }
+        else if(request.params.direction == "0"){
+          response.json(bus.bus_routes.get(request.params.route)?.paths.Direction0);
+        }
+        else{
+          response.json(bus.bus_routes.get(request.params.route));
+        }
+      }
+      else{
+        response.json(bus.bus_route_list);
+      }
+    }
+  },
+);
+
+app.get("/bus/routes/:route/:direction/stops", function (request: any, response: any) {
+    response.set("Access-Control-Allow-Origin", "*");
+    if (backend.bootstrap_status.bus_routes === "RUNNING") {
+      response.json({ 
+        error: "System is booting up. Please try again later." 
+      });
+    } 
+    else if (backend.bootstrap_status.bus_routes === "ERROR") {
+      response.json({
+        error: "System ran into error fetching bus routes. Please try again later.",
+      });
+    } 
+    else {
+      if(request.params.route){
+        if(request.params.direction == "1"){
+          response.json(bus.bus_routes.get(request.params.route)?.paths.Direction1.Stops);
+        }
+        else if(request.params.direction == "0"){
+          response.json(bus.bus_routes.get(request.params.route)?.paths.Direction0.Stops);
+        }
+        else{
+          response.json({ 
+            error: "Invalid direction number. Valid direction numbers are \"1\" and \"0\"." 
+          }).status(400);
+        }
+      }
+      else{
+        response.json({ 
+          error: "Invalid Route." 
+        }).status(400);
+      }
+    }
+  },
+);
+
+
+//Catchall function to handle invalid endpoints.
+app.get("/*", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.json({ 
+    error: "ummm... that wasn't a valid endpoint" 
+  });
+});
+
+//Catchall function to handle invalid endpoints.
 app.get("/api/*", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
-  response.json({ error: "ummm... that wasn't a valid endpoint" });
+  response.json({ 
+    error: "ummm... that wasn't a valid endpoint" 
+  });
 });
 
 export const server: any = app.listen(process.env.BACKEND_PORT || 4000, () => {

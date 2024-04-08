@@ -5,13 +5,7 @@
 
 import * as backend from "./backend";
 import { ESMap } from "typescript";
-import {
-  stationCodeNameMap,
-  train,
-  fares,
-  entrance,
-  station,
-} from "./interfaces_and_classes";
+import { stationCodeNameMap, train, fares, entrance, station } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
 const path = require("path");
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
@@ -110,19 +104,10 @@ export async function get_rail_alerts() {
     );
     let date = alertsResponse.headers.get("date");
     rawAlerts = await alertsResponse.json();
-    //     railAlerts = rawAlerts.Incidents;
     backend.lastUpdated.alerts = date;
   } catch (e: any) {
     backend.bootstrap_status.rail_alerts = "ERROR";
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_rail_alerts",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     return "ERROR";
   }
   backend.bootstrap_status.rail_alerts = "SUCCESS";
@@ -169,15 +154,7 @@ export async function get_train_positions() {
     });
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
-    //console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_train_positions",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
@@ -342,7 +319,6 @@ export async function get_rail_alerts_gtft_rt() {
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
-      //    console.log(entity.alert);
       entity.alert.informedEntity.forEach(function (e: any) {
         if (e.routeId === "RED") {
           line.push("RD");
@@ -358,8 +334,6 @@ export async function get_rail_alerts_gtft_rt() {
           line.push("SV");
         }
       });
-
-      //  console.log(entity.alert.headerText.translation[0].text)
       output.push({
         alertId: entity.id,
         line: line,
@@ -372,15 +346,7 @@ export async function get_rail_alerts_gtft_rt() {
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
     backend.bootstrap_status.train_positions = "ERROR";
-    console.log("---- ERROR has been caught. Check Log ----");
     console.error(e);
-    /*var error: error_template = {
-      timestamp: Date.now().toString(),
-      function: "get_rail_alerts_gtft_rt",
-      error: e.message,
-      trace: e.stack,
-    };
-    backend.error_log.push(error);*/
     setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.
     return "ERROR";
   }

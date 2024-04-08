@@ -6,22 +6,18 @@
 import { ESMap } from "typescript";
 import * as backend from "./backend";
 import * as database from "./database";
-import {
-  busRoute,
-  busStop,
-  error_template,
-} from "./interfaces_and_classes";
+import { busRoute, busStop } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
 const express = require("express");
 const path = require("path");
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-
+//const app = express();
 require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 
-const app = express();
-app.use(express.static(path.join(__dirname, "client/build")));
+
+//app.use(express.static(path.join(__dirname, "client/build")));
 
 var key = process.env.WMATA_KEY;
 export var bus_stops: ESMap<string, busStop>;
@@ -46,7 +42,6 @@ function clear_old_data(){
   bus_stops.forEach((key: any, value: any)=>{
     if(value.lastUpdated !== null){
       if ((Date.now() - value.lastUpdated ) > 600000){
-        console.log(value)
         value.nextBus = []
         value.lastUpdated = Date.now()
       }
