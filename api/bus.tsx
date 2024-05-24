@@ -63,21 +63,21 @@ export async function update_bus_data() {
    // let buses = await  get_realtime_bus()
    // console.log(buses.length)
     if(buses.length > 0){
-      var current_stop = buses[0].stop_code
-      var current_array: any[] = []
+     // var current_stop = buses[0].stop_code
+   //   var current_array: any[] = []
       let current_date = new Date()//.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
       let templ = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
       let current_time = current_date.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
       console.log(`templ: ${templ} -- current_date: ${current_date} current_time: ${current_time} `)
-      for (const bus of buses) {
+   /*   for (const bus of buses) {
         if(bus.stop_code !== current_stop){
-          var stop = bus_stops.get(current_stop);
-          if (stop) {
-            stop.nextBus = Array.from(current_array)
-            stop.lastUpdated = timestamp;
-          }
           current_stop = bus.stop_code
           current_array = []
+        }
+        var stop = bus_stops.get(current_stop);
+        if (stop) {
+          stop.nextBus = Array.from(current_array)
+          stop.lastUpdated = timestamp;
         }
         let time = compareTime(bus.departure_time, current_time);
         if(time < 0) continue;
@@ -89,7 +89,38 @@ export async function update_bus_data() {
           VehicleID: bus.vehicle_id
         })
       }
-      console.log(buses[0])
+*/
+   //   const result = Object.groupBy(buses, ({ stop_code }:any) => stop_code);
+      var res = buses.reduce(
+        (result:any, currentValue:any) => { 
+          (result[currentValue['stop_code']] = result[currentValue['stop_code']] || []).push(currentValue);
+          return result;
+        }, {});
+        console.log(typeof res)
+      for (const r in res){
+        var stop = bus_stops.get(r);
+        if (stop) {
+          var temp:any = []
+          res[r].forEach((bus:any) => {
+            let time = compareTime(bus.departure_time, current_time);
+            if(time > 0) {
+              temp.push({
+                RouteID: bus.route_id,
+                Minutes: time,
+                DirectionText: bus.trip_headsign ? bus.trip_headsign : "",
+                TripID: bus.trip_id,
+                VehicleID: bus.vehicle_id
+              })
+            }
+          })
+          stop.nextBus = Array.from(temp)
+          stop.lastUpdated = timestamp;
+        }
+      }
+     // console.log(res)
+     // console.log(result)
+
+      console.log(buses[buses.length - 1])
       console.log("Comparing time of first entry: " + compareTime(buses[0].departure_time, current_time))
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
