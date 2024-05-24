@@ -89,6 +89,7 @@ export async function update_bus_data() {
           VehicleID: bus.vehicle_id
         })
       }
+      console.log(buses[0])
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()
