@@ -68,7 +68,7 @@ export async function update_bus_data() {
       let current_date = new Date()//.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
       let templ = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
       let current_time = current_date.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-      console.log(`templ: ${templ} -- current_date: ${current_date} current_time: ${current_time} `)
+      //console.log(`templ: ${templ} -- current_date: ${current_date} current_time: ${current_time} `)
    /*   for (const bus of buses) {
         if(bus.stop_code !== current_stop){
           current_stop = bus.stop_code
@@ -103,7 +103,7 @@ export async function update_bus_data() {
           var temp:any = []
           res[r].forEach((bus:any) => {
             let time = compareTime(bus.departure_time, current_time);
-            if(time > 0) {
+            if(time >= 0) {
               temp.push({
                 RouteID: bus.route_id,
                 Minutes: time,
@@ -117,11 +117,6 @@ export async function update_bus_data() {
           stop.lastUpdated = timestamp;
         }
       }
-     // console.log(res)
-     // console.log(result)
-
-      console.log(buses[buses.length - 1])
-      console.log("Comparing time of first entry: " + compareTime(buses[0].departure_time, current_time))
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()

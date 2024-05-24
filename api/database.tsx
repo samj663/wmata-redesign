@@ -59,7 +59,6 @@ export async function get_next_bus(stop_id: string){
 async function service_id_today(){
   let sql = postgres(process.env.local_url, { ssl: true });
   let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
-  console.log(date)
   let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
   var output;
   if(service_exception.length > 0){
@@ -88,6 +87,8 @@ async function service_id_today(){
   else{
     output = (await sql`select service_id from bus_calendar where saturday = 1 limit 1`)[0].service_id
   }
+  console.log("service id:"+ output + " -- date: "+date)
+
   sql.end()
   return output
 }
@@ -113,8 +114,8 @@ export async function get_all_next_bus(){
     bus_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
     ORDER BY bus_stops.stop_code, bus_stop_times.departure_time`
   sql.end()
-  console.log(`(1ST) Start Time: ${start_time} -- End Time: ${end_time}`)
-  console.log(`(2ND) Start Time: ${temp} -- End Time: ${temp2}`)
+  //console.log(`(1ST) Start Time: ${start_time} -- End Time: ${end_time}`)
+  console.log(`Start Time: ${temp} -- End Time: ${temp2}`)
   return output
 }
 
