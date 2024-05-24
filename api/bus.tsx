@@ -90,6 +90,7 @@ export async function update_bus_data() {
         })
       }
       console.log(buses[0])
+      console.log("Comparing time of first entry: " + compareTime(buses[0].departure_time, current_time))
     }
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()
