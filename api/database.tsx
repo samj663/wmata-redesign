@@ -64,30 +64,30 @@ async function service_id_today(){
   if(service_exception.length > 0){
     return service_exception[0].service_id
   }
-  let day = new Date().getDay() 
+  let day = new Date().toLocaleDateString("en-US",{timeZone: 'America/New_York', weekday: "short"})
 
-  if(day == 0){
+  if(day == "Sun"){
     output = (await sql`select service_id from bus_calendar where sunday = 1 limit 1`)[0].service_id
   }
-  else if(day == 1){
+  else if(day == "Mon"){
     output = (await sql`select service_id from bus_calendar where monday = 1 limit 1`)[0].service_id
   }
-  else if(day == 2){
+  else if(day == "Tue"){
     output = (await sql`select service_id from bus_calendar where tuesday = 1 limit 1`)[0].service_id
   }
-  else if(day == 3){
+  else if(day == "Wed"){
     output = (await sql`select service_id from bus_calendar where wednesday = 1 limit 1`)[0].service_id
   }
-  else if(day == 4){
+  else if(day == "Thu"){
     output = (await sql`select service_id from bus_calendar where thursday = 1 limit 1`)[0].service_id
   }
-  else if(day == 5){
+  else if(day == "Fri"){
     output = (await sql`select service_id from bus_calendar where friday = 1 limit 1`)[0].service_id
   }
   else{
     output = (await sql`select service_id from bus_calendar where saturday = 1 limit 1`)[0].service_id
   }
-  console.log("service id:"+ output + " -- date: "+date)
+  console.log("service id:"+ output + " -- date: "+day)
 
   sql.end()
   return output
