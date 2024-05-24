@@ -58,7 +58,7 @@ export async function get_next_bus(stop_id: string){
 
 async function service_id_today(){
   let sql = postgres(process.env.local_url, { ssl: true });
-  let date = new Date().toLocaleDateString("af-ZA").replace(/-/g,"")
+  let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
   let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
   var output;
   if(service_exception.length > 0){
