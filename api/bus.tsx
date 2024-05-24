@@ -65,7 +65,10 @@ export async function update_bus_data() {
     if(buses.length > 0){
       var current_stop = buses[0].stop_code
       var current_array: any[] = []
-      let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      let current_date = new Date()//.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      let templ = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      let current_time = current_date.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      console.log(`templ: ${templ} -- current_date: ${current_date} current_time: ${current_time} `)
       for (const bus of buses) {
         if(bus.stop_code !== current_stop){
           var stop = bus_stops.get(current_stop);
@@ -76,7 +79,7 @@ export async function update_bus_data() {
           current_stop = bus.stop_code
           current_array = []
         }
-        let time = compareTime(bus.departure_time, current_date);
+        let time = compareTime(bus.departure_time, current_time);
         if(time < 0) continue;
         current_array.push({
           RouteID: bus.route_id,
