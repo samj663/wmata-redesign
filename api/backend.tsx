@@ -61,6 +61,7 @@ export async function main() {
   bootstrap_bus_routes();
   bootstrap_train_positions();
   bootstrap_get_bus_alerts();
+  //await bus.read_bus_trip_data();
   database.update_bus_data();
   bus.update_bus_data()
 }

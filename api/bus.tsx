@@ -10,6 +10,7 @@ import { busRoute, busStop } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 //const app = express();
 require("dotenv").config({
@@ -24,6 +25,8 @@ export var bus_stops: ESMap<string, busStop>;
 export var bus_routes: ESMap<string, busRoute>;
 export var bus_route_list: any;
 export var bus_alerts: any;
+export var tripMap: any;
+export var stopID_to_stopCode: any;
 
 function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
@@ -57,6 +60,7 @@ export async function update_bus_data() {
   let timestamp = Date.now()
   try{
     let buses = await database.get_all_next_bus()
+   // let buses = await  get_realtime_bus()
    // console.log(buses.length)
     if(buses.length > 0){
       var current_stop = buses[0].stop_code
@@ -104,7 +108,7 @@ export async function get_bus_routes() {
       else return true;
     });
 
-    await backend.delay(5000);
+   // await backend.delay(5000);
     backend.bootstrap_status.bus_route_list = "SUCCESS";
     for (const route of rawBus.Routes) {
       var routeResponse = await fetch(
@@ -230,6 +234,109 @@ export async function get_bus_alerts_gtft_rt() {
   bus_alerts = output;
   setTimeout(get_bus_alerts_gtft_rt, 5000);
   return "SUCCESS";
+}
+
+export async function read_bus_trip_data(){
+  tripMap = new Map()
+  stopID_to_stopCode = new Map()
+  var content = await fs.readFileSync("./static_bus/trips.txt", "utf8");
+  var s = content.split("\n");
+  var e = s.shift().split(",");
+  var trips = new Map()
+  for (const e of s) {
+    let val = e.split(",");
+    if(val[1] == undefined) continue
+    tripMap.set(val[2], {
+      route_id: val[0],
+      service_id: val[1],
+      trip_headsign: val[3],
+      direction_id: parseInt(val[4]),
+      vehicle_id: -1
+    })
+  }
+  
+  content = await fs.readFileSync("./static_bus/stops.txt", "utf8");
+  s = content.split("\n");
+  e = s.shift().split(",");
+
+  for (const e of s) {
+    let val = e.split(",");
+    stopID_to_stopCode.set(val[0],val[1])
+  }
+}
+
+
+
+async function get_realtime_bus() {
+  try{
+    let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
+    //stoptimeupdate:
+    //time: add three 0's to make it proper date? The time number is short for some reason
+    const res = await fetch(req);
+    var blob = await res.arrayBuffer();
+    var b = Buffer.from(blob);
+    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
+    var insert:any = []
+    var count = 0
+   // console.log(feed.entity.length)
+    let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+    feed.entity.forEach(function (entity : any) {
+      
+      entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
+        var t;
+        var time;
+        if(e.departure != null){
+          t =  parseInt(e.departure.time + "000")
+          time = new Date(t);
+        }
+        else{
+          t = parseInt(e.arrival.time + "000")
+          time = new Date(t);
+        }
+        let temp = time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+          count += 1
+            let text = tripMap.get(entity.tripUpdate.trip.tripId)
+            if(text != undefined){
+              insert.push({
+                route_id: entity.tripUpdate.trip.routeId,
+                departure_time: time.toLocaleTimeString('it-IT').toString(),
+                trip_headsign: text.trip_headsign,
+                trip_id: entity.tripUpdate.trip.tripId,
+                vehicle_id: parseInt(entity.tripUpdate.vehicle.id)
+              })
+            }
+            else{
+       //   if(tripMap.get(entity.tripUpdate.trip.tripId) != undefined){
+            insert.push({
+              route_id: entity.tripUpdate.trip.routeId,
+              departure_time: time.toLocaleTimeString('it-IT').toString(),
+              trip_headsign: "",
+              trip_id: entity.tripUpdate.trip.tripId,
+              vehicle_id: parseInt(entity.tripUpdate.vehicle.id),
+              stop_code: stopID_to_stopCode.get(e.stopId)
+            })
+          
+            //console.log(e.stopId + " - " + entity.tripUpdate.trip.routeId + " - " + entity.tripUpdate.trip.tripId) 
+            
+          }
+        
+      })
+    });
+
+    console.log(new Date().toString() +": Updated database info")
+  } catch (e){
+    console.log(e)
+    return []
+  }
+ /* var temp: any = []
+  for (const e of insert){
+    if (!temp.includes(e.route_id)){
+      temp.push(e.route_id)
+    }
+  }
+  console.log(temp.sort())*/
+  return insert
+ // setTimeout(update_bus_data, 10000)
 }
 
 export * from "./bus";

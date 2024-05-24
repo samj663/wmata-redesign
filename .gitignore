@@ -48,3 +48,5 @@ api/*build*
 api/certs
 *.pem
 *copy*
+static_bus/stops.txt
+static_bus/trips.txt
