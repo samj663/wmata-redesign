@@ -16,7 +16,7 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 app.use(express.static(path.join(__dirname, "client/build")));
-app.use(require('express-status-monitor')());
+//app.use(require('express-status-monitor')());
 //--------------------------------------------------------------------
 //         Below is all the GET endpoint functions
 //         Note: any parameters defined for each funciton
@@ -349,6 +349,44 @@ app.get("/rail/arrival/:station/:group/transf", function (request: any, response
       return;
     }
   }
+});
+
+/**
+ * Returns status of the  services that fetches data frequently
+ * @param service which specific service you want to check 
+ * @returns json with status of the service requested
+ */
+app.get("/status/:service", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=600");
+  if (request.params.service == 'bus_arrival') {
+    response.json(backend.fetch_status.bus_arrival);
+  }
+  else if (request.params.service == 'rail_arrival') {
+    response.json(backend.fetch_status.rail_arrival);
+  }
+  else if (request.params.service == 'bus_alerts') {
+    response.json(backend.fetch_status.bus_alerts);
+  }
+  else if (request.params.service == 'rail_alerts') {
+    response.json(backend.fetch_status.rail_alerts);
+  }
+  else if (request.params.service == 'bus_database_status') {
+    response.json(backend.fetch_status.rail_alerts);
+  }
+  else{
+    response.status(400).json({ error: "Invalid service type" });
+  }
+});
+
+/**
+ * Returns status of the  services that fetches data frequently
+ * @returns json with status of services
+ */
+app.get("/status", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=600");
+  response.json(backend.fetch_status);
 });
 
 /**

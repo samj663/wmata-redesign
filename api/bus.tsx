@@ -32,13 +32,16 @@ function compareTime(time2: string, time1:string){
   let array1 = time1.split(":")
   let array2 = time2.split(":")
   let output = [0,0,0]
+  if( parseInt(array2[0]) < parseInt(array1[0])){
+    array2[0] = array2[0] + 24
+  }
   for(var i = 0; i < array1.length ; i++){
     output[i] = parseInt(array2[i]) - parseInt(array1[i]);
   }
   for(var i = 1; i < output.length ; i++){
     output[i] = output[i] +  (output[i - 1] * 60)
   }
-  return Math.floor(output[2] / 60)
+  return (Math.floor(output[2] / 60) > 60) ? -1 : Math.floor(output[2] / 60)
 }
 
 function clear_old_data(){
@@ -96,7 +99,6 @@ export async function update_bus_data() {
           (result[currentValue['stop_code']] = result[currentValue['stop_code']] || []).push(currentValue);
           return result;
         }, {});
-        console.log(typeof res)
       for (const r in res){
         var stop = bus_stops.get(r);
         if (stop) {
@@ -121,8 +123,10 @@ export async function update_bus_data() {
     console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()
   } catch(e: any) {
-    console.error(e);
+    backend.handleErrors(e, "update_bus_data", "bus_arrival")
+    //console.error(e);
   }
+  backend.handleSuccess("bus_arrival")
   setTimeout(update_bus_data, 20000);
 }
 
@@ -156,9 +160,10 @@ export async function get_bus_routes() {
       await backend.delay(250);
     }
   } catch (e: any) {
+    backend.handleErrors(e, "get_bus_routes", "")
     backend.bootstrap_status.bus_routes = "ERROR";
     backend.bootstrap_status.bus_route_list = "ERROR";
-    console.error(e);
+    //console.error(e);
     return "ERROR";
   }
   console.log("finished caching bus routes!");
@@ -185,8 +190,9 @@ export async function get_bus_stops() {
       bus_stops.set(stop.StopID, temp);
     }
   } catch (e: any) {
+    backend.handleErrors(e, "get_bus_stops", "")
     backend.bootstrap_status.bus_stops = "ERROR";
-    console.error(e);
+    //console.error(e);
     return "ERROR";
   }
   console.log("Bus stops cached!");
@@ -209,7 +215,8 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
       }
     })
   } catch (e: any) {
-    console.error(e);
+    backend.handleErrors(e, "get_nearest_bus_stops", "")
+    //console.error(e);
   }
   return output;
 }
@@ -257,12 +264,14 @@ export async function get_bus_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
-    backend.bootstrap_status.train_positions = "ERROR";
-    console.error(e);
+    backend.handleErrors(e, "get_bus_alerts_gtft_rt", "bus_alerts")
+    //backend.bootstrap_status.train_positions = "ERROR";
+    //console.error(e);
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   bus_alerts = output;
+  backend.handleSuccess("bus_alerts")
   setTimeout(get_bus_alerts_gtft_rt, 5000);
   return "SUCCESS";
 }
@@ -295,8 +304,6 @@ export async function read_bus_trip_data(){
     stopID_to_stopCode.set(val[0],val[1])
   }
 }
-
-
 
 async function get_realtime_bus() {
   try{
@@ -354,9 +361,9 @@ async function get_realtime_bus() {
       })
     });
 
-    console.log(new Date().toString() +": Updated database info")
+    //console.log(new Date().toString() +": Updated database info")
   } catch (e){
-    console.log(e)
+   // console.log(e)
     return []
   }
  /* var temp: any = []

@@ -1,3 +1,5 @@
+
+import * as backend from "./backend";
 const postgres = require('postgres')
 const { default: fetch } = require("node-fetch");
 const path = require('path');
@@ -57,66 +59,93 @@ export async function get_next_bus(stop_id: string){
 }
 
 async function service_id_today(){
-  let sql = postgres(process.env.local_url, { ssl: true });
-  let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
-  let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
-  var output;
-  if(service_exception.length > 0){
-    return service_exception[0].service_id
-  }
-  let day = new Date().toLocaleDateString("en-US",{timeZone: 'America/New_York', weekday: "short"})
+  try{
+    let sql = postgres(process.env.local_url, { ssl: true });
+    let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
+    let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
+    var output;
+    if(service_exception.length > 0){
+      return service_exception[0].service_id
+    }
+    let day = new Date().toLocaleDateString("en-US",{timeZone: 'America/New_York', weekday: "short"})
 
-  if(day == "Sun"){
-    output = (await sql`select service_id from bus_calendar where sunday = 1 limit 1`)[0].service_id
-  }
-  else if(day == "Mon"){
-    output = (await sql`select service_id from bus_calendar where monday = 1 limit 1`)[0].service_id
-  }
-  else if(day == "Tue"){
-    output = (await sql`select service_id from bus_calendar where tuesday = 1 limit 1`)[0].service_id
-  }
-  else if(day == "Wed"){
-    output = (await sql`select service_id from bus_calendar where wednesday = 1 limit 1`)[0].service_id
-  }
-  else if(day == "Thu"){
-    output = (await sql`select service_id from bus_calendar where thursday = 1 limit 1`)[0].service_id
-  }
-  else if(day == "Fri"){
-    output = (await sql`select service_id from bus_calendar where friday = 1 limit 1`)[0].service_id
-  }
-  else{
-    output = (await sql`select service_id from bus_calendar where saturday = 1 limit 1`)[0].service_id
-  }
-  console.log("service id:"+ output + " -- date: "+day)
+    if(day == "Sun"){
+      output = (await sql`select service_id from bus_calendar where sunday = 1 limit 1`)[0].service_id
+    }
+    else if(day == "Mon"){
+      output = (await sql`select service_id from bus_calendar where monday = 1 limit 1`)[0].service_id
+    }
+    else if(day == "Tue"){
+      output = (await sql`select service_id from bus_calendar where tuesday = 1 limit 1`)[0].service_id
+    }
+    else if(day == "Wed"){
+      output = (await sql`select service_id from bus_calendar where wednesday = 1 limit 1`)[0].service_id
+    }
+    else if(day == "Thu"){
+      output = (await sql`select service_id from bus_calendar where thursday = 1 limit 1`)[0].service_id
+    }
+    else if(day == "Fri"){
+      output = (await sql`select service_id from bus_calendar where friday = 1 limit 1`)[0].service_id
+    }
+    else{
+      output = (await sql`select service_id from bus_calendar where saturday = 1 limit 1`)[0].service_id
+    }
 
-  sql.end()
-  return output
+    sql.end()
+    backend.fetch_status.bus_database_status.service_id = output
+    return output
+  }
+  catch(e: any){
+    backend.handleErrors(e, "service_id_today", "bus_database_status")
+  }
 }
 
 // TODO: Account for when late night servce spills into next days's service. It's not guaranteed
 // that late night service is the same for each day.
 export async function get_all_next_bus(){
-  let sql = postgres(process.env.local_url, { ssl: true });
-  let today_service = await service_id_today()
-  let start_time = new Date()
-  let startTimestamp = start_time.getTime()
-  let timeExtent = 45 * 60 * 1000
-  let end_time = new Date(startTimestamp + timeExtent)
-  let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-  let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-  let output = await sql`
-    SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
-    FROM bus_stop_times, bus_trips, bus_stops WHERE
-    bus_trips.service_id = ${today_service} and
-    bus_trips.trip_id = bus_stop_times.trip_id and
-    bus_stops.stop_id = bus_stop_times.stop_id and
-    bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
-    bus_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
-    ORDER BY bus_stops.stop_code, bus_stop_times.departure_time`
-  sql.end()
-  //console.log(`(1ST) Start Time: ${start_time} -- End Time: ${end_time}`)
-  console.log(`Start Time: ${temp} -- End Time: ${temp2}`)
-  return output
+  try{
+    let sql = postgres(process.env.local_url, { ssl: true });
+    let today_service = await service_id_today()
+    let start_time = new Date()
+    let startTimestamp = start_time.getTime()
+    let timeExtent = 45 * 60 * 1000
+    let end_time = new Date(startTimestamp + timeExtent)
+    let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+    let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+    let output;
+    if(parseInt(temp.slice(0,2)) == 23 && parseInt(temp2.slice(0,2)) < 2){
+      //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
+     // console.log(temp3)
+      output = await sql`
+      SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
+      FROM bus_stop_times, bus_trips, bus_stops WHERE
+      bus_trips.service_id = ${today_service} and
+      bus_trips.trip_id = bus_stop_times.trip_id and
+      bus_stops.stop_id = bus_stop_times.stop_id and
+      (bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} or
+      bus_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2})
+      ORDER BY bus_stops.stop_code, bus_stop_times.departure_time`
+    }
+    else{
+      output = await sql`
+        SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
+        FROM bus_stop_times, bus_trips, bus_stops WHERE
+        bus_trips.service_id = ${today_service} and
+        bus_trips.trip_id = bus_stop_times.trip_id and
+        bus_stops.stop_id = bus_stop_times.stop_id and
+        bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
+        bus_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
+        ORDER BY bus_stops.stop_code, bus_stop_times.departure_time`
+    }
+    sql.end()
+    //console.log(`(1ST) Start Time: ${start_time} -- End Time: ${end_time}`)
+    if(output.length == 0){
+      console.warn('WARNING: "get_all_next_bus" -- Returned an empty array')
+    }
+    return output
+  } catch (e:any){
+    backend.handleErrors(e, "get_all_next_bus", "bus_database_status")
+  }
 }
 
 export async function update_bus_data() {
@@ -171,10 +200,10 @@ export async function update_bus_data() {
         WHERE bus_trips.trip_id = update_data.tripID
         RETURNING bus_trips.trip_id`
     }
-    console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
+    //console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
   } catch(e: any) {
-    console.warn(`Database Info Failed To Update --`)
-    console.error(e);
+    backend.handleErrors(e, "update_bus_data", "bus_database_status")
+    //console.warn(`Database Info Failed To Update --`)
   }
   sql.end()
   setTimeout(update_bus_data, 20000);
@@ -232,10 +261,10 @@ export async function update_bus_data_no_db() {
         WHERE bus_trips.trip_id = update_data.tripID
         RETURNING bus_trips.trip_id`
     }
-    console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
+    //console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
   } catch(e: any) {
-    console.warn(`Database Info Failed To Update --`)
-    console.error(e);
+    //console.warn(`Database Info Failed To Update --`)
+    //console.error(e);
   }
   sql.end()
   setTimeout(update_bus_data, 20000);

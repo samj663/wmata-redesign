@@ -38,10 +38,12 @@ export async function get_train_data() {
     }
     trains = parseTrains(rawTrains.Trains);
   } catch (e: any) {
-    console.error(trainResponse);
+    backend.handleErrors(e, "get_train_data", "rail_arrival")
+    //I thought this wase.error(trainResponse);
     setTimeout(get_train_data, 20000);
     return "ERROR";
   }
+  backend.handleSuccess("rail_arrival")
   backend.lastUpdated.next_train = trainResponse.headers.get("date");
   backend.bootstrap_status.next_train = "SUCCESS";
   setTimeout(get_train_data, 10000);
@@ -79,9 +81,9 @@ export async function get_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
+    backend.handleErrors(e, "get_data", "")
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
-
-    console.error(e);
+    //console.error(e);
     setTimeout(get_train_data, 100000);
     return "ERROR";
   }
@@ -107,7 +109,7 @@ export async function get_rail_alerts() {
     backend.lastUpdated.alerts = date;
   } catch (e: any) {
     backend.bootstrap_status.rail_alerts = "ERROR";
-    console.error(e);
+    //console.error(e);
     return "ERROR";
   }
   backend.bootstrap_status.rail_alerts = "SUCCESS";
@@ -153,8 +155,9 @@ export async function get_train_positions() {
       }
     });
   } catch (e: any) {
+    backend.handleErrors(e, "get_train_positions", "")
     backend.bootstrap_status.train_positions = "ERROR";
-    console.error(e);
+    //console.error(e);
     setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
@@ -345,12 +348,14 @@ export async function get_rail_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
+    backend.handleErrors(e, "get_rail_alerts_gtft_rt", "rail_alerts")
     backend.bootstrap_status.train_positions = "ERROR";
-    console.error(e);
+    //console.error(e);
     setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   railAlerts = output;
+  backend.handleSuccess("rail_alerts")
   setTimeout(get_rail_alerts_gtft_rt, 60000);
   return "SUCCESS";
 }

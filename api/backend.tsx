@@ -35,6 +35,45 @@ export var bootstrap_status = {
   bus_alerts: "RUNNING",
 };
 
+export var fetch_status = {
+  bus_arrival: {
+    status: "SUCCESS",
+    last_success_timestamp: 0 ,
+    last_error_timestamp: 0,
+    error_function: '',
+    error_code: ''
+  },
+  rail_arrival: {
+    status: "SUCCESS",
+    last_success_timestamp: 0 ,
+    last_error_timestamp: 0,
+    error_function: '',
+    error_code: ''
+  },
+  rail_alerts: {
+    status: "SUCCESS",
+    last_success_timestamp: 0 ,
+    last_error_timestamp: 0,
+    error_function: '',
+    error_code: ''
+  },
+  bus_alerts: {
+    status: "SUCCESS",
+    last_success_timestamp: 0 ,
+    last_error_timestamp: 0,
+    error_function: '',
+    error_code: ''
+  },
+  bus_database_status: {
+    service_id: 0,
+    status: "SUCCESS",
+    last_success_timestamp: 0 ,
+    last_error_timestamp: 0,
+    error_function: '',
+    error_code: ''
+  },
+};
+
 const MAX_RETRY = 5;
 
 /**
@@ -195,4 +234,74 @@ export function delay(millisec: number) {
       resolve("");
     }, millisec);
   });
+}
+
+export function handleErrors(error: any, functionName: string, service:string){
+  var time = Date.now()
+  if(error.code == 'ENOTFOUND'){
+    console.error(`ERROR: "${functionName}" -- ${error.message}`)
+  }
+  else if(error.code == 'CONNECT_TIMEOUT'){
+    console.error(`ERROR: "${functionName}" -- Connection timeout to server`)
+  }
+  else if(error.code == 'EHOSTUNREACH'){
+    console.error(`ERROR: "${functionName}" -- No route to host`)
+  }
+  else{
+    console.error(`ERROR: "${functionName}" -- ${error.message}`)
+  }
+  if(service == 'bus_arrival'){
+    fetch_status.bus_arrival.status = "ERROR"
+    fetch_status.bus_arrival.last_error_timestamp = time
+    fetch_status.bus_arrival.error_function = functionName
+    fetch_status.bus_arrival.error_code = error.error_code
+  }
+  else if(service == 'rail_arrival'){
+    fetch_status.rail_arrival.status = "ERROR"
+    fetch_status.rail_arrival.last_error_timestamp = time
+    fetch_status.rail_arrival.error_function = functionName
+    fetch_status.rail_arrival.error_code = error.error_code
+  }
+  else if(service == 'bus_alerts'){
+    fetch_status.bus_alerts.status = "ERROR"
+    fetch_status.bus_alerts.last_error_timestamp = time
+    fetch_status.bus_alerts.error_function = functionName
+    fetch_status.bus_alerts.error_code = error.error_code
+  }
+  else if(service == 'rail_alerts'){
+    fetch_status.rail_alerts.status = "ERROR"
+    fetch_status.rail_alerts.last_error_timestamp = time
+    fetch_status.rail_alerts.error_function = functionName
+    fetch_status.rail_alerts.error_code = error.error_code
+  }
+  else if(service == 'bus_database_status'){
+    fetch_status.bus_database_status.status = "ERROR"
+    fetch_status.bus_database_status.last_error_timestamp = time
+    fetch_status.bus_database_status.error_function = functionName
+    fetch_status.bus_database_status.error_code = error.error_code
+  }
+}
+
+export function handleSuccess(service:string){
+  var time = Date.now()
+  if(service == 'bus_arrival'){
+    fetch_status.bus_arrival.status = "SUCCESS"
+    fetch_status.bus_arrival.last_success_timestamp = time
+  }
+  else if(service == 'rail_arrival'){
+    fetch_status.rail_arrival.status = "SUCCESS"
+    fetch_status.rail_arrival.last_success_timestamp = time
+  }
+  else if(service == 'bus_alerts'){
+    fetch_status.bus_alerts.status = "SUCCESS"
+    fetch_status.bus_alerts.last_success_timestamp = time
+  }
+  else if(service == 'rail_alerts'){
+    fetch_status.rail_alerts.status = "SUCCESS"
+    fetch_status.rail_alerts.last_success_timestamp = time
+  }
+  else if(service == 'bus_database_status'){
+    fetch_status.bus_database_status.status = "SUCCESS"
+    fetch_status.bus_database_status.last_success_timestamp = time
+  }
 }
