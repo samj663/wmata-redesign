@@ -29,6 +29,7 @@ export var tripMap: any;
 export var stopID_to_stopCode: any;
 
 function compareTime(time2: string, time1:string){
+  
   let array1 = time1.split(":")
   let array2 = time2.split(":")
   let output = [0,0,0]
@@ -41,6 +42,7 @@ function compareTime(time2: string, time1:string){
   for(var i = 1; i < output.length ; i++){
     output[i] = output[i] +  (output[i - 1] * 60)
   }
+  //console.log(time2 + " -- " + time1 + " == "+  Math.floor(output[2] / 60))
   return (Math.floor(output[2] / 60) > 60) ? -1 : Math.floor(output[2] / 60)
 }
 
@@ -120,7 +122,7 @@ export async function update_bus_data() {
         }
       }
     }
-    console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
+    //console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()
   } catch(e: any) {
     backend.handleErrors(e, "update_bus_data", "bus_arrival")

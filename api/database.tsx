@@ -57,10 +57,30 @@ export async function get_next_bus(stop_id: string){
     console.error(e)
   }
 }
-
+/**
+ * Gets service id from tripupdates.
+ */
 async function service_id_today(){
   try{
     let sql = postgres(process.env.local_url, { ssl: true });
+    let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
+    const res = await fetch(req);
+    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(Buffer.from(await res.arrayBuffer()));
+    var trip_id: any[] = []
+    feed.entity.forEach(function (entity: any) {
+      trip_id.push(entity.id)
+    });
+    var result =  await sql` select count(trip_id), service_id from bus_trips
+    where trip_id in ${ sql(trip_id) } group by service_id`;
+    
+    result.sort(function(a:any, b:any) {
+      return parseInt(b.count) - parseInt(a.count);
+    })
+
+    if(result.length > 0 ){
+      sql.end()
+      return result[0].service_id
+    }
     let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
     let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
     var output;
@@ -115,11 +135,11 @@ export async function get_all_next_bus(){
     let output;
     if(parseInt(temp.slice(0,2)) == 23 && parseInt(temp2.slice(0,2)) < 2){
       //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
-     // console.log(temp3)
+      console.log("HMMM")
       output = await sql`
       SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
       FROM bus_stop_times, bus_trips, bus_stops WHERE
-      bus_trips.service_id = ${today_service} and
+      bus_trips.service_id = 7 and
       bus_trips.trip_id = bus_stop_times.trip_id and
       bus_stops.stop_id = bus_stop_times.stop_id and
       (bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} or
@@ -130,7 +150,7 @@ export async function get_all_next_bus(){
       output = await sql`
         SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
         FROM bus_stop_times, bus_trips, bus_stops WHERE
-        bus_trips.service_id = ${today_service} and
+        bus_trips.service_id = 7 and
         bus_trips.trip_id = bus_stop_times.trip_id and
         bus_stops.stop_id = bus_stop_times.stop_id and
         bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
