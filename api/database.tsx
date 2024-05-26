@@ -139,7 +139,7 @@ export async function get_all_next_bus(){
       output = await sql`
       SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
       FROM bus_stop_times, bus_trips, bus_stops WHERE
-      bus_trips.service_id = 7 and
+      bus_trips.service_id = ${today_service} and
       bus_trips.trip_id = bus_stop_times.trip_id and
       bus_stops.stop_id = bus_stop_times.stop_id and
       (bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} or
@@ -150,7 +150,7 @@ export async function get_all_next_bus(){
       output = await sql`
         SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
         FROM bus_stop_times, bus_trips, bus_stops WHERE
-        bus_trips.service_id = 7 and
+        bus_trips.service_id = ${today_service} and
         bus_trips.trip_id = bus_stop_times.trip_id and
         bus_stops.stop_id = bus_stop_times.stop_id and
         bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
