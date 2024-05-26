@@ -251,18 +251,20 @@ export async function get_bus_alerts_gtft_rt() {
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
-      entity.alert.informedEntity.forEach(function (e: any) {
-        line.push(e.routeId);
-      });
-
-      output.push({
-        alertId: entity.id,
-        line: line,
-        cause: entity.alert.cause,
-        effect: entity.alert.effect,
-        headerText: entity.alert.headerText.translation[0].text,
-        descriptionText: entity.alert.descriptionText.translation[0].text,
-      });
+      if(entity.alert.informedEntity[0].agencyId == '1') {
+        entity.alert.informedEntity.forEach(function (e: any) {
+          line.push(e.routeId);
+        });
+        
+        output.push({
+          alertId: entity.id,
+          line: line,
+          cause: entity.alert.cause,
+          effect: entity.alert.effect,
+          headerText: entity.alert.headerText.translation[0].text,
+          descriptionText: entity.alert.descriptionText.translation[0].text,
+        });
+      }
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
