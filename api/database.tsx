@@ -77,8 +77,9 @@ async function service_id_today(){
       return parseInt(b.count) - parseInt(a.count);
     })
 
-    if(result.length > 0 ){
+    if(result.length  > 0 ){
       sql.end()
+      backend.fetch_status.bus_database_status.service_id = result[0].service_id
       return result[0].service_id
     }
     let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
