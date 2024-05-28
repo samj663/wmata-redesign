@@ -6,11 +6,12 @@ const path = require('path');
 require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
+const database_url = process.env.local_url
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 // Not in use. Database only stores bus information for now.
 async function get_next_scheduled_trains(station_code : string, direction :number){
-  let sql = postgres(process.env.local_url, { ssl: true});
+  let sql = postgres(database_url, { ssl: true});
   try{
     var today = new Date();
     var time = today.getHours() + ":" + String(today.getMinutes()).padStart(2, '0') + ":" + String(today.getSeconds()).padStart(2,'0');
@@ -45,7 +46,7 @@ async function get_train_position_destinations(trains:any){
 //Not in use. All next bus info is updated from get_all_next_bus()
 export async function get_next_bus(stop_id: string){
   try{
-    let sql = postgres(process.env.local_url, { ssl: true });
+    let sql = postgres(database_url, { ssl: true });
     let start_time = new Date()
     var output =  await sql`
       SELECT * FROM bus_stop_times where
@@ -62,7 +63,7 @@ export async function get_next_bus(stop_id: string){
  */
 async function service_id_today(){
   try{
-    let sql = postgres(process.env.local_url, { ssl: true });
+    let sql = postgres(database_url, { ssl: true });
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(Buffer.from(await res.arrayBuffer()));
@@ -79,6 +80,9 @@ async function service_id_today(){
 
     if(result.length  > 0 ){
       sql.end()
+      if (backend.fetch_status.bus_database_status.service_id != result[0].service_id ){
+        await reset_bus_trip(backend.fetch_status.bus_database_status.service_id)
+      }
       backend.fetch_status.bus_database_status.service_id = result[0].service_id
       return result[0].service_id
     }
@@ -113,6 +117,9 @@ async function service_id_today(){
     }
 
     sql.end()
+    if (backend.fetch_status.bus_database_status.service_id != output ){
+      await reset_bus_trip(backend.fetch_status.bus_database_status.service_id)
+    }
     backend.fetch_status.bus_database_status.service_id = output
     return output
   }
@@ -121,11 +128,21 @@ async function service_id_today(){
   }
 }
 
+async function reset_bus_trip(service_id: number){
+  let sql = postgres(database_url, { ssl: true });
+  try{
+    let t = await sql `UPDATE bus_trips SET vehicle_id = -1, delay = 0 where service_id = ${service_id}`;
+  }
+  catch(e: any){
+    backend.handleErrors(e, "reset_bus_trip", "")
+  }
+}
+
 // TODO: Account for when late night servce spills into next days's service. It's not guaranteed
 // that late night service is the same for each day.
 export async function get_all_next_bus(){
   try{
-    let sql = postgres(process.env.local_url, { ssl: true });
+    let sql = postgres(database_url, { ssl: true });
     let today_service = await service_id_today()
     let start_time = new Date()
     let startTimestamp = start_time.getTime()
@@ -138,7 +155,7 @@ export async function get_all_next_bus(){
       //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
       console.log("HMMM")
       output = await sql`
-      SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
+      SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id, bus_trips.delay
       FROM bus_stop_times, bus_trips, bus_stops WHERE
       bus_trips.service_id = ${today_service} and
       bus_trips.trip_id = bus_stop_times.trip_id and
@@ -149,7 +166,7 @@ export async function get_all_next_bus(){
     }
     else{
       output = await sql`
-        SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id
+        SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id, bus_trips.delay
         FROM bus_stop_times, bus_trips, bus_stops WHERE
         bus_trips.service_id = ${today_service} and
         bus_trips.trip_id = bus_stop_times.trip_id and
@@ -170,19 +187,20 @@ export async function get_all_next_bus(){
 }
 
 export async function update_bus_data() {
-  let sql = postgres(process.env.local_url, { ssl: true });
+  let sql = postgres(database_url, { ssl: true });
   try{
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
     var b = Buffer.from(blob);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
-    var vehicle_updates:any = []
+    var trip_updates:any = []
     var time_updates: any =[]
     feed.entity.forEach(function (entity:any) {
-      vehicle_updates.push([
+      trip_updates.push([
         entity.tripUpdate.trip.tripId,
-        parseInt(entity.tripUpdate.vehicle.id)
+        parseInt(entity.tripUpdate.vehicle.id),
+        entity.tripUpdate.delay
       ])
       entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
         var t;
@@ -214,10 +232,10 @@ export async function update_bus_data() {
         RETURNING bus_stop_times.trip_id`
         updated_count += t.length
     }
-    for(var i = 0 ; i < vehicle_updates.length; i = i+ 700){
+    for(var i = 0 ; i < trip_updates.length; i = i+ 700){
       await sql`
-        UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int 
-        FROM (values ${sql(vehicle_updates)}) as update_data (tripID, vehicle_id)
+        UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int, delay = (update_data.delay)::int
+        FROM (values ${sql(trip_updates)}) as update_data (tripID, vehicle_id, delay)
         WHERE bus_trips.trip_id = update_data.tripID
         RETURNING bus_trips.trip_id`
     }
@@ -231,17 +249,17 @@ export async function update_bus_data() {
 }
 
 export async function update_bus_data_no_db() {
-  let sql = postgres(process.env.local_url, { ssl: true });
+  let sql = postgres(database_url, { ssl: true });
   try{
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
     var b = Buffer.from(blob);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
-    var vehicle_updates:any = []
+    var trip_updates:any = []
     var time_updates: any =[]
     feed.entity.forEach(function (entity:any) {
-      vehicle_updates.push([
+      trip_updates.push([
         entity.tripUpdate.trip.tripId,
         parseInt(entity.tripUpdate.vehicle.id)
       ])
@@ -275,10 +293,10 @@ export async function update_bus_data_no_db() {
         RETURNING bus_stop_times.trip_id`
         updated_count += t.length
     }
-    for(var i = 0 ; i < vehicle_updates.length; i = i+ 700){
+    for(var i = 0 ; i < trip_updates.length; i = i+ 700){
       await sql`
         UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int 
-        FROM (values ${sql(vehicle_updates)}) as update_data (tripID, vehicle_id)
+        FROM (values ${sql(trip_updates)}) as update_data (tripID, vehicle_id)
         WHERE bus_trips.trip_id = update_data.tripID
         RETURNING bus_trips.trip_id`
     }

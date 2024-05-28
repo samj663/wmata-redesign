@@ -93,16 +93,17 @@ export var bootstrap_retry_counter = {
  * Starts up backend system and manage when to get next arrival data
  */
 export async function main() {
-  bootstrap_get_rail_alerts();
-  bootstrap_get_data();
-  bootstrap_get_train_data();
-  bootstrap_bus_stops();
-  bootstrap_bus_routes();
-  bootstrap_train_positions();
-  bootstrap_get_bus_alerts();
+  await bootstrap_get_rail_alerts();
+  await bootstrap_get_station_data();
+  await bootstrap_get_train_data();
+  await bootstrap_bus_stops();
+  await bootstrap_train_positions();
+  await bootstrap_get_bus_alerts();
+  
   //await bus.read_bus_trip_data();
-  database.update_bus_data();
-  bus.update_bus_data()
+  await database.update_bus_data();
+  await bus.update_bus_data();
+  await bootstrap_bus_routes();
 }
 //get_bus_alerts_gtft_rt()
 export async function bootstrap_get_rail_alerts() {
@@ -155,9 +156,9 @@ export async function bootstrap_get_train_data() {
   }
 }
 
-export async function bootstrap_get_data() {
+export async function bootstrap_get_station_data() {
   bootstrap_status.stations_fares_entrances = "RUNNING";
-  var status = await rail.get_data();
+  var status = await rail. get_station_data();
   bootstrap_status.stations_fares_entrances = status;
 
   if (status === "ERROR") {
@@ -167,7 +168,7 @@ export async function bootstrap_get_data() {
       );
     } else bootstrap_retry_counter.stations_fares_entrances++;
     console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
-    setTimeout(bootstrap_get_data, 10000);
+    setTimeout(bootstrap_get_station_data, 10000);
   }
 }
 

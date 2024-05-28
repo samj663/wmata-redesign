@@ -54,7 +54,7 @@ export async function get_train_data() {
  * Gets stations, entrances, and fare information from WMATA's API
  * Will rerun every hour.
  */
-export async function get_data() {
+export async function get_station_data() {
   let rawStations, rawEntrances, rawFares;
   try {
     backend.bootstrap_status.stations_fares_entrances = "RUNNING";
@@ -81,7 +81,7 @@ export async function get_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
-    backend.handleErrors(e, "get_data", "")
+    backend.handleErrors(e, "get_station_data", "")
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
     //console.error(e);
     setTimeout(get_train_data, 100000);

@@ -113,7 +113,8 @@ export async function update_bus_data() {
                 Minutes: time,
                 DirectionText: bus.trip_headsign ? bus.trip_headsign : "",
                 TripID: bus.trip_id,
-                VehicleID: bus.vehicle_id
+                VehicleID: bus.vehicle_id,
+                Delay: bus.delay
               })
             }
           })
@@ -159,7 +160,7 @@ export async function get_bus_routes() {
         paths: rawRoute,
       };
       bus_routes.set(route.RouteID, temp);
-      await backend.delay(250);
+      await backend.delay(100);
     }
   } catch (e: any) {
     backend.handleErrors(e, "get_bus_routes", "")
