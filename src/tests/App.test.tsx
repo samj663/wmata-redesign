@@ -5,7 +5,7 @@ import 'jest-extended';
 const request = require("supertest");
 const path = require('path');
 require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
-jest.setTimeout(20000)
+jest.setTimeout(300000) // Gives this test suite 5 minutes to run everything.
 
 describe("Backend tests", () => {
   var station_info_test:any;
@@ -15,20 +15,27 @@ describe("Backend tests", () => {
 
   beforeAll(async() => {
     let count = 1;
-    while(count !== 10){
+    while(count !== 500){
       const response = await request(app).get("/api/bootstrap")
       if( (response.body.stations_fares_entrances !== "SUCCESS") 
           ||  (response.body.rail_alerts !== "SUCCESS") 
           ||  (response.body.next_train !== "SUCCESS")
-          ||  (response.body.bus_stops !== "SUCCESS") ){
-
+          ||  (response.body.bus_stops !== "SUCCESS") 
+          ||  (response.body.bus_route_list !== "SUCCESS")
+          ||  (response.body.bus_routes !== "SUCCESS")
+          ||  (response.body.train_positions !== "SUCCESS")
+          ||  (response.body.bus_alerts !== "SUCCESS")){
         count += 1
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 1000));
       }
       else{
         break
       }
     }
+  });
+
+  beforeEach(async () => {
+    await new Promise((r) => setTimeout(r, 100)); // Delays each test by 100ms to avoid api rate limit
   });
 
   afterAll(async () => {
@@ -58,21 +65,21 @@ describe("Backend tests", () => {
   });
 
   test('/api/stationInfo?station=A01', async () => {
-    await get_test_station_info("A01")
+    var temp = await get_test_station_info("A01")
     const response = await request(app).get('/api/stationInfo?station=A01')
-    expect(response.body.Code).toEqual(station_info_test.Code)
-    expect(response.body.Name).toEqual(station_info_test.Name)
-    expect(response.body.StationTogether1).toEqual(station_info_test.StationTogether1)
-    expect(response.body.Address).toEqual(station_info_test.Address)
+    expect(response.body.Code).toEqual(temp.Code)
+    expect(response.body.Name).toEqual(temp.Name)
+    expect(response.body.StationTogether1).toEqual(temp.StationTogether1)
+    expect(response.body.Address).toEqual(temp.Address)
   });
 
   test('/api/stationInfo?station=F01', async () => {
-    await get_test_station_info("F01")
+    var temp = await get_test_station_info("F01")
     const response = await request(app).get('/api/stationInfo?station=F01')
-    expect(response.body.Code).toEqual(station_info_test.Code)
-    expect(response.body.Name).toEqual(station_info_test.Name)
-    expect(response.body.StationTogether1).toEqual(station_info_test.StationTogether1)
-    expect(response.body.Address).toEqual(station_info_test.Address)
+    expect(response.body.Code).toEqual(temp.Code)
+    expect(response.body.Name).toEqual(temp.Name)
+    expect(response.body.StationTogether1).toEqual(temp.StationTogether1)
+    expect(response.body.Address).toEqual(temp.Address)
   });
 
   test('/api/nextarrival?station=A01', async () => {
@@ -125,9 +132,9 @@ describe("Backend tests", () => {
   });
 
   test('/api/fares?sourcestation=F01&destinationstation=N01', async () => {
-    await get_fare_info("F01","N01")
+    var temp = await get_fare_info("F01","N01")
     const response = await request(app).get("/api/fares?sourcestation=F01&destinationstation=N01")
-    expect(response.body).toEqual(fares_test)
+    expect(response.body).toEqual(temp)
   });
 
   test('/api/entrances', async () => {
@@ -153,6 +160,48 @@ describe("Backend tests", () => {
     }))
   });
 
+  //Tests for revised routes
+
+  test("/", async () => {
+    const response = await request(app).get("/")
+    .expect('This is the DC Metro API backend');
+    expect(response.statusCode).toBe(200);
+  });
+
+  
+  test("/bus/routes/A4", async () => {
+    const response = await request(app).get("/bus/routes/A4")
+    expect(response.body).toEqual(expect.objectContaining({
+      name: "A4 - DC VILLAGE - ANACOSTIA", 
+      description: "Anacostia-Fort Drum Line",
+      lastUpdated: expect.any(Number),
+      paths: expect.any(Object)
+    }))
+    expect(response.statusCode).toBe(200);
+  });
+  test("/bus/routes/A4/1", async () => {
+    const response = await request(app).get("/bus/routes/A4/1")
+    expect(response.body).toEqual(expect.objectContaining({
+      TripHeadsign: "DC VILLAGE VIA FORT DRUM", 
+      DirectionText: "SOUTH",
+      DirectionNum: "1",
+      Shape: expect.any(Array),
+      Stops: expect.any(Array)
+    }))
+    expect(response.statusCode).toBe(200);
+  });
+
+  test("/bus/routes/A4/1", async () => {
+    const response = await request(app).get("/bus/routes/A4/1")
+    expect(response.body).toEqual(expect.objectContaining({
+      TripHeadsign: "DC VILLAGE VIA FORT DRUM", 
+      DirectionText: "SOUTH",
+      DirectionNum: "1",
+      Shape: expect.any(Array),
+      Stops: expect.any(Array)
+    }))
+    expect(response.statusCode).toBe(200);
+  });
 
 /*
   test('/api/bootstrap', async () => {
@@ -182,12 +231,15 @@ describe("Backend tests", () => {
   }*/
 
   async function get_test_station_info(station:string){
-    station_info_test = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY}`)).json();
+    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY_JEST}`)).json();
+    station_info_test = temp
+    return temp
   }
   
   async function get_fare_info(source:string, dest:string){
-    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY}`)).json();
+    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY_JEST}`)).json();
     fares_test = temp.StationToStationInfos[0].RailFare;
+    return temp.StationToStationInfos[0].RailFare
   }
 })
 

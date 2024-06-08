@@ -93,17 +93,19 @@ export var bootstrap_retry_counter = {
  * Starts up backend system and manage when to get next arrival data
  */
 export async function main() {
-  await bootstrap_get_rail_alerts();
   await bootstrap_get_station_data();
-  await bootstrap_get_train_data();
   await bootstrap_bus_stops();
+  await bootstrap_get_rail_alerts();
+  await bootstrap_get_train_data();
   await bootstrap_train_positions();
   await bootstrap_get_bus_alerts();
-  
+  await rail.get_elevator_escalator_alerts(); 
   //await bus.read_bus_trip_data();
+  
   await database.update_bus_data();
   await bus.update_bus_data();
   await bootstrap_bus_routes();
+ 
 }
 //get_bus_alerts_gtft_rt()
 export async function bootstrap_get_rail_alerts() {

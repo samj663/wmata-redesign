@@ -6,12 +6,12 @@ const path = require('path');
 require('dotenv').config({path: ".env"});
 require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-const database_url = process.env.local_url
+const database_url = `${process.env.digitalocean_url}?ssl=require`
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 // Not in use. Database only stores bus information for now.
 async function get_next_scheduled_trains(station_code : string, direction :number){
-  let sql = postgres(database_url, { ssl: true});
+  let sql = postgres(database_url);
   try{
     var today = new Date();
     var time = today.getHours() + ":" + String(today.getMinutes()).padStart(2, '0') + ":" + String(today.getSeconds()).padStart(2,'0');
@@ -46,7 +46,7 @@ async function get_train_position_destinations(trains:any){
 //Not in use. All next bus info is updated from get_all_next_bus()
 export async function get_next_bus(stop_id: string){
   try{
-    let sql = postgres(database_url, { ssl: true });
+    let sql = postgres(database_url);
     let start_time = new Date()
     var output =  await sql`
       SELECT * FROM bus_stop_times where
@@ -63,7 +63,7 @@ export async function get_next_bus(stop_id: string){
  */
 async function service_id_today(){
   try{
-    let sql = postgres(database_url, { ssl: true });
+    let sql = postgres(database_url);
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(Buffer.from(await res.arrayBuffer()));
@@ -129,7 +129,7 @@ async function service_id_today(){
 }
 
 async function reset_bus_trip(service_id: number){
-  let sql = postgres(database_url, { ssl: true });
+  let sql = postgres(database_url);
   try{
     let t = await sql `UPDATE bus_trips SET vehicle_id = -1, delay = 0 where service_id = ${service_id}`;
   }
@@ -142,7 +142,7 @@ async function reset_bus_trip(service_id: number){
 // that late night service is the same for each day.
 export async function get_all_next_bus(){
   try{
-    let sql = postgres(database_url, { ssl: true });
+    let sql = postgres(database_url);
     let today_service = await service_id_today()
     let start_time = new Date()
     let startTimestamp = start_time.getTime()
@@ -187,7 +187,7 @@ export async function get_all_next_bus(){
 }
 
 export async function update_bus_data() {
-  let sql = postgres(database_url, { ssl: true });
+  let sql = postgres(database_url);
   try{
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);
@@ -249,7 +249,7 @@ export async function update_bus_data() {
 }
 
 export async function update_bus_data_no_db() {
-  let sql = postgres(database_url, { ssl: true });
+  let sql = postgres(database_url);
   try{
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
     const res = await fetch(req);

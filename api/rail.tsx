@@ -20,6 +20,7 @@ export var trains: ESMap<string, train[]>;
 export var stations: ESMap<string, station>;
 export var railAlerts: any;
 export var train_positions: any;
+export var escalator_elevator_outages: any;
 
 /**
  * Gets real time train predictions from WMATA's API
@@ -114,6 +115,27 @@ export async function get_rail_alerts() {
   }
   backend.bootstrap_status.rail_alerts = "SUCCESS";
   setTimeout(get_rail_alerts, 60000);
+  return "SUCCESS";
+}
+
+export async function get_elevator_escalator_alerts() {
+  let outages;
+  try {
+   // backend.bootstrap_status.rail_alerts = "RUNNING";
+    var alertsResponse = await fetch(
+      `https://api.wmata.com/Incidents.svc/json/ElevatorIncidents?api_key=${key}`,
+    );
+    let date = alertsResponse.headers.get("date");
+    outages = await alertsResponse.json();
+    backend.lastUpdated.alerts = date;
+  } catch (e: any) {
+   // backend.bootstrap_status.rail_alerts = "ERROR";
+    //console.error(e);
+    return "ERROR";
+  }
+  //backend.bootstrap_status.rail_alerts = "SUCCESS";
+  escalator_elevator_outages = outages.ElevatorIncidents
+  setTimeout(get_elevator_escalator_alerts, 60000);
   return "SUCCESS";
 }
 
