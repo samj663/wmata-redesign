@@ -8,8 +8,7 @@ require('dotenv').config({path: path.resolve(__dirname,"../..",".env.local")});
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 const database_url = `${process.env.digitalocean_url}?ssl=require`
 const fs = require("fs");
-
-const decompress = require("decompress");
+var AdmZip = require("adm-zip");
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 // Not in use. Database only stores bus information for now.
@@ -548,15 +547,16 @@ export async function refresh_bus_database() {
   }
 
 async function get_static_data(req: any, folder_name: string) {
-  console.log("Fetching Data...");
-  const res = await fetch(req);
-  var blob = await res.arrayBuffer();
-  var b = Buffer.from(blob);
-  console.log("Unzipping file...");
-  await decompress(b, folder_name);
-  console.log("Unzipped file!");
-}
-
+    console.log("Fetching Data...");
+    const res = await fetch(req);
+    var blob = await res.arrayBuffer();
+    var b = Buffer.from(blob);
+    console.log("Unzipping file...");
+    //await decompress(b, folder_name);
+    var zip = new AdmZip(b);
+    zip.extractAllTo(folder_name, true);
+    console.log("Unzipped file!");
+  }
 async function create_tables(){
 let sql = postgres(database_url);
 await sql`
