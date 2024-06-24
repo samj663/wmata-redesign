@@ -104,8 +104,10 @@ export async function main() {
   
   await database.update_bus_data();
   await bus.update_bus_data();
+  database.refresh_bus_database()
+  runAtSpecificTimeOfDay(3,0,() => database.refresh_bus_database());
   await bootstrap_bus_routes();
- 
+  
 }
 //get_bus_alerts_gtft_rt()
 export async function bootstrap_get_rail_alerts() {
@@ -288,23 +290,55 @@ export function handleErrors(error: any, functionName: string, service:string){
 export function handleSuccess(service:string){
   var time = Date.now()
   if(service == 'bus_arrival'){
+    if(fetch_status.bus_arrival.status != "SUCCESS"){
+      console.log('SUCCESS: bus_arrival recovered from error')
+    }
     fetch_status.bus_arrival.status = "SUCCESS"
     fetch_status.bus_arrival.last_success_timestamp = time
   }
   else if(service == 'rail_arrival'){
+    if(fetch_status.rail_arrival.status != "SUCCESS"){
+      console.log('SUCCESS: rail_arrival recovered from error')
+    }
     fetch_status.rail_arrival.status = "SUCCESS"
     fetch_status.rail_arrival.last_success_timestamp = time
   }
   else if(service == 'bus_alerts'){
+    if(fetch_status.bus_alerts.status != "SUCCESS"){
+      console.log('SUCCESS: bus_alerts recovered from error')
+    }
     fetch_status.bus_alerts.status = "SUCCESS"
     fetch_status.bus_alerts.last_success_timestamp = time
   }
   else if(service == 'rail_alerts'){
+    if(fetch_status.rail_alerts.status != "SUCCESS"){
+      console.log('SUCCESS: rail_alerts recovered from error')
+    }
     fetch_status.rail_alerts.status = "SUCCESS"
     fetch_status.rail_alerts.last_success_timestamp = time
   }
   else if(service == 'bus_database_status'){
+    if(fetch_status.bus_database_status.status != "SUCCESS"){
+      console.log('SUCCESS: bus_database_status recovered from error')
+    }
     fetch_status.bus_database_status.status = "SUCCESS"
     fetch_status.bus_database_status.last_success_timestamp = time
   }
+}
+
+export async function runAtSpecificTimeOfDay(hour: number, minutes: number, func: any){
+  const twentyFourHours = 86400000;
+  const now = new Date();
+  const later = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime()
+  let eta_ms = later - now.getTime();
+  if (eta_ms < 0)
+  {
+    eta_ms += twentyFourHours;
+  }
+  setTimeout(function() {
+    //run once
+    func();
+    // run every 24 hours from now on
+    setInterval(func, twentyFourHours);
+  }, eta_ms);
 }

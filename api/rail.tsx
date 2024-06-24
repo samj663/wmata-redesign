@@ -33,13 +33,19 @@ export async function get_train_data() {
     var trainResponse = await fetch(
       `https://api.wmata.com/StationPrediction.svc/json/GetPrediction/All?api_key=${key}`,
     );
-    rawTrains = await trainResponse.json();
-    if (rawTrains === undefined) {
-      throw new Error("Proper data structure wasn't found within json file");
+    let contentType = trainResponse.headers.get('content-type')
+    if(contentType && contentType.includes('application/json')){
+      rawTrains = await trainResponse.json();
+      if (rawTrains === undefined) {
+        throw new Error("Proper data structure wasn't found within json file");
+      }
+      trains = parseTrains(rawTrains.Trains);
     }
-    trains = parseTrains(rawTrains.Trains);
+    else{
+      throw new Error(trainResponse.text())
+    }
   } catch (e: any) {
-    backend.handleErrors(e, "get_train_data", "rail_arrival")
+    backend.handleErrors(e, "rail/get_train_data", "rail_arrival")
     //I thought this wase.error(trainResponse);
     setTimeout(get_train_data, 20000);
     return "ERROR";
@@ -82,17 +88,17 @@ export async function get_station_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
-    backend.handleErrors(e, "get_station_data", "")
+    backend.handleErrors(e, "rail/get_station_data", "")
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
     //console.error(e);
-    setTimeout(get_train_data, 100000);
+    setTimeout(get_station_data, 100000);
     return "ERROR";
   }
   backend.bootstrap_status.stations_fares_entrances = "SUCCESS";
 
   backend.lastUpdated.stations_fares_entrances =
     stationResponse.headers.get("date");
-  setTimeout(get_train_data, 3600000);
+  setTimeout(get_station_data, 3600000);
   return "SUCCESS";
 }
 
@@ -119,8 +125,8 @@ export async function get_rail_alerts() {
 }
 
 export async function get_elevator_escalator_alerts() {
-  let outages;
   try {
+    let outages;
    // backend.bootstrap_status.rail_alerts = "RUNNING";
     var alertsResponse = await fetch(
       `https://api.wmata.com/Incidents.svc/json/ElevatorIncidents?api_key=${key}`,
@@ -128,13 +134,24 @@ export async function get_elevator_escalator_alerts() {
     let date = alertsResponse.headers.get("date");
     outages = await alertsResponse.json();
     backend.lastUpdated.alerts = date;
+
+    let contentType = alertsResponse.headers.get('content-type')
+    if(contentType && contentType.includes('application/json')){
+      outages = await alertsResponse.json();
+      if (outages === undefined) {
+        throw new Error("Proper data structure wasn't found within json file");
+      }
+      escalator_elevator_outages = outages.ElevatorIncidents
+    }
+    else{
+      throw new Error(alertsResponse.text())
+    }
   } catch (e: any) {
    // backend.bootstrap_status.rail_alerts = "ERROR";
     //console.error(e);
     return "ERROR";
   }
   //backend.bootstrap_status.rail_alerts = "SUCCESS";
-  escalator_elevator_outages = outages.ElevatorIncidents
   setTimeout(get_elevator_escalator_alerts, 60000);
   return "SUCCESS";
 }
@@ -177,7 +194,7 @@ export async function get_train_positions() {
       }
     });
   } catch (e: any) {
-    backend.handleErrors(e, "get_train_positions", "")
+    backend.handleErrors(e, "rail/get_train_positions", "")
     backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function.
@@ -370,7 +387,7 @@ export async function get_rail_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
-    backend.handleErrors(e, "get_rail_alerts_gtft_rt", "rail_alerts")
+    backend.handleErrors(e, "rail/get_rail_alerts_gtft_rt", "rail_alerts")
     backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.

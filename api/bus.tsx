@@ -125,11 +125,11 @@ export async function update_bus_data() {
     }
     //console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
     clear_old_data()
+    backend.handleSuccess("bus_arrival")
   } catch(e: any) {
-    backend.handleErrors(e, "update_bus_data", "bus_arrival")
+    backend.handleErrors(e, "bus/update_bus_data", "bus_arrival")
     //console.error(e);
   }
-  backend.handleSuccess("bus_arrival")
   setTimeout(update_bus_data, 20000);
 }
 
@@ -139,6 +139,7 @@ export async function get_bus_routes() {
     var routesResponse = await fetch(
       `https://api.wmata.com/Bus.svc/json/jRoutes?api_key=${key}`,
     );
+    
     var rawBus = await routesResponse.json();
     console.log("Caching bus routes...");
     bus_route_list = rawBus.Routes.filter((e: any) => {
@@ -163,7 +164,7 @@ export async function get_bus_routes() {
       await backend.delay(100);
     }
   } catch (e: any) {
-    backend.handleErrors(e, "get_bus_routes", "")
+    backend.handleErrors(e, "bus/get_bus_routes", "")
     backend.bootstrap_status.bus_routes = "ERROR";
     backend.bootstrap_status.bus_route_list = "ERROR";
     //console.error(e);
@@ -193,7 +194,7 @@ export async function get_bus_stops() {
       bus_stops.set(stop.StopID, temp);
     }
   } catch (e: any) {
-    backend.handleErrors(e, "get_bus_stops", "")
+    backend.handleErrors(e, "bus/get_bus_stops", "")
     backend.bootstrap_status.bus_stops = "ERROR";
     //console.error(e);
     return "ERROR";
@@ -218,7 +219,7 @@ export function get_nearest_bus_stops(lat: number, lon: number, radius: number) 
       }
     })
   } catch (e: any) {
-    backend.handleErrors(e, "get_nearest_bus_stops", "")
+    backend.handleErrors(e, "bus/get_nearest_bus_stops", "")
     //console.error(e);
   }
   return output;
@@ -269,7 +270,7 @@ export async function get_bus_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
-    backend.handleErrors(e, "get_bus_alerts_gtft_rt", "bus_alerts")
+    backend.handleErrors(e, "bus/get_bus_alerts_gtft_rt", "bus_alerts")
     //backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.

@@ -48,9 +48,8 @@ api/*build*
 api/certs
 *.pem
 *copy*
-static_bus/stops.txt
-static_bus/trips.txt
 *swagger.ts
 *swagger-output.json
 *api_documentation.json
 *available_routes.txt
+static_bus/
