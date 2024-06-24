@@ -328,7 +328,7 @@ export function handleSuccess(service:string){
 
 export async function runAtSpecificTimeOfDay(hour: number, minutes: number, func: any){
   const twentyFourHours = 86400000;
-  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "timezone id"}));
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: 'America/New_York'}));
   const later = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime()
   let eta_ms = later - now.getTime();
   if (eta_ms < 0)

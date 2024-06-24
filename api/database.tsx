@@ -334,8 +334,8 @@ export async function refresh_bus_database() {
   var e = s.shift().split(",");
   
   let new_dates = s[0].split(",");
-  console.log(new_dates)
-  console.log(dates)
+  //console.log(new_dates)
+  //console.log(dates)
   if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
     console.log("NOTICE: Checked GTFS bus schedule. No date change found.")
     return
@@ -547,15 +547,15 @@ export async function refresh_bus_database() {
   }
 
 async function get_static_data(req: any, folder_name: string) {
-    console.log("Fetching Data...");
+    console.log("NOTICE: Fetching Bus GTFS Data...");
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
     var b = Buffer.from(blob);
-    console.log("Unzipping file...");
+    console.log("NOTICE: Unzipping Bus GTFS Data...");
     //await decompress(b, folder_name);
     var zip = new AdmZip(b);
     zip.extractAllTo(folder_name, true);
-    console.log("Unzipped file!");
+    console.log("NOTICE: Unzipped Bus GTFS Data.");
   }
 async function create_tables(){
 let sql = postgres(database_url);
