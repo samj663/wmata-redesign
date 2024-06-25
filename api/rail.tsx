@@ -131,9 +131,6 @@ export async function get_elevator_escalator_alerts() {
     var alertsResponse = await fetch(
       `https://api.wmata.com/Incidents.svc/json/ElevatorIncidents?api_key=${key}`,
     );
-    let date = alertsResponse.headers.get("date");
-    outages = await alertsResponse.json();
-    backend.lastUpdated.alerts = date;
 
     let contentType = alertsResponse.headers.get('content-type')
     if(contentType && contentType.includes('application/json')){
@@ -142,6 +139,8 @@ export async function get_elevator_escalator_alerts() {
         throw new Error("Proper data structure wasn't found within json file");
       }
       escalator_elevator_outages = outages.ElevatorIncidents
+      let date = alertsResponse.headers.get("date");
+       backend.lastUpdated.alerts = date;
     }
     else{
       throw new Error(alertsResponse.text())
