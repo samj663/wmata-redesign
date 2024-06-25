@@ -322,6 +322,11 @@ export async function update_bus_data_no_db() {
   setTimeout(update_bus_data, 20000);
 }
 
+/**
+ * Used to refresh bus database. Currently not in use because of memory limitation
+ * in cloud server
+ */
+
 export async function refresh_bus_database() {
   await get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus")
   let sql = postgres(database_url);

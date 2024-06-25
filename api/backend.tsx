@@ -104,8 +104,8 @@ export async function main() {
   
   await database.update_bus_data();
   await bus.update_bus_data();
-  database.refresh_bus_database()
-  runAtSpecificTimeOfDay(3,0,() => database.refresh_bus_database());
+  //database.refresh_bus_database()
+  //runAtSpecificTimeOfDay(3,0,() => database.refresh_bus_database());
   await bootstrap_bus_routes();
   
 }
