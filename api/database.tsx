@@ -420,8 +420,8 @@ export async function update_rail_data() {
   export async function get_train_schedule_today(){
       let sql = postgres(database_url);
       try{
-          let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
-          let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date} and exception_type = 1`
+          let date = new Date()
+          let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")} and exception_type = 1`
           let todays_service = service_exception.map((a:any) => a.service_id);
           let start_time = new Date()
           let startTimestamp = start_time.getTime()
