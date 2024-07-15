@@ -430,8 +430,9 @@ export async function update_rail_data() {
           let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
           let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
           let output;
-          console.log(service_exception)
-          console.log()
+          console.log(`${start_time} -- ${end_time}`)
+          console.log(todays_service)
+       //   console.log()
           if(parseInt(temp.slice(0,2)) == 23 && parseInt(temp2.slice(0,2)) < 2){
           //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
           // console.log("HMMM")
