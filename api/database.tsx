@@ -422,7 +422,7 @@ export async function update_rail_data() {
       try{
           let date = new Date()
           console.log(date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,""))
-          let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")} and exception_type = 1`
+          let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,"")} and exception_type = 1`
           let todays_service = service_exception.map((a:any) => a.service_id);
           let start_time = new Date()
           let startTimestamp = start_time.getTime()
