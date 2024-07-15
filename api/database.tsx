@@ -322,11 +322,210 @@ export async function update_bus_data_no_db() {
   setTimeout(update_bus_data, 20000);
 }
 
+export async function update_rail_data() {
+  let sql = postgres(database_url);
+  try{
+    let req = `https://api.wmata.com/gtfs/rail-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
+    const res = await fetch(req);
+    var blob = await res.arrayBuffer();
+    var b = Buffer.from(blob);
+    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
+    var trip_updates:any = []
+    var time_updates: any =[]
+    var g = JSON.stringify(feed.entity, null, 2)//.replace(/[\[\]\,\"]/g,'');
+   /* fs.writeFile('rail_update.json', g, (err:any) => {
+      if (err) {
+        console.error(err);
+      } else {
+        // file written successfully
+      }
+    });*/
+    feed.entity.forEach(function (entity:any) {
+      if(entity.tripUpdate.vehicle != null){
+          trip_updates.push([
+              entity.tripUpdate.trip.tripId,
+              entity.tripUpdate.vehicle.licensePlate,
+              entity.tripUpdate.trip.scheduleRelationship
+          ])
+      }
+      else{
+          trip_updates.push([
+              entity.tripUpdate.trip.tripId,
+              "-1",
+              entity.tripUpdate.trip.scheduleRelationship
+          ])
+      }
+      entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
+        var t;
+        var time;
+        if(e.scheduleRelationship == 0){
+          if(e.departure != null){
+              t =  parseInt(e.departure.time + "000")
+              time = new Date(t);
+          }
+          else{
+              t = parseInt(e.arrival.time + "000")
+              time = new Date(t);
+          }
+          //console.log(time)
+          let temp = time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()//val[2].length == 7 ?"0" +val[2]:val[2]
+          time_updates.push([
+              entity.tripUpdate.trip.tripId,
+              temp.length == 7 ? "0" + temp:temp,
+              parseInt(e.stopSequence),
+              e.stopId,
+              e.scheduleRelationship
+          ])
+        }
+        else{
+          time_updates.push([
+              entity.tripUpdate.trip.tripId,
+              "",
+              parseInt(e.stopSequence),
+              e.stopId,
+              e.scheduleRelationship
+          ])
+         // console.log(e.scheduleRelationship)
+        }
+      })
+    });
+    var updated_count = 0
+    for(var i = 0 ; i < time_updates.length; i = i + 700){
+      let end = i + 700
+      let t = await sql`
+        UPDATE rail_stop_times SET departure_time = update_data.time, status = update_data.scheduleRelationship
+        FROM (values ${sql(time_updates.slice(i, end))}) as update_data (tripID, time, sequence, stopID, scheduleRelationship)
+        WHERE rail_stop_times.trip_id = update_data.tripID and rail_stop_times.stop_id = update_data.stopID and rail_stop_times.stop_sequence = (update_data.sequence)::int 
+        RETURNING *`
+        updated_count += t.length
+     //   console.log(t)
+    }
+    for(var i = 0 ; i < trip_updates.length; i = i+ 700){
+      await sql`
+        UPDATE rail_trips SET license_plate = update_data.vehicle_id, status = update_data.status
+        FROM (values ${sql(trip_updates)}) as update_data (tripID, vehicle_id, status)
+        WHERE rail_trips.trip_id = update_data.tripID
+        RETURNING *`
+    }
+    //console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
+   // await get_train_schedule_all()
+  } catch(e: any) {
+      console.error(e)
+   // backend.handleErrors(e, "database/update_bus_data", "bus_database_status")
+    //console.warn(`Database Info Failed To Update --`)
+  }
+  sql.end()
+  //setTimeout(update_rail_data, 20000);
+}
+  export async function get_train_schedule_today(){
+      let sql = postgres(database_url);
+      try{
+          let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
+          let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date} and exception_type = 1`
+          let todays_service = service_exception.map((a:any) => a.service_id);
+          let start_time = new Date()
+          let startTimestamp = start_time.getTime()
+          let timeExtent = 60  * 60 * 1000
+          let end_time = new Date(startTimestamp + timeExtent)
+          let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+          let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+          let output;
+          console.log(service_exception)
+          console.log()
+          if(parseInt(temp.slice(0,2)) == 23 && parseInt(temp2.slice(0,2)) < 2){
+          //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
+          // console.log("HMMM")
+          
+              output = await sql`
+              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              FROM rail_stop_times, rail_trips WHERE
+              rail_trips.service_id in ${sql(todays_service)} and
+              rail_trips.trip_id = rail_stop_times.trip_id and
+              (rail_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} or
+              rail_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2})
+              ORDER BY stop_id, rail_stop_times.departure_time`
+          }
+          else{//NOTE: stop_id is now named 'replace' because of replace function
+          output = await sql`
+              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              FROM rail_stop_times, rail_trips WHERE
+              rail_trips.service_id in ${sql(todays_service)} and
+              rail_trips.trip_id = rail_stop_times.trip_id and
+              rail_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
+              rail_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
+              ORDER BY stop_id, rail_stop_times.departure_time`
+          }
+          //console.log(groupBy(output, "replace"))
+          //const map = new Map(Object.entries(groupBy(output, "replace")));
+          //console.log(map.get('A01'))
+          //console.log(output)
+
+      sql.end()
+      return output
+      //setTimeout(get_train_schedule_today, 20000)
+      } catch (e:any){
+
+          console.error(e)
+          sql.end()
+          //setTimeout(get_train_schedule_today, 20000)
+          return []
+          // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+      }
+  }
+export async function get_train_schedule_all(){
+  let sql = postgres(database_url);
+  try{
+      let output = await sql`
+      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              FROM rail_stop_times, rail_trips WHERE
+              rail_trips.trip_id = rail_stop_times.trip_id
+              ORDER BY stop_id, rail_stop_times.departure_time`
+      //console.log(groupBy(output, "stop_id"))
+      //let result = output.reduce((map, obj) => (map[obj.stop_id] = obj, map), {});
+      //console.log(result)
+      //console.log( Map.groupBy((output), ({ stop_id }:any) => stop_id))
+      return output
+  } catch (e:any){
+     // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+     return []
+  }
+  //setTimeout(get_train_schedule_all, 20000)
+  sql.end()
+
+}
+
+export async function get_train_schedule_calendar(){
+  let sql = postgres(database_url);
+      try{
+        let output = await sql`
+        SELECT service_id, service_date FROM rail_calendar_dates
+        ORDER BY service_date`
+       // console.log(groupBy(output, "service_date"))
+      sql.end()
+      return output
+      //setTimeout(get_train_schedule_today, 20000)
+      } catch (e:any){
+
+          console.error(e)
+          sql.end()
+          //setTimeout(get_train_schedule_today, 20000)
+          return null
+          // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+      }
+}
+
+var groupBy = function(xs: any, key:any) {
+  return xs.reduce(function(rv:any, x:any) {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
+
 /**
  * Used to refresh bus database. Currently not in use because of memory limitation
  * in cloud server
  */
-
+/*
 export async function refresh_bus_database() {
   await get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus")
   let sql = postgres(database_url);
@@ -512,7 +711,7 @@ export async function refresh_bus_database() {
 
     /*let sql = postgres(database_url);
     let t = await sql`TRUNCATE bus_stop_times CASCADE`
-    sql.end()*/
+    sql.end()*
 
     content = await fs.readFileSync("./static_bus/stop_times.txt", "utf8");
     s = content.split("\n");
@@ -632,4 +831,4 @@ CREATE TABLE IF NOT EXISTS bus_calendar(
     end_date varchar(8)
 );`;
 sql.end()
-}
+}*/

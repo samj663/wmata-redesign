@@ -7,6 +7,8 @@
 import * as bus from "./bus";
 import * as rail from "./rail";
 import * as database from "./database";
+import * as rail_db from "./read_rail_schedule";
+import * as bus_db from "./read_bus_schedule";
 import "./routes";
 import { error_template } from "./interfaces_and_classes";
 import { shutdown } from "./routes";
@@ -100,12 +102,15 @@ export async function main() {
   await bootstrap_train_positions();
   await bootstrap_get_bus_alerts();
   await rail.get_elevator_escalator_alerts(); 
+  //await database.get_train_schedule_today()
   //await bus.read_bus_trip_data();
-  
+  await rail.update_rail_schedule();
+  await rail.update_full_rail_schedule()
   await database.update_bus_data();
   await bus.update_bus_data();
   //database.refresh_bus_database()
-  //runAtSpecificTimeOfDay(3,0,() => database.refresh_bus_database());
+  await runAtSpecificTimeOfDay(18,50,() => rail_db.read_rail_schedule());
+  await runAtSpecificTimeOfDay(18,50,() => bus_db.read_bus_schedule_new());
   await bootstrap_bus_routes();
   
 }
@@ -341,4 +346,8 @@ export async function runAtSpecificTimeOfDay(hour: number, minutes: number, func
     // run every 24 hours from now on
     setInterval(func, twentyFourHours);
   }, eta_ms);
+}
+
+export async function update_database(){
+
 }

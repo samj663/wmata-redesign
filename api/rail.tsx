@@ -4,6 +4,7 @@
  */
 
 import * as backend from "./backend";
+import * as database from "./database";
 import { ESMap } from "typescript";
 import { stationCodeNameMap, train, fares, entrance, station } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
@@ -21,6 +22,9 @@ export var stations: ESMap<string, station>;
 export var railAlerts: any;
 export var train_positions: any;
 export var escalator_elevator_outages: any;
+export var schedule_data: any;
+export var schedule_calendar: any;
+export var schedule_data_full: any;
 
 /**
  * Gets real time train predictions from WMATA's API
@@ -397,3 +401,58 @@ export async function get_rail_alerts_gtft_rt() {
   setTimeout(get_rail_alerts_gtft_rt, 60000);
   return "SUCCESS";
 }
+
+export async function update_rail_schedule(){
+  await database.update_rail_data();
+  let temp = await database.get_train_schedule_today()
+  let temp2 = await database.get_train_schedule_calendar()
+  /*if (schedule_data == undefined){
+    schedule_data = new Map()
+    for (const e of stationNames.codeArray){
+      schedule_data.set(e, [])
+    }
+  }*/
+  if((temp != null && temp2 != null) || (temp.length > 0 && temp2.length > 0)){
+    schedule_data = new Map(Object.entries(groupBy(temp, "replace")));
+    schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
+    //console.log(schedule_data.get("A04"))
+   /* for(const e of temp){
+
+    }*/
+    //console.log(schedule_data.get("F06"))
+    //update_rail_schedule();
+  }else{
+  console.error("ERROR: Rail database get_train_schedule_today returned null")
+  }
+  setTimeout(update_rail_schedule, 20000)
+}
+
+export async function update_full_rail_schedule(){
+  let temp = await database.get_train_schedule_all()
+  /*if (schedule_data == undefined){
+    schedule_data = new Map()
+    for (const e of stationNames.codeArray){
+      schedule_data.set(e, [])
+    }
+  }*/
+  if((temp.length > 0)){
+    schedule_data_full = new Map(Object.entries(groupBy(temp, "replace")));
+    //schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
+    //console.log(schedule_data_full.get("A04"))
+   /* for(const e of temp){
+
+    }*/
+    //console.log(schedule_data.get("F06"))
+    //update_rail_schedule();
+  }else{
+  console.error("ERROR: Rail database get_train_schedule_today returned null")
+  }
+  setTimeout(update_rail_schedule, 3_600_000)
+}
+
+var groupBy = function(xs: any, key:any) {
+  return xs.reduce(function(rv:any, x:any) {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
