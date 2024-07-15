@@ -90,7 +90,7 @@ async function service_id_today(){
       backend.fetch_status.bus_database_status.service_id = result[0].service_id
       return result[0].service_id
     }
-    let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")
+    let date = new Date().toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,"")
     let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
     var output;
     if(service_exception.length > 0){
@@ -421,7 +421,7 @@ export async function update_rail_data() {
       let sql = postgres(database_url);
       try{
           let date = new Date()
-          console.log(date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,""))
+          console.log(date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,""))
           let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York'}).replace(/-/g,"")} and exception_type = 1`
           let todays_service = service_exception.map((a:any) => a.service_id);
           let start_time = new Date()
