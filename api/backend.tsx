@@ -101,6 +101,8 @@ export async function main() {
   await bootstrap_get_train_data();
   await bootstrap_train_positions();
   await bootstrap_get_bus_alerts();
+  await runAtSpecificTimeOfDay(4,30,() => rail_db.read_rail_schedule());
+  await runAtSpecificTimeOfDay(4,35,() => bus_db.read_bus_schedule_new());
   await rail.get_elevator_escalator_alerts(); 
   //await database.get_train_schedule_today()
   //await bus.read_bus_trip_data();
@@ -109,8 +111,7 @@ export async function main() {
   await database.update_bus_data();
   await bus.update_bus_data();
   //database.refresh_bus_database()
-  await runAtSpecificTimeOfDay(4,30,() => rail_db.read_rail_schedule());
-  await runAtSpecificTimeOfDay(4,35,() => bus_db.read_bus_schedule_new());
+  
   await bootstrap_bus_routes();
   
 }
