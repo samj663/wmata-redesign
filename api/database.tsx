@@ -443,6 +443,7 @@ export async function update_rail_data() {
               FROM rail_stop_times, rail_trips WHERE
               rail_trips.service_id in ${sql(todays_service)} and
               rail_trips.trip_id = rail_stop_times.trip_id and
+              (rail_trips.status != '3' or rail_trips.status IS NULL) and
               (rail_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} or
               rail_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2})
               ORDER BY stop_id, rail_stop_times.departure_time`
@@ -453,6 +454,7 @@ export async function update_rail_data() {
               FROM rail_stop_times, rail_trips WHERE
               rail_trips.service_id in ${sql(todays_service)} and
               rail_trips.trip_id = rail_stop_times.trip_id and
+              (rail_trips.status != '3' or rail_trips.status IS NULL) and
               rail_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp:temp} and 
               rail_stop_times.departure_time <= ${temp2.length == 7 ? "0" + temp2:temp2}
               ORDER BY stop_id, rail_stop_times.departure_time`
