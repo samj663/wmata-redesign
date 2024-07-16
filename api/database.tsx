@@ -488,15 +488,34 @@ export async function get_train_schedule_all(){
       //let result = output.reduce((map, obj) => (map[obj.stop_id] = obj, map), {});
       //console.log(result)
       //console.log( Map.groupBy((output), ({ stop_id }:any) => stop_id))
+      sql.end()
       return output
   } catch (e:any){
      // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+     sql.end()
      return []
   }
   //setTimeout(get_train_schedule_all, 20000)
-  sql.end()
+  //sql.end()
 
 }
+/*
+export async function get_rail_feed_info(){
+  let sql = postgres(database_url);
+  try{
+      let output = await sql`
+      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              FROM rail_stop_times, rail_trips WHERE
+              rail_trips.trip_id = rail_stop_times.trip_id
+              ORDER BY stop_id, rail_stop_times.departure_time`
+      sql.end()
+      return output
+  } catch (e:any){
+     // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+     sql.end()
+     return []
+  }
+}*/
 
 export async function get_train_schedule_calendar(){
   let sql = postgres(database_url);

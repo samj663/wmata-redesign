@@ -108,7 +108,7 @@ export async function main() {
   //await database.get_train_schedule_today()
   //await bus.read_bus_trip_data();
   await rail.update_rail_schedule();
-  await rail.update_full_rail_schedule()
+  //await rail.update_full_rail_schedule()
   await database.update_bus_data();
   await bus.update_bus_data();
   //database.refresh_bus_database()

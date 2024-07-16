@@ -503,6 +503,23 @@ app.get("/rail/alerts", function (request: any, response: any) {
   }
 });
 
+app.get("/rail/schedule/calendar", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  response.set("Cache-Control", "public, max-age=600");
+  let output = [];
+  if (rail.schedule_calendar_object == undefined) {
+    response.json({
+      error:
+        "System ran into error getting rail schedule calendar. Please try again later.",
+    });
+  } else {
+    //console.log(rail.schedule_calendar_object)
+    response.json(rail.schedule_calendar_object);
+  }
+});
+
+
+
 app.get("/bus/alerts", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Cache-Control", "public, max-age=600");

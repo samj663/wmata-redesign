@@ -23,7 +23,8 @@ export var railAlerts: any;
 export var train_positions: any;
 export var escalator_elevator_outages: any;
 export var schedule_data: any;
-export var schedule_calendar: any;
+export var schedule_calendar_map: any;
+export var schedule_calendar_object: any;
 export var schedule_data_full: any;
 
 /**
@@ -402,10 +403,21 @@ export async function get_rail_alerts_gtft_rt() {
   return "SUCCESS";
 }
 
+var full_schedule_refresh = 0
+
 export async function update_rail_schedule(){
   await database.update_rail_data();
   let temp = await database.get_train_schedule_today()
   let temp2 = await database.get_train_schedule_calendar()
+  let temp3;
+  if (full_schedule_refresh == 180){
+    temp3 = await database.get_train_schedule_all()
+    full_schedule_refresh = 0
+  }
+  else{
+    full_schedule_refresh += 1
+  }
+  
   /*if (schedule_data == undefined){
     schedule_data = new Map()
     for (const e of stationNames.codeArray){
@@ -414,7 +426,8 @@ export async function update_rail_schedule(){
   }*/
   if((temp != null && temp2 != null) || (temp.length > 0 && temp2.length > 0)){
     schedule_data = new Map(Object.entries(groupBy(temp, "replace")));
-    schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
+    schedule_calendar_map =  new Map(Object.entries(groupBy(temp2, "service_date")));
+    schedule_calendar_object = temp2;
     //console.log(schedule_data.get("A04"))
    /* for(const e of temp){
 
@@ -422,7 +435,11 @@ export async function update_rail_schedule(){
     //console.log(schedule_data.get("F06"))
     //update_rail_schedule();
   }else{
-  console.error("ERROR: Rail database get_train_schedule_today returned null")
+    console.error("ERROR: Rail database get_train_schedule_today returned null")
+  }
+  if(temp3 != undefined){
+    schedule_data_full = new Map(Object.entries(groupBy(temp3, "replace")));
+    console.log("NOTICE: Updated full rail schedule")
   }
   setTimeout(update_rail_schedule, 20000)
 }
@@ -444,8 +461,9 @@ export async function update_full_rail_schedule(){
     }*/
     //console.log(schedule_data.get("F06"))
     //update_rail_schedule();
-  }else{
-  console.error("ERROR: Rail database get_train_schedule_today returned null")
+  }
+  else{
+    console.error("ERROR: Rail database get_train_schedule_today returned null")
   }
   setTimeout(update_rail_schedule, 3_600_000)
 }
