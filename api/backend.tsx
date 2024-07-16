@@ -340,9 +340,9 @@ export async function runAtSpecificTimeOfDay(hour: number, minutes: number, func
   {
     eta_ms += twentyFourHours;
   }
-  setTimeout(function() {
+  setTimeout(async function() {
     //run once
-    func();
+    await func();
     // run every 24 hours from now on
     setInterval(func, twentyFourHours);
   }, eta_ms);
