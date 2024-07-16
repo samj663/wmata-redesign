@@ -421,7 +421,7 @@ export async function update_rail_data() {
       let sql = postgres(database_url);
       try{
           let date = new Date()
-          console.log(date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,""))
+    //     console.log(date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,""))
           let service_exception = await sql`select service_id from rail_calendar_dates where service_date = ${date.toLocaleDateString("af-ZA",{timeZone: 'America/New_York', month: "2-digit", year: "numeric", day: "2-digit"}).replace(/-/g,"")} and exception_type = 1`
           let todays_service = service_exception.map((a:any) => a.service_id);
           let start_time = new Date()
@@ -431,8 +431,8 @@ export async function update_rail_data() {
           let temp = start_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
           let temp2 = end_time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
           let output;
-          console.log(`${temp} -- ${temp2}`)
-          console.log(service_exception)
+       //   console.log(`${temp} -- ${temp2}`)
+         // console.log(service_exception)
        //   console.log()
           if(parseInt(temp.slice(0,2)) == 23 && parseInt(temp2.slice(0,2)) < 2){
           //let temp3 = parseInt(temp2.slice(0,2) + 24).toString() + temp2.slice(2)
