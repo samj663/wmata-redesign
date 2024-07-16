@@ -324,10 +324,11 @@ export async function read_bus_schedule_new() {
       let sql = postgres(url);
       await sql` insert into bus_stop_times ${sql(stop_times)} ON CONFLICT DO NOTHING`;
      
-      console.log("Added final stop_times data: ", rows_entered)
+      
       count = 0;
       stop_times = [];
       sql.end()
+      console.log("Added final stop_times data: ", rows_entered)
     }
     let psql = postgres(url);
     await sql`TRUNCATE bus_feed_info CASCADE`
