@@ -109,7 +109,7 @@ export async function read_rail_schedule() {
   //console.log(new_dates)
   //console.log(dates)
   
-  if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
+ if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
     console.log("NOTICE: Checked GTFS rail schedule. No date change found.")
     sql.end()
     return
@@ -388,9 +388,10 @@ export async function read_rail_schedule() {
       stop_times = [];
       sql.end()
     }
+    
     let psql = postgres(url);
-    await sql`TRUNCATE rail_feed_info CASCADE`
-    await sql`insert into rail_feed_info values (${new_dates[3]},${new_dates[4]})`
+    await psql`TRUNCATE rail_feed_info CASCADE`
+    await psql`insert into rail_feed_info values (${new_dates[3]},${new_dates[4]})`
     psql.end()
     console.log("NOTICE: Finished updating rail database")
 

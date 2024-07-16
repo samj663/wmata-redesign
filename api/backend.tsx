@@ -95,14 +95,15 @@ export var bootstrap_retry_counter = {
  * Starts up backend system and manage when to get next arrival data
  */
 export async function main() {
+  await runAtSpecificTimeOfDay(4,30,() => rail_db.read_rail_schedule());
+  await runAtSpecificTimeOfDay(4,35,() => bus_db.read_bus_schedule_new());
   await bootstrap_get_station_data();
   await bootstrap_bus_stops();
   await bootstrap_get_rail_alerts();
   await bootstrap_get_train_data();
   await bootstrap_train_positions();
   await bootstrap_get_bus_alerts();
-  //await runAtSpecificTimeOfDay(4,30,() => rail_db.read_rail_schedule());
-  //await runAtSpecificTimeOfDay(4,35,() => bus_db.read_bus_schedule_new());
+  
   await rail.get_elevator_escalator_alerts(); 
   //await database.get_train_schedule_today()
   //await bus.read_bus_trip_data();

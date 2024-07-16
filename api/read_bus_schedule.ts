@@ -331,8 +331,8 @@ export async function read_bus_schedule_new() {
       console.log("Added final stop_times data: ", rows_entered)
     }
     let psql = postgres(url);
-    await sql`TRUNCATE bus_feed_info CASCADE`
-    await sql`insert into bus_feed_info values (${new_dates[3]},${new_dates[4]})`
+    await psql`TRUNCATE bus_feed_info CASCADE`
+    await psql`insert into bus_feed_info values (${new_dates[3]},${new_dates[4]})`
     psql.end()
     console.log("NOTICE: Finished updating bus database")
   }
