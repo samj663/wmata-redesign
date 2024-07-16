@@ -264,7 +264,7 @@ export async function read_rail_schedule() {
       sql.end()
     }
 
-    
+    try{
     content = await fs.readFileSync("./static_rail/calendar_dates.txt", "utf8");
     s = content.split("\n");
     e = s.shift().split(",");
@@ -299,6 +299,9 @@ export async function read_rail_schedule() {
       calendar_dates = [];
       sql.end()
     }
+}catch(e:any){
+    console.error("WARNING: rail_calendar_dates.txt is missing")
+}
   
     try{
       content = await fs.readFileSync("./static_rail/calendar.txt", "utf8");

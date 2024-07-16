@@ -206,7 +206,8 @@ export async function read_bus_schedule_new() {
       trips = [];
       sql.end()
     }
-  
+
+  try{
     content = await fs.readFileSync("./static_bus/calendar_dates.txt", "utf8");
     s = content.split("\n");
     e = s.shift().split(",");
@@ -241,7 +242,10 @@ export async function read_bus_schedule_new() {
       calendar_dates = [];
       sql.end()
     }
-  
+}catch(e:any){
+    console.error("WARNING: bus_calendar_dates.txt is missing")
+}
+  try{
     content = await fs.readFileSync("./static_bus/calendar.txt", "utf8");
     s = content.split("\n");
     e = s.shift().split(",");
@@ -283,7 +287,9 @@ export async function read_bus_schedule_new() {
       calendar_dates = [];
       sql.end()
     }
-
+}catch(e:any){
+    console.error("WARNING: bus_calendar.txt is missing")
+}
    /* let sql = postgres(url);
     let t = await sql`TRUNCATE bus_stop_times CASCADE`
     sql.end()*/
