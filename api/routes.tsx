@@ -725,6 +725,22 @@ app.get("/rail/schedule/full/:stop", function (request: any, response: any) {
   }
 });
 
+app.get("/rail/schedule/feed/info", function (request: any, response: any) {
+  response.set("Access-Control-Allow-Origin", "*");
+  if (rail.schedule_data_full == null) {
+    response.json({ error: "System is booting up. Please try again later." });
+  } 
+  else if (backend.bootstrap_status.bus_stops === "ERROR") {
+    response.json({
+      error:
+        "System ran into error fetching bus stops. Please try again later.",
+    });
+  } 
+  else {
+    response.json(rail.schedule_feed_info)
+  }
+});
+
 app.get("/rail/schedule/:stop/includeTransf", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   if (rail.schedule_data == null) {

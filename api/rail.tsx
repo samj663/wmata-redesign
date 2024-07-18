@@ -26,6 +26,7 @@ export var schedule_data: any;
 export var schedule_calendar_map: any;
 export var schedule_calendar_object: any;
 export var schedule_data_full: any;
+export var schedule_feed_info: any;
 
 /**
  * Gets real time train predictions from WMATA's API
@@ -410,14 +411,17 @@ export async function update_rail_schedule(){
   let temp = await database.get_train_schedule_today()
   let temp2 = await database.get_train_schedule_calendar()
   let temp3;
-  if (full_schedule_refresh == 180){
+  let temp4 = await database.get_train_schedule_feed_info()
+  if (full_schedule_refresh == 180 && schedule_data_full != undefined){
     temp3 = await database.get_train_schedule_all()
     full_schedule_refresh = 0
   }
   else{
     full_schedule_refresh += 1
   }
-  
+  if(schedule_data_full == undefined){
+    temp3 = await database.get_train_schedule_all()
+  }
   /*if (schedule_data == undefined){
     schedule_data = new Map()
     for (const e of stationNames.codeArray){
@@ -428,6 +432,7 @@ export async function update_rail_schedule(){
     schedule_data = new Map(Object.entries(groupBy(temp, "replace")));
     schedule_calendar_map =  new Map(Object.entries(groupBy(temp2, "service_date")));
     schedule_calendar_object = temp2;
+    schedule_feed_info = temp4[0]
     //console.log(schedule_data.get("A04"))
    /* for(const e of temp){
 
@@ -446,6 +451,7 @@ export async function update_rail_schedule(){
 
 export async function update_full_rail_schedule(){
   let temp = await database.get_train_schedule_all()
+  let temp2 = await database.get_train_schedule_feed_info()
   /*if (schedule_data == undefined){
     schedule_data = new Map()
     for (const e of stationNames.codeArray){
@@ -454,6 +460,7 @@ export async function update_full_rail_schedule(){
   }*/
   if((temp.length > 0)){
     schedule_data_full = new Map(Object.entries(groupBy(temp, "replace")));
+    schedule_feed_info = temp2[0]
     //schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
     //console.log(schedule_data_full.get("A04"))
    /* for(const e of temp){

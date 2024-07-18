@@ -439,7 +439,7 @@ export async function update_rail_data() {
           // console.log("HMMM")
           
               output = await sql`
-              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id, rail_trips.service_id
               FROM rail_stop_times, rail_trips WHERE
               rail_trips.service_id in ${sql(todays_service)} and
               rail_trips.trip_id = rail_stop_times.trip_id and
@@ -450,7 +450,7 @@ export async function update_rail_data() {
           }
           else{//NOTE: stop_id is now named 'replace' because of replace function
           output = await sql`
-              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+              SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id, rail_trips.service_id
               FROM rail_stop_times, rail_trips WHERE
               rail_trips.service_id in ${sql(todays_service)} and
               rail_trips.trip_id = rail_stop_times.trip_id and
@@ -480,7 +480,7 @@ export async function get_train_schedule_all(){
   let sql = postgres(database_url);
   try{
       let output = await sql`
-      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id, rail_trips.service_id
               FROM rail_stop_times, rail_trips WHERE
               rail_trips.trip_id = rail_stop_times.trip_id
               ORDER BY stop_id, rail_stop_times.departure_time`
@@ -499,23 +499,37 @@ export async function get_train_schedule_all(){
   //sql.end()
 
 }
-/*
-export async function get_rail_feed_info(){
+
+export async function get_train_schedule_feed_info(){
   let sql = postgres(database_url);
   try{
       let output = await sql`
-      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id
+      SELECT * from rail_feed_info`
+      
+      sql.end()
+      return output
+  } catch (e:any){
+     sql.end()
+     return []
+  }
+}
+
+export async function get_train_schedule_full(station_code: any){
+  let sql = postgres(database_url);
+  try{
+      let output = await sql`
+      SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id, rail_trips.service_id
               FROM rail_stop_times, rail_trips WHERE
-              rail_trips.trip_id = rail_stop_times.trip_id
+              rail_trips.trip_id = rail_stop_times.trip_id AND
+              rail_stop_times.stop_id LIKE ${station_code}
               ORDER BY stop_id, rail_stop_times.departure_time`
       sql.end()
       return output
   } catch (e:any){
-     // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
      sql.end()
      return []
   }
-}*/
+}
 
 export async function get_train_schedule_calendar(){
   let sql = postgres(database_url);
