@@ -17,15 +17,15 @@ read_rail_schedule();
 //get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus_test")
 
 async function get_static_data(req:any, folder_name:any) {
-  console.log("Fetching Data...");
+  console.info("Fetching Data...");
   const res = await fetch(req);
   var blob = await res.arrayBuffer();
   var b = Buffer.from(blob);
-  console.log("Unzipping file...");
+  console.info("Unzipping file...");
   //await decompress(b, folder_name);
   var zip = new AdmZip(b);
   zip.extractAllTo(folder_name, true);
-  console.log("Unzipped file!");
+  console.info("Unzipped file!");
 }
 
 async function create_tables(){
