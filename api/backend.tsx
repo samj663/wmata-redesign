@@ -298,35 +298,35 @@ export function handleSuccess(service:string){
   var time = Date.now()
   if(service == 'bus_arrival'){
     if(fetch_status.bus_arrival.status != "SUCCESS"){
-      console.info('SUCCESS: bus_arrival recovered from error')
+      console.info('SUCCESS: bus_arrival recovered')
     }
     fetch_status.bus_arrival.status = "SUCCESS"
     fetch_status.bus_arrival.last_success_timestamp = time
   }
   else if(service == 'rail_arrival'){
     if(fetch_status.rail_arrival.status != "SUCCESS"){
-      console.info('SUCCESS: rail_arrival recovered from error')
+      console.info('SUCCESS: rail_arrival recovered')
     }
     fetch_status.rail_arrival.status = "SUCCESS"
     fetch_status.rail_arrival.last_success_timestamp = time
   }
   else if(service == 'bus_alerts'){
     if(fetch_status.bus_alerts.status != "SUCCESS"){
-      console.info('SUCCESS: bus_alerts recovered from error')
+      console.info('SUCCESS: bus_alerts recovered')
     }
     fetch_status.bus_alerts.status = "SUCCESS"
     fetch_status.bus_alerts.last_success_timestamp = time
   }
   else if(service == 'rail_alerts'){
     if(fetch_status.rail_alerts.status != "SUCCESS"){
-      console.info('SUCCESS: rail_alerts recovered from error')
+      console.info('SUCCESS: rail_alerts recovered')
     }
     fetch_status.rail_alerts.status = "SUCCESS"
     fetch_status.rail_alerts.last_success_timestamp = time
   }
   else if(service == 'bus_database_status'){
     if(fetch_status.bus_database_status.status != "SUCCESS"){
-      console.info('SUCCESS: bus_database_status recovered from error')
+      console.info('SUCCESS: bus_database_status recovered')
     }
     fetch_status.bus_database_status.status = "SUCCESS"
     fetch_status.bus_database_status.last_success_timestamp = time
