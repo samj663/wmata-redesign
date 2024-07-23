@@ -482,6 +482,7 @@ export async function get_train_schedule_all(){
       let output = await sql`
       SELECT REPLACE(REPLACE(REPLACE(REPLACE(stop_id, 'PF_', ''), '_C', ''), '_1', ''), '_2', ''), route_id, departure_time, REPLACE(trip_headsign, '"', '') as trip_headsign, rail_trips.license_plate, rail_trips.trip_id, rail_trips.service_id
               FROM rail_stop_times, rail_trips WHERE
+              (rail_trips.status != '3' or rail_trips.status IS NULL) and
               rail_trips.trip_id = rail_stop_times.trip_id
               ORDER BY stop_id, rail_stop_times.departure_time`
       //console.log(groupBy(output, "stop_id"))
