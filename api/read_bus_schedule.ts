@@ -107,7 +107,8 @@ export async function read_bus_schedule_new() {
   let new_dates = s[0].split(",");
   //console.log(new_dates)
   //console.log(dates)
-  
+  console.log(`Current Bus Schedule: ${new_dates[3]} to  ${new_dates[4]} --- Downloaded Bus Schedule: ${dates[0].start_date} to ${dates[0].end_date}`)
+
   if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
     console.log("NOTICE: Checked GTFS bus schedule. No date change found.")
     sql.end()

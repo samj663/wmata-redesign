@@ -4,17 +4,12 @@ require("dotenv").config({ path: ".env" });
 require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
-//const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 const fs = require("fs");
-//const decompress = require("decompress");
 var AdmZip = require("adm-zip");
 const { default: fetch } = require("node-fetch");
 const url =`${process.env.digitalocean_url}?ssl=require`
 
 read_rail_schedule();
-
-//get_static_data(`https://api.wmata.com/gtfs/rail-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`,"./static_rail");
-//get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus_test")
 
 async function get_static_data(req:any, folder_name:any) {
   console.info("Fetching Data...");
@@ -27,7 +22,7 @@ async function get_static_data(req:any, folder_name:any) {
   zip.extractAllTo(folder_name, true);
   console.info("Unzipped file!");
 }
-
+/*
 async function create_tables(){
   let sql = postgres(url);
 
@@ -89,7 +84,7 @@ async function create_tables(){
   await sql`TRUNCATE TABLE bus_calendar CASCADE;`
 
   sql.end()
-}
+}*/
 
 export async function read_rail_schedule() {
   let date = new Date()
@@ -106,10 +101,8 @@ export async function read_rail_schedule() {
   var e = s.shift().split(",");
   
   let new_dates = s[0].split(",");
-  //console.log(new_dates)
-  //console.log(dates)
-  
- if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
+  console.log(`Current Rail Schedule: ${new_dates[3]} to  ${new_dates[4]} --- Downloaded Rail Schedule: ${dates[0].start_date} to ${dates[0].end_date}`)
+  if(new_dates[3] == dates[0].start_date && new_dates[4] == dates[0].end_date){
     console.log("NOTICE: Checked GTFS rail schedule. No date change found.")
     sql.end()
     return
@@ -118,18 +111,16 @@ export async function read_rail_schedule() {
     console.warn("WARNING: Checked GTFS rail schedule. Date change found. Updating bus database.")
     
     await sql`TRUNCATE TABLE rail_trips CASCADE;`
-  await sql`TRUNCATE TABLE rail_stops CASCADE;`
-  await sql`TRUNCATE TABLE rail_stop_times CASCADE;`
-  await sql`TRUNCATE TABLE rail_calendar_dates CASCADE;`
-  await sql`TRUNCATE TABLE rail_calendar CASCADE;`
-  await sql`TRUNCATE TABLE rail_fare_leg_rules CASCADE;`
-  sql.end()
-   // sql.end()
+    await sql`TRUNCATE TABLE rail_stops CASCADE;`
+    await sql`TRUNCATE TABLE rail_stop_times CASCADE;`
+    await sql`TRUNCATE TABLE rail_calendar_dates CASCADE;`
+    await sql`TRUNCATE TABLE rail_calendar CASCADE;`
+    await sql`TRUNCATE TABLE rail_fare_leg_rules CASCADE;`
+    sql.end()
   }
   //await create_tables();
   //let sql = postgres(url);
   
-
   var content = await fs.readFileSync("./static_rail/stops.txt", "utf8");
   var s = content.split("\n");
   var e = s.shift().split(",");
