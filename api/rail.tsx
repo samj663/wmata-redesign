@@ -412,7 +412,7 @@ export async function update_rail_schedule(){
   let temp2 = await database.get_train_schedule_calendar()
   let temp3;
   let temp4 = await database.get_train_schedule_feed_info()
-  if (full_schedule_refresh == 180 && schedule_data_full != undefined){
+  if (full_schedule_refresh == 30 && schedule_data_full != undefined){ //Full schedule updates every 10 mins
     temp3 = await database.get_train_schedule_all()
     full_schedule_refresh = 0
   }
@@ -444,7 +444,7 @@ export async function update_rail_schedule(){
   }
   if(temp3 != undefined){
     schedule_data_full = new Map(Object.entries(groupBy(temp3, "replace")));
-    console.log("NOTICE: Updated full rail schedule")
+    //console.log("NOTICE: Updated full rail schedule")
   }
   setTimeout(update_rail_schedule, 20000)
 }
