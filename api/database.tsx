@@ -212,8 +212,8 @@ export async function update_bus_data() {
     feed.entity.forEach(function (entity:any) {
       trip_updates.push([
         entity.tripUpdate.trip.tripId,
-        parseInt(entity.tripUpdate.vehicle.id),
-        entity.tripUpdate.delay
+        parseInt(entity.tripUpdate.vehicle.id) >= 0 ?  parseInt(entity.tripUpdate.vehicle.id) : -1,
+        parseInt(entity.tripUpdate.delay) >= 0 ? parseInt(entity.tripUpdate.delay) : 0
       ])
       entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
         var t;
@@ -230,12 +230,13 @@ export async function update_bus_data() {
         time_updates.push([
           entity.tripUpdate.trip.tripId,
           temp.length == 7 ? "0" + temp:temp,
-          parseInt(e.stopSequence),
+          parseInt(e.stopSequence) >= 0 ? parseInt(e.stopSequence) : -1,
           e.stopId
         ])
       })
     });
     var updated_count = 0
+    console.log("TEMP")
     for(var i = 0 ; i < time_updates.length; i = i + 700){
       let end = i + 700
       let t = await sql`
@@ -254,6 +255,7 @@ export async function update_bus_data() {
     }
     //console.log(`Updated Database Info -- Fetched: ${time_updates.length} items | Updated: ${updated_count} items`)
   } catch(e: any) {
+    console.error(e)
     backend.handleErrors(e, "database/update_bus_data", "bus_database_status")
     //console.warn(`Database Info Failed To Update --`)
   }
@@ -291,7 +293,7 @@ export async function update_bus_data_no_db() {
         time_updates.push([
           entity.tripUpdate.trip.tripId,
           temp.length == 7 ? "0" + temp:temp,
-          parseInt(e.stopSequence),
+          parseInt(e.stopSequence) >= 0 ? parseInt(e.stopSequence) : -1,
           e.stopId
         ])
       })
@@ -306,6 +308,7 @@ export async function update_bus_data_no_db() {
         RETURNING bus_stop_times.trip_id`
         updated_count += t.length
     }
+    console.log("temps")
     for(var i = 0 ; i < trip_updates.length; i = i+ 700){
       await sql`
         UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int 
