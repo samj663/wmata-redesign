@@ -94,6 +94,7 @@ async function service_id_today(){
     let service_exception = await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`
     var output;
     if(service_exception.length > 0){
+      sql.end()
       return service_exception[0].service_id
     }
     let day = new Date().toLocaleDateString("en-US",{timeZone: 'America/New_York', weekday: "short"})
