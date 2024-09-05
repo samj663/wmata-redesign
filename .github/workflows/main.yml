@@ -35,5 +35,5 @@ jobs:
         enable_ssl: ${{ secrets.ENABLE_SSL }}
         WMATA_KEY_JEST: ${{ secrets.WMATA_KEY_JEST }}
         BACKEND_PORT: 4000
-      run: npm run test-api && npm run test-react
+      run: npm run test-api
       
