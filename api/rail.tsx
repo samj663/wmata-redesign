@@ -462,12 +462,6 @@ export async function update_full_rail_schedule(){
     schedule_data_full = new Map(Object.entries(groupBy(temp, "replace")));
     schedule_feed_info = temp2[0]
     //schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
-    //console.log(schedule_data_full.get("A04"))
-   /* for(const e of temp){
-
-    }*/
-    //console.log(schedule_data.get("F06"))
-    //update_rail_schedule();
   }
   else{
     console.error("ERROR: Rail database get_train_schedule_today returned null")
