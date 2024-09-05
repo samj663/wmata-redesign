@@ -307,7 +307,7 @@ export async function update_bus_data_no_db() {
         RETURNING bus_stop_times.trip_id`
         updated_count += t.length
     }
-    console.log("temps")
+   // console.log("temps")
     for(var i = 0 ; i < trip_updates.length; i = i+ 700){
       await sql`
         UPDATE bus_trips SET vehicle_id = (update_data.vehicle_id)::int 

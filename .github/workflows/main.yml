@@ -31,6 +31,8 @@ jobs:
     - name: running npm test
       env: # Set the secret as an input
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
+        digitalocean_url: ${{ secrets.DIGITALOCEAN_URL }}
+        enable_ssl: ${{ secrets.ENABLE_SSL }}
         BACKEND_PORT: 4000
       run: npm run test-api && npm run test-react
       
