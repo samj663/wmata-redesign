@@ -33,6 +33,7 @@ jobs:
         WMATA_KEY: ${{ secrets.WMATA_KEY }}
         digitalocean_url: ${{ secrets.DIGITALOCEAN_URL }}
         enable_ssl: ${{ secrets.ENABLE_SSL }}
+        WMATA_KEY_JEST: ${{ secrets.WMATA_KEY_JEST }}
         BACKEND_PORT: 4000
       run: npm run test-api && npm run test-react
       
