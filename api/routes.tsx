@@ -550,7 +550,7 @@ app.get("/bus/alerts", function (request: any, response: any) {
 
 app.get("/bus/arrival/:stopid", async function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
-  if (request.query.stopid !== undefined) {
+  if (request.params.stopid !== undefined) {
     var info = bus.bus_stops.get(request.params.stopid);
     if (info === undefined) {
       response.json({ error: "Stop not found" });

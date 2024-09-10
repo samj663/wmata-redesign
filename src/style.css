@@ -1,288 +1,326 @@
 .main {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color:white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
-
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
-#testing{
-  background-color: red;
-}
-
-.test{
-  height: calc(100% - 71px);
+#testing {
+    background-color: red;
 }
 
-html, body{
-  background-color: white;
-  height: 100%;
+.test {
+    height: calc(100% - 71px);
 }
-#root{
-  background-color: white;
-  height: 100%;
+
+html,
+body {
+    background-color: white;
+    height: 100%;
+}
+#root {
+    background-color: white;
+    height: 100%;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+        monospace;
 }
 
 .station-marker {
-  background-image: url('./images/station-marker.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:1;
-  cursor: pointer;
+    background-image: url("./images/station-marker.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 1;
+    cursor: pointer;
 }
 .escalator-marker {
-  background-image: url('./images/entrance_picture.png');
-  background-size: cover;
-  width: 35px;
-  height: 35px;
+    background-image: url("./images/entrance_picture.png");
+    background-size: cover;
+    width: 35px;
+    height: 35px;
 
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .elevator-marker {
-  background-image: url('./images/entrance_picture.png');
-  background-size: cover;
-  width: 35px;
-  height: 35px;
+    background-image: url("./images/entrance_picture.png");
+    background-size: cover;
+    width: 35px;
+    height: 35px;
 
-  cursor: pointer;
-}
-.small-station-circle{
-  height: 14px;
-  width: 14px;
-  margin-left: 2.5px;
-  margin-right: 2.5px;
-  border-radius: 50%;
-  background-color: rgb(191,53,62);
-  font-weight: bold;
-  display:inline-table;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+    cursor: pointer;
 }
 
-.transfer-station-circle{
-  height: 30px;
-  width: 30px;
-  margin-left: 5px;
-  margin-right: 2.5px;
-  border-radius: 50%;
-  font-size: 16px;
-  background-color: lightgray;
-  color:white;
-  font-weight: bold;
-  justify-content: center;
-  text-justify: center;
-  text-align: center;
-  align-items: center; 
-  display: flex;
+.transfer-station-circle {
+    height: 30px;
+    width: 40px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 10%;
+    font-size: 16px;
+    background-color: blue;
+    color: white;
+    font-weight: bold;
+    justify-content: center;
+    text-justify: center;
+    text-align: center;
+    align-items: center;
+    display: flex;
 }
-.BL, .BLUE{
-  background-color: rgb(4,106,164);
-  color:white;
+.BL,
+.BLUE {
+    background-color: rgb(4, 106, 164);
+    color: white;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
-.RD, .RED{
-  background-color: rgb(191,53,62);
-  color:white;
+.RD,
+.RED {
+    background-color: rgb(191, 53, 62);
+    color: white;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
-.YL, .YELLOW{
-  background-color: rgb(244,207,77);
-  color: black;
+.YL,
+.YELLOW {
+    background-color: rgb(244, 207, 77);
+    color: black;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
-.GR, .GREEN{
-  background-color: rgb(25,154,82);
-  color:white;
+.GR,
+.GREEN {
+    background-color: rgb(25, 154, 82);
+    color: white;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
-.SV, .SILVER{
-  background-color: rgb(153,155,150);
-  color: black;
+.SV,
+.SILVER {
+    background-color: rgb(153, 155, 150);
+    color: black;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
-.OR, .ORANGE{
-  background-color: rgb(222,144,68);
-  color: black;
+.OR,
+.ORANGE {
+    background-color: rgb(222, 144, 68);
+    color: black;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
 }
 
-.circle-table-margin{
-  margin-left: auto;
-  margin-right:auto;
+.small-station-circle {
+    height: 14px;
+    width: 14px;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+    border-radius: 50%;
+    /*background-color: rgb(191, 53, 62);*/
+    font-weight: bold;
+    display: inline-table;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.circle-table-margin {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .map-container {
-  height: 100%;
-  width: auto;
+    height: 100%;
+    width: auto;
 }
 
 .mapboxgl-canvas-container {
-  height: 100%;
+    height: 100%;
 }
 
 .mapboxgl-canvas {
-  height: 100%;
+    height: 100%;
 }
 
-.home-button-image{
-  width: 100%;
-  height: 100%;
-  filter: grayscale(1);
-  z-index: 1;
-  position:relative;
+.home-button-image {
+    width: 100%;
+    height: 100%;
+    filter: grayscale(1);
+    z-index: 1;
+    position: relative;
 }
 
-.card-custom{
-  width: 18rem;
-  overflow: hidden;
-  
+.card-custom {
+    width: 18rem;
+    overflow: hidden;
 }
 
-.card-custom:hover .card-image-custom{
-  filter: grayscale(0);
-  opacity: 1;
-  transition: 0.4s;
+.card-custom:hover .card-image-custom {
+    filter: grayscale(0);
+    opacity: 1;
+    transition: 0.4s;
 }
 
-.card-image-custom{
-  height: 12rem;
-  width: 100%;
-  opacity: 0.7;
-  object-fit: cover;
-  animation: hover-container 4s;
+.card-image-custom {
+    height: 12rem;
+    width: 100%;
+    opacity: 0.7;
+    object-fit: cover;
+    animation: hover-container 4s;
 }
-
 
 @media (max-width: 576px) {
-  .card-image-custom{
-    height: 7rem;
-    width: 100%;
-  }
-  .card-custom{
-    width: 11rem;
-  }
+    .card-image-custom {
+        height: 7rem;
+        width: 100%;
+    }
+    .card-custom {
+        width: 11rem;
+    }
 }
 
 @media (max-width: 400px) {
-  .card-image-custom{
-    height: 5rem;
-    width: 100%;
-  }
-  .card-custom{
-    width: 9rem;
-  }
+    .card-image-custom {
+        height: 5rem;
+        width: 100%;
+    }
+    .card-custom {
+        width: 9rem;
+    }
 }
 
-.background-logo-new{
-  background-color: white;
+.background-logo-new {
+    background-color: white;
 }
 
 .mapboxgl-popup-close-button {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
 }
 
-.mapboxgl-popup-content { 
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif; 
-  padding: 20px;
-  border-radius: 10%;
-  cursor: pointer;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+.mapboxgl-popup-content {
+    font:
+        400 15px/22px "Source Sans Pro",
+        "Helvetica Neue",
+        Sans-serif;
+    padding: 20px;
+    border-radius: 10%;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
 }
-.mapboxgl-popup{
-  z-index: 4;
+.mapboxgl-popup {
+    z-index: 4;
 }
 
 .train-icon {
-  background-image: url('./images/Arrows\ Down\ circular.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrows\ Down\ circular.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 
 .train-icon-RED {
-  background-image: url('./images/Arrow\ Circular\ RD.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrow\ Circular\ RD.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
-.train-icon-ORANGE{
-  background-image: url('./images/Arrow\ Circular\ OR.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+.train-icon-ORANGE {
+    background-image: url("./images/Arrow\ Circular\ OR.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 .train-icon-BLUE {
-  background-image: url('./images/Arrow\ Circular\ BL.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrow\ Circular\ BL.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 .train-icon-YELLOW {
-  background-image: url('./images/Arrow\ Circular\ YL.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrow\ Circular\ YL.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 .train-icon-GREEN {
-  background-image: url('./images/Arrow\ Circular\ GR.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrow\ Circular\ GR.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 .train-icon-SILVER {
-  background-image: url('./images/Arrow\ Circular\ SV.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  z-index:2;
-  cursor: pointer;
+    background-image: url("./images/Arrow\ Circular\ SV.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    cursor: pointer;
 }
 /*
 .train-icon{
@@ -298,12 +336,12 @@ code {
   justify-content: center;
   text-justify: center;
   text-align: center;
-  align-items: center; 
+  align-items: center;
   display: flex;
 }*/
 /*
-.show-live-tra{ 
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif; 
+.show-live-tra{
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding: 20px;
   border-radius: 10%;
   cursor: pointer;
