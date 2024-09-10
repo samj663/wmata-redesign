@@ -17,7 +17,6 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 
-
 //app.use(express.static(path.join(__dirname, "client/build")));
 
 var key = process.env.WMATA_KEY;
@@ -28,53 +27,56 @@ export var bus_alerts: any;
 export var tripMap: any;
 export var stopID_to_stopCode: any;
 
-function compareTime(time2: string, time1:string){
-  
-  let array1 = time1.split(":")
-  let array2 = time2.split(":")
-  let output = [0,0,0]
-  if( parseInt(array2[0]) < parseInt(array1[0])){
-    array2[0] = array2[0] + 24
+function compareTime(time2: string, time1: string) {
+  let array1 = time1.split(":");
+  let array2 = time2.split(":");
+  let output = [0, 0, 0];
+  if (parseInt(array2[0]) < parseInt(array1[0])) {
+    array2[0] = array2[0] + 24;
   }
-  for(var i = 0; i < array1.length ; i++){
+  for (var i = 0; i < array1.length; i++) {
     output[i] = parseInt(array2[i]) - parseInt(array1[i]);
   }
-  for(var i = 1; i < output.length ; i++){
-    output[i] = output[i] +  (output[i - 1] * 60)
+  for (var i = 1; i < output.length; i++) {
+    output[i] = output[i] + output[i - 1] * 60;
   }
   //console.log(time2 + " -- " + time1 + " == "+  Math.floor(output[2] / 60))
-  return (Math.floor(output[2] / 60) > 60) ? -1 : Math.floor(output[2] / 60)
+  return Math.floor(output[2] / 60) > 60 ? -1 : Math.floor(output[2] / 60);
 }
 
-function clear_old_data(){
-  bus_stops.forEach((key: any, value: any)=>{
-    if(value.lastUpdated !== null){
-      if ((Date.now() - value.lastUpdated ) > 600000){
-        value.nextBus = []
-        value.lastUpdated = Date.now()
+function clear_old_data() {
+  bus_stops.forEach((key: any, value: any) => {
+    if (value.lastUpdated !== null) {
+      if (Date.now() - value.lastUpdated > 600000) {
+        value.nextBus = [];
+        value.lastUpdated = Date.now();
       }
-      bus_stops.set(key, value)
+      bus_stops.set(key, value);
     }
-  })
+  });
 }
 /**
  * TODO: Create a method to flush out old bus data. It seems like when the last scheduled bus
  * arrived and leaves the stop, the data isn't removed because theres no new data to populate the field
  */
 export async function update_bus_data() {
-  let timestamp = Date.now()
-  try{
-    let buses = await database.get_all_next_bus()
-   // let buses = await  get_realtime_bus()
-   // console.log(buses.length)
-    if(buses.length > 0){
-     // var current_stop = buses[0].stop_code
-   //   var current_array: any[] = []
-      let current_date = new Date()//.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-      let templ = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-      let current_time = current_date.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+  let timestamp = Date.now();
+  try {
+    let buses = await database.get_all_next_bus();
+    // let buses = await  get_realtime_bus()
+    // console.log(buses.length)
+    if (buses.length > 0) {
+      // var current_stop = buses[0].stop_code
+      //   var current_array: any[] = []
+      let current_date = new Date(); //.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
+      let templ = new Date()
+        .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
+        .toString();
+      let current_time = current_date
+        .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
+        .toString();
       //console.log(`templ: ${templ} -- current_date: ${current_date} current_time: ${current_time} `)
-   /*   for (const bus of buses) {
+      /*   for (const bus of buses) {
         if(bus.stop_code !== current_stop){
           current_stop = bus.stop_code
           current_array = []
@@ -95,39 +97,39 @@ export async function update_bus_data() {
         })
       }
 */
-   //   const result = Object.groupBy(buses, ({ stop_code }:any) => stop_code);
-      var res = buses.reduce(
-        (result:any, currentValue:any) => { 
-          (result[currentValue['stop_code']] = result[currentValue['stop_code']] || []).push(currentValue);
-          return result;
-        }, {});
-      for (const r in res){
+      //   const result = Object.groupBy(buses, ({ stop_code }:any) => stop_code);
+      var res = buses.reduce((result: any, currentValue: any) => {
+        (result[currentValue["stop_code"]] =
+          result[currentValue["stop_code"]] || []).push(currentValue);
+        return result;
+      }, {});
+      for (const r in res) {
         var stop = bus_stops.get(r);
         if (stop) {
-          var temp:any = []
-          res[r].forEach((bus:any) => {
+          var temp: any = [];
+          res[r].forEach((bus: any) => {
             let time = compareTime(bus.departure_time, current_time);
-            if(time >= 0) {
+            if (time >= 0) {
               temp.push({
                 RouteID: bus.route_id,
                 Minutes: time,
                 DirectionText: bus.trip_headsign ? bus.trip_headsign : "",
                 TripID: bus.trip_id,
                 VehicleID: bus.vehicle_id,
-                Delay: bus.delay
-              })
+                Delay: bus.delay,
+              });
             }
-          })
-          stop.nextBus = Array.from(temp)
+          });
+          stop.nextBus = Array.from(temp);
           stop.lastUpdated = timestamp;
         }
       }
     }
     //console.log(`Updated Next Bus Info -- Fetched: ${buses.length} items`)
-    clear_old_data()
-    backend.handleSuccess("bus_arrival")
-  } catch(e: any) {
-    backend.handleErrors(e, "bus/update_bus_data", "bus_arrival")
+    clear_old_data();
+    backend.handleSuccess("bus_arrival");
+  } catch (e: any) {
+    backend.handleErrors(e, "bus/update_bus_data", "bus_arrival");
     //console.error(e);
   }
   setTimeout(update_bus_data, 20000);
@@ -139,7 +141,7 @@ export async function get_bus_routes() {
     var routesResponse = await fetch(
       `https://api.wmata.com/Bus.svc/json/jRoutes?api_key=${key}`,
     );
-    
+
     var rawBus = await routesResponse.json();
     console.log("Caching bus routes...");
     bus_route_list = rawBus.Routes.filter((e: any) => {
@@ -147,7 +149,7 @@ export async function get_bus_routes() {
       else return true;
     });
 
-   // await backend.delay(5000);
+    // await backend.delay(5000);
     backend.bootstrap_status.bus_route_list = "SUCCESS";
     for (const route of rawBus.Routes) {
       var routeResponse = await fetch(
@@ -164,7 +166,7 @@ export async function get_bus_routes() {
       await backend.delay(100);
     }
   } catch (e: any) {
-    backend.handleErrors(e, "bus/get_bus_routes", "")
+    backend.handleErrors(e, "bus/get_bus_routes", "");
     backend.bootstrap_status.bus_routes = "ERROR";
     backend.bootstrap_status.bus_route_list = "ERROR";
     //console.error(e);
@@ -194,7 +196,7 @@ export async function get_bus_stops() {
       bus_stops.set(stop.StopID, temp);
     }
   } catch (e: any) {
-    backend.handleErrors(e, "bus/get_bus_stops", "")
+    backend.handleErrors(e, "bus/get_bus_stops", "");
     backend.bootstrap_status.bus_stops = "ERROR";
     //console.error(e);
     return "ERROR";
@@ -203,44 +205,48 @@ export async function get_bus_stops() {
   return "SUCCESS";
 }
 
-export function get_nearest_bus_stops(lat: number, lon: number, radius: number) {
-  var output:any = []
+export function get_nearest_bus_stops(
+  lat: number,
+  lon: number,
+  radius: number,
+) {
+  var output: any = [];
   try {
-    bus_stops.forEach((value, key) =>{
-      var d = distance(lat, value.lat, lon, value.lon)
-      if(d < radius){
+    bus_stops.forEach((value, key) => {
+      var d = distance(lat, value.lat, lon, value.lon);
+      if (d < radius) {
         output.push({
           id: key,
           name: value.name,
           lat: value.lat,
           lon: value.lon,
-          distance: d
-        })
+          distance: d,
+        });
       }
-    })
+    });
   } catch (e: any) {
-    backend.handleErrors(e, "bus/get_nearest_bus_stops", "")
+    backend.handleErrors(e, "bus/get_nearest_bus_stops", "");
     //console.error(e);
   }
   return output;
 }
-function distance(lat1: number, lat2: number, lon1:number, lon2:number){
-  lon1 =  lon1 * Math.PI / 180;
-  lon2 = lon2 * Math.PI / 180;
-  lat1 = lat1 * Math.PI / 180;
-  lat2 = lat2 * Math.PI / 180;
+function distance(lat1: number, lat2: number, lon1: number, lon2: number) {
+  lon1 = (lon1 * Math.PI) / 180;
+  lon2 = (lon2 * Math.PI) / 180;
+  lat1 = (lat1 * Math.PI) / 180;
+  lat2 = (lat2 * Math.PI) / 180;
 
-  // Haversine formula 
-  let dlon = lon2 - lon1; 
+  // Haversine formula
+  let dlon = lon2 - lon1;
   let dlat = lat2 - lat1;
-  let a = Math.pow(Math.sin(dlat / 2), 2)
-  + Math.cos(lat1) * Math.cos(lat2)
-  * Math.pow(Math.sin(dlon / 2),2);
+  let a =
+    Math.pow(Math.sin(dlat / 2), 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
 
   let c = 2 * Math.asin(Math.sqrt(a));
   let r = 6371;
 
-  return(c * r);
+  return c * r;
 }
 
 export async function get_bus_alerts_gtft_rt() {
@@ -253,11 +259,11 @@ export async function get_bus_alerts_gtft_rt() {
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
-      if(entity.alert.informedEntity[0].agencyId == '1') {
+      if (entity.alert.informedEntity[0].agencyId == "1") {
         entity.alert.informedEntity.forEach(function (e: any) {
           line.push(e.routeId);
         });
-        
+
         output.push({
           alertId: entity.id,
           line: line,
@@ -270,117 +276,116 @@ export async function get_bus_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
-    backend.handleErrors(e, "bus/get_bus_alerts_gtft_rt", "bus_alerts")
+    backend.handleErrors(e, "bus/get_bus_alerts_gtft_rt", "bus_alerts");
     //backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   bus_alerts = output;
-  backend.handleSuccess("bus_alerts")
+  backend.handleSuccess("bus_alerts");
   setTimeout(get_bus_alerts_gtft_rt, 5000);
   return "SUCCESS";
 }
 
-export async function read_bus_trip_data(){
-  tripMap = new Map()
-  stopID_to_stopCode = new Map()
+export async function read_bus_trip_data() {
+  tripMap = new Map();
+  stopID_to_stopCode = new Map();
   var content = await fs.readFileSync("./static_bus/trips.txt", "utf8");
   var s = content.split("\n");
   var e = s.shift().split(",");
-  var trips = new Map()
+  var trips = new Map();
   for (const e of s) {
     let val = e.split(",");
-    if(val[1] == undefined) continue
+    if (val[1] == undefined) continue;
     tripMap.set(val[2], {
       route_id: val[0],
       service_id: val[1],
       trip_headsign: val[3],
       direction_id: parseInt(val[4]),
-      vehicle_id: -1
-    })
+      vehicle_id: -1,
+    });
   }
-  
+
   content = await fs.readFileSync("./static_bus/stops.txt", "utf8");
   s = content.split("\n");
   e = s.shift().split(",");
 
   for (const e of s) {
     let val = e.split(",");
-    stopID_to_stopCode.set(val[0],val[1])
+    stopID_to_stopCode.set(val[0], val[1]);
   }
 }
 
 async function get_realtime_bus() {
-  try{
-    let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`
+  try {
+    let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
     //stoptimeupdate:
     //time: add three 0's to make it proper date? The time number is short for some reason
     const res = await fetch(req);
     var blob = await res.arrayBuffer();
     var b = Buffer.from(blob);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
-    var insert:any = []
-    var count = 0
-   // console.log(feed.entity.length)
-    let current_date = new Date().toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-    feed.entity.forEach(function (entity : any) {
-      
-      entity.tripUpdate.stopTimeUpdate.forEach(function (e:any) {
+    var insert: any = [];
+    var count = 0;
+    // console.log(feed.entity.length)
+    let current_date = new Date()
+      .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
+      .toString();
+    feed.entity.forEach(function (entity: any) {
+      entity.tripUpdate.stopTimeUpdate.forEach(function (e: any) {
         var t;
         var time;
-        if(e.departure != null){
-          t =  parseInt(e.departure.time + "000")
+        if (e.departure != null) {
+          t = parseInt(e.departure.time + "000");
+          time = new Date(t);
+        } else {
+          t = parseInt(e.arrival.time + "000");
           time = new Date(t);
         }
-        else{
-          t = parseInt(e.arrival.time + "000")
-          time = new Date(t);
+        let temp = time
+          .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
+          .toString();
+        count += 1;
+        let text = tripMap.get(entity.tripUpdate.trip.tripId);
+        if (text != undefined) {
+          insert.push({
+            route_id: entity.tripUpdate.trip.routeId,
+            departure_time: time.toLocaleTimeString("it-IT").toString(),
+            trip_headsign: text.trip_headsign,
+            trip_id: entity.tripUpdate.trip.tripId,
+            vehicle_id: parseInt(entity.tripUpdate.vehicle.id),
+          });
+        } else {
+          //   if(tripMap.get(entity.tripUpdate.trip.tripId) != undefined){
+          insert.push({
+            route_id: entity.tripUpdate.trip.routeId,
+            departure_time: time.toLocaleTimeString("it-IT").toString(),
+            trip_headsign: "",
+            trip_id: entity.tripUpdate.trip.tripId,
+            vehicle_id: parseInt(entity.tripUpdate.vehicle.id),
+            stop_code: stopID_to_stopCode.get(e.stopId),
+          });
+
+          //console.log(e.stopId + " - " + entity.tripUpdate.trip.routeId + " - " + entity.tripUpdate.trip.tripId)
         }
-        let temp = time.toLocaleTimeString('it-IT',{timeZone: 'America/New_York'}).toString()
-          count += 1
-            let text = tripMap.get(entity.tripUpdate.trip.tripId)
-            if(text != undefined){
-              insert.push({
-                route_id: entity.tripUpdate.trip.routeId,
-                departure_time: time.toLocaleTimeString('it-IT').toString(),
-                trip_headsign: text.trip_headsign,
-                trip_id: entity.tripUpdate.trip.tripId,
-                vehicle_id: parseInt(entity.tripUpdate.vehicle.id)
-              })
-            }
-            else{
-       //   if(tripMap.get(entity.tripUpdate.trip.tripId) != undefined){
-            insert.push({
-              route_id: entity.tripUpdate.trip.routeId,
-              departure_time: time.toLocaleTimeString('it-IT').toString(),
-              trip_headsign: "",
-              trip_id: entity.tripUpdate.trip.tripId,
-              vehicle_id: parseInt(entity.tripUpdate.vehicle.id),
-              stop_code: stopID_to_stopCode.get(e.stopId)
-            })
-          
-            //console.log(e.stopId + " - " + entity.tripUpdate.trip.routeId + " - " + entity.tripUpdate.trip.tripId) 
-            
-          }
-        
-      })
+      });
     });
 
     //console.log(new Date().toString() +": Updated database info")
-  } catch (e){
-   // console.log(e)
-    return []
+  } catch (e) {
+    // console.log(e)
+    return [];
   }
- /* var temp: any = []
+  /* var temp: any = []
   for (const e of insert){
     if (!temp.includes(e.route_id)){
       temp.push(e.route_id)
     }
   }
   console.log(temp.sort())*/
-  return insert
- // setTimeout(update_bus_data, 10000)
+  return insert;
+  // setTimeout(update_bus_data, 10000)
 }
 
 export * from "./bus";

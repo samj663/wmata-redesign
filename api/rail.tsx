@@ -6,7 +6,13 @@
 import * as backend from "./backend";
 import * as database from "./database";
 import { ESMap } from "typescript";
-import { stationCodeNameMap, train, fares, entrance, station } from "./interfaces_and_classes";
+import {
+  stationCodeNameMap,
+  train,
+  fares,
+  entrance,
+  station,
+} from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
 const path = require("path");
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
@@ -39,24 +45,23 @@ export async function get_train_data() {
     var trainResponse = await fetch(
       `https://api.wmata.com/StationPrediction.svc/json/GetPrediction/All?api_key=${key}`,
     );
-    let contentType = trainResponse.headers.get('content-type')
-    if(contentType && contentType.includes('application/json')){
+    let contentType = trainResponse.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
       rawTrains = await trainResponse.json();
       if (rawTrains === undefined) {
         throw new Error("Proper data structure wasn't found within json file");
       }
       trains = parseTrains(rawTrains.Trains);
-    }
-    else{
-      throw new Error(trainResponse.text())
+    } else {
+      throw new Error(trainResponse.text());
     }
   } catch (e: any) {
-    backend.handleErrors(e, "rail/get_train_data", "rail_arrival")
+    backend.handleErrors(e, "rail/get_train_data", "rail_arrival");
     //I thought this wase.error(trainResponse);
     setTimeout(get_train_data, 20000);
     return "ERROR";
   }
-  backend.handleSuccess("rail_arrival")
+  backend.handleSuccess("rail_arrival");
   backend.lastUpdated.next_train = trainResponse.headers.get("date");
   backend.bootstrap_status.next_train = "SUCCESS";
   setTimeout(get_train_data, 10000);
@@ -94,7 +99,7 @@ export async function get_station_data() {
     let f = parseFares(rawFares.StationToStationInfos);
     stations = parseStations(rawStations.Stations, f, e);
   } catch (e: any) {
-    backend.handleErrors(e, "rail/get_station_data", "")
+    backend.handleErrors(e, "rail/get_station_data", "");
     backend.bootstrap_status.stations_fares_entrances = "ERROR";
     //console.error(e);
     setTimeout(get_station_data, 100000);
@@ -133,26 +138,25 @@ export async function get_rail_alerts() {
 export async function get_elevator_escalator_alerts() {
   try {
     let outages;
-   // backend.bootstrap_status.rail_alerts = "RUNNING";
+    // backend.bootstrap_status.rail_alerts = "RUNNING";
     var alertsResponse = await fetch(
       `https://api.wmata.com/Incidents.svc/json/ElevatorIncidents?api_key=${key}`,
     );
 
-    let contentType = alertsResponse.headers.get('content-type')
-    if(contentType && contentType.includes('application/json')){
+    let contentType = alertsResponse.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
       outages = await alertsResponse.json();
       if (outages === undefined) {
         throw new Error("Proper data structure wasn't found within json file");
       }
-      escalator_elevator_outages = outages.ElevatorIncidents
+      escalator_elevator_outages = outages.ElevatorIncidents;
       let date = alertsResponse.headers.get("date");
-       backend.lastUpdated.alerts = date;
-    }
-    else{
-      throw new Error(alertsResponse.text())
+      backend.lastUpdated.alerts = date;
+    } else {
+      throw new Error(alertsResponse.text());
     }
   } catch (e: any) {
-   // backend.bootstrap_status.rail_alerts = "ERROR";
+    // backend.bootstrap_status.rail_alerts = "ERROR";
     //console.error(e);
     return "ERROR";
   }
@@ -186,7 +190,7 @@ export async function get_train_positions() {
             label: entity.vehicle.vehicle.label,
             licensePlate: entity.vehicle.vehicle.licensePlate,
             rotation: entity.vehicle.position.bearing,
-            destination: "not available"
+            destination: "not available",
           },
           geometry: {
             type: "Point",
@@ -199,7 +203,7 @@ export async function get_train_positions() {
       }
     });
   } catch (e: any) {
-    backend.handleErrors(e, "rail/get_train_positions", "")
+    backend.handleErrors(e, "rail/get_train_positions", "");
     backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_train_positions, 5000); // Timeout might occur that will stop function.
@@ -392,35 +396,35 @@ export async function get_rail_alerts_gtft_rt() {
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
   } catch (e: any) {
-    backend.handleErrors(e, "rail/get_rail_alerts_gtft_rt", "rail_alerts")
+    backend.handleErrors(e, "rail/get_rail_alerts_gtft_rt", "rail_alerts");
     backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
     setTimeout(get_rail_alerts_gtft_rt, 60000); // Timeout might occur that will stop function.
     return "ERROR";
   }
   railAlerts = output;
-  backend.handleSuccess("rail_alerts")
+  backend.handleSuccess("rail_alerts");
   setTimeout(get_rail_alerts_gtft_rt, 60000);
   return "SUCCESS";
 }
 
-var full_schedule_refresh = 0
+var full_schedule_refresh = 0;
 
-export async function update_rail_schedule(){
+export async function update_rail_schedule() {
   await database.update_rail_data();
-  let temp = await database.get_train_schedule_today()
-  let temp2 = await database.get_train_schedule_calendar()
+  let temp = await database.get_train_schedule_today();
+  let temp2 = await database.get_train_schedule_calendar();
   let temp3;
-  let temp4 = await database.get_train_schedule_feed_info()
-  if (full_schedule_refresh == 30 && schedule_data_full != undefined){ //Full schedule updates every 10 mins
-    temp3 = await database.get_train_schedule_all()
-    full_schedule_refresh = 0
+  let temp4 = await database.get_train_schedule_feed_info();
+  if (full_schedule_refresh == 30 && schedule_data_full != undefined) {
+    //Full schedule updates every 10 mins
+    temp3 = await database.get_train_schedule_all();
+    full_schedule_refresh = 0;
+  } else {
+    full_schedule_refresh += 1;
   }
-  else{
-    full_schedule_refresh += 1
-  }
-  if(schedule_data_full == undefined){
-    temp3 = await database.get_train_schedule_all()
+  if (schedule_data_full == undefined) {
+    temp3 = await database.get_train_schedule_all();
   }
   /*if (schedule_data == undefined){
     schedule_data = new Map()
@@ -428,49 +432,57 @@ export async function update_rail_schedule(){
       schedule_data.set(e, [])
     }
   }*/
-  if((temp != null && temp2 != null) || (temp.length > 0 && temp2.length > 0)){
+  if (
+    (temp != null && temp2 != null) ||
+    (temp.length > 0 && temp2.length > 0)
+  ) {
     schedule_data = new Map(Object.entries(groupBy(temp, "replace")));
-    schedule_calendar_map =  new Map(Object.entries(groupBy(temp2, "service_date")));
+    schedule_calendar_map = new Map(
+      Object.entries(groupBy(temp2, "service_date")),
+    );
     schedule_calendar_object = temp2;
-    schedule_feed_info = temp4[0]
+    schedule_feed_info = temp4[0];
     //console.log(schedule_data.get("A04"))
-   /* for(const e of temp){
+    /* for(const e of temp){
 
     }*/
     //console.log(schedule_data.get("F06"))
     //update_rail_schedule();
-  }else{
-    console.error("ERROR: Rail database get_train_schedule_today returned null")
+  } else {
+    console.error(
+      "ERROR: Rail database get_train_schedule_today returned null",
+    );
   }
-  if(temp3 != undefined){
+  if (temp3 != undefined) {
     schedule_data_full = new Map(Object.entries(groupBy(temp3, "replace")));
     //console.log("NOTICE: Updated full rail schedule")
   }
-  setTimeout(update_rail_schedule, 20000)
+  setTimeout(update_rail_schedule, 20000);
 }
 
-export async function update_full_rail_schedule(){
-  let temp = await database.get_train_schedule_all()
-  let temp2 = await database.get_train_schedule_feed_info()
+export async function update_full_rail_schedule() {
+  let temp = await database.get_train_schedule_all();
+  let temp2 = await database.get_train_schedule_feed_info();
   /*if (schedule_data == undefined){
     schedule_data = new Map()
     for (const e of stationNames.codeArray){
       schedule_data.set(e, [])
     }
   }*/
-  if((temp.length > 0)){
+  if (temp.length > 0) {
     schedule_data_full = new Map(Object.entries(groupBy(temp, "replace")));
-    schedule_feed_info = temp2[0]
+    schedule_feed_info = temp2[0];
     //schedule_calendar =  new Map(Object.entries(groupBy(temp2, "service_date")));
+  } else {
+    console.error(
+      "ERROR: Rail database get_train_schedule_today returned null",
+    );
   }
-  else{
-    console.error("ERROR: Rail database get_train_schedule_today returned null")
-  }
-  setTimeout(update_rail_schedule, 3_600_000)
+  setTimeout(update_rail_schedule, 3_600_000);
 }
 
-var groupBy = function(xs: any, key:any) {
-  return xs.reduce(function(rv:any, x:any) {
+var groupBy = function (xs: any, key: any) {
+  return xs.reduce(function (rv: any, x: any) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
   }, {});
