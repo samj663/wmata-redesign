@@ -40,7 +40,7 @@
     "build": "react-scripts build",
     "test-api": "jest App.test.tsx --detectOpenHandles --forceExit --config jest.config.js",
     "test-react": "jest React.test.tsx --config jest.config-react.js",
-    "test-both": "jest --silent --detectOpenHandles --forceExit --config jest.config-react.js",
+    "test-both": "npm run test-api && npm run test-react",
     "test-react-scripts": "react-scripts test",
     "eject": "react-scripts eject",
     "both": "concurrently \"npm run backend\"  \"sleep 5 && npm start\"",

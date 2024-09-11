@@ -14,7 +14,7 @@ export var REACT_APP_MAPBOX_STYLE =
   "mapbox://styles/samuelj246/clj0ed7g7018v01qi7k96f2oe";
 export const API_URL =
   process.env.REACT_APP_API_URL === undefined
-    ? "https://wmata-backend.onrender.com"
+    ? "https://dcmetrobackend.samueljohnson.dev"
     : process.env.REACT_APP_API_URL;
 //export const API_URL = "https://dcmetrobackend.samueljohnson.dev";
 

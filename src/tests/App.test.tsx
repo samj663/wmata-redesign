@@ -1,35 +1,36 @@
-import '@testing-library/jest-dom'
-import {describe, expect, test} from '@jest/globals';
-const {default : fetch} = require('node-fetch');
-import 'jest-extended';
+import "@testing-library/jest-dom";
+import { describe, expect, test } from "@jest/globals";
+const { default: fetch } = require("node-fetch");
+import "jest-extended";
 const request = require("supertest");
-const path = require('path');
-require('dotenv').config({path: path.resolve(__dirname,"..",".env.local")});
-jest.setTimeout(300000) // Gives this test suite 5 minutes to run everything.
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "..", ".env.local") });
+jest.setTimeout(300000); // Gives this test suite 5 minutes to run everything.
 
 describe("Backend tests", () => {
-  var station_info_test:any;
- // var bus_route_test:any;
-  var fares_test:any;
+  var station_info_test: any;
+  // var bus_route_test:any;
+  var fares_test: any;
   const app = require("../../api/build/routes");
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     let count = 1;
-    while(count !== 500){
-      const response = await request(app).get("/api/bootstrap")
-      if( (response.body.stations_fares_entrances !== "SUCCESS") 
-          ||  (response.body.rail_alerts !== "SUCCESS") 
-          ||  (response.body.next_train !== "SUCCESS")
-          ||  (response.body.bus_stops !== "SUCCESS") 
-          ||  (response.body.bus_route_list !== "SUCCESS")
-          ||  (response.body.bus_routes !== "SUCCESS")
-          ||  (response.body.train_positions !== "SUCCESS")
-          ||  (response.body.bus_alerts !== "SUCCESS")){
-        count += 1
+    while (count !== 500) {
+      const response = await request(app).get("/api/bootstrap");
+      if (
+        response.body.stations_fares_entrances !== "SUCCESS" ||
+        response.body.rail_alerts !== "SUCCESS" ||
+        response.body.next_train !== "SUCCESS" ||
+        response.body.bus_stops !== "SUCCESS" ||
+        response.body.bus_route_list !== "SUCCESS" ||
+        response.body.bus_routes !== "SUCCESS" ||
+        response.body.train_positions !== "SUCCESS" ||
+        response.body.bus_alerts !== "SUCCESS"
+      ) {
+        count += 1;
         await new Promise((r) => setTimeout(r, 1000));
-      }
-      else{
-        break
+      } else {
+        break;
       }
     }
   });
@@ -39,171 +40,192 @@ describe("Backend tests", () => {
   });
 
   afterAll(async () => {
-    await app.close()
+    await app.close();
   });
 
   test("/api", async () => {
-    const response = await request(app).get("/api")
-    .expect('This is the DC Metro API backend');
+    const response = await request(app)
+      .get("/api")
+      .expect("This is the DC Metro API backend");
     expect(response.statusCode).toBe(200);
   });
 
-  test('/api/*', async () => {
-     const response = await request(app).get('/api/*')
-     expect(response.body).toEqual({error:"ummm... that wasn't a valid endpoint"})
+  test("/api/*", async () => {
+    const response = await request(app).get("/api/*");
+    expect(response.body).toEqual({
+      error: "ummm... that wasn't a valid endpoint",
+    });
   });
 
   test("/api/nextarrival", async () => {
-    const response = await request(app).get("/api/nextarrival")
-    expect(response.body).toEqual({"error": "Provide station"});
+    const response = await request(app).get("/api/nextarrival");
+    expect(response.body).toEqual({ error: "Provide station" });
     expect(response.statusCode).toBe(400);
   });
 
   test("/api/stationList", async () => {
-    const response = await request(app).get("/api/stationList")
-    expect(response.body).toEqual(stationlist)
+    const response = await request(app).get("/api/stationList");
+    expect(response.body).toEqual(stationlist);
   });
 
-  test('/api/stationInfo?station=A01', async () => {
-    var temp = await get_test_station_info("A01")
-    const response = await request(app).get('/api/stationInfo?station=A01')
-    expect(response.body.Code).toEqual(temp.Code)
-    expect(response.body.Name).toEqual(temp.Name)
-    expect(response.body.StationTogether1).toEqual(temp.StationTogether1)
-    expect(response.body.Address).toEqual(temp.Address)
+  test("/api/stationInfo?station=A01", async () => {
+    var temp = await get_test_station_info("A01");
+    const response = await request(app).get("/api/stationInfo?station=A01");
+    expect(response.body.Code).toEqual(temp.Code);
+    expect(response.body.Name).toEqual(temp.Name);
+    expect(response.body.StationTogether1).toEqual(temp.StationTogether1);
+    expect(response.body.Address).toEqual(temp.Address);
   });
 
-  test('/api/stationInfo?station=F01', async () => {
-    var temp = await get_test_station_info("F01")
-    const response = await request(app).get('/api/stationInfo?station=F01')
-    expect(response.body.Code).toEqual(temp.Code)
-    expect(response.body.Name).toEqual(temp.Name)
-    expect(response.body.StationTogether1).toEqual(temp.StationTogether1)
-    expect(response.body.Address).toEqual(temp.Address)
+  test("/api/stationInfo?station=F01", async () => {
+    var temp = await get_test_station_info("F01");
+    const response = await request(app).get("/api/stationInfo?station=F01");
+    expect(response.body.Code).toEqual(temp.Code);
+    expect(response.body.Name).toEqual(temp.Name);
+    expect(response.body.StationTogether1).toEqual(temp.StationTogether1);
+    expect(response.body.Address).toEqual(temp.Address);
   });
 
-  test('/api/nextarrival?station=A01', async () => {
-    const response = await request(app).get('/api/nextarrival?station=A01')
-    expect(response.body).toEqual(expect.arrayContaining([
+  test("/api/nextarrival?station=A01", async () => {
+    const response = await request(app).get("/api/nextarrival?station=A01");
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Car: expect.any(String),
+          Destination: expect.any(String),
+          DestinationCode: expect.any(String),
+          DestinationName: expect.any(String),
+          Group: expect.any(String),
+          Line: expect.any(String),
+          LocationCode: "A01",
+          LocationName: "Metro Center",
+          Min: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("/api/nextarrival?station=B01", async () => {
+    const response = await request(app).get("/api/nextarrival?station=B01");
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          //   Car: expect.any(String),
+          Destination: expect.any(String),
+          //   DestinationCode: expect.any(String),
+          DestinationName: expect.any(String),
+          Group: expect.any(String),
+          Line: expect.any(String),
+          LocationCode: "B01",
+          LocationName: "Gallery Pl-Chinatown",
+          Min: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("/api/nextarrival?station=F01", async () => {
+    const response = await request(app).get("/api/nextarrival?station=F01");
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Destination: expect.any(String),
+          DestinationName: expect.any(String),
+          Group: expect.any(String),
+          Line: expect.any(String),
+          LocationCode: expect.any(String),
+          LocationName: expect.any(String),
+          Min: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("/api/fares?sourcestation=F01&destinationstation=N01", async () => {
+    var temp = await get_fare_info("F01", "N01");
+    const response = await request(app).get(
+      "/api/fares?sourcestation=F01&destinationstation=N01",
+    );
+    expect(response.body).toEqual(temp);
+  });
+
+  test("/api/entrances", async () => {
+    const response = await request(app).get("/api/entrances?station=A01");
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          Name: expect.any(String),
+          Description: expect.any(String),
+          Lat: expect.any(Number),
+          Lon: expect.any(Number),
+          Type: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
+  test("/api/busStop?stopid=1000031", async () => {
+    const response = await request(app).get("/api/busStop?stopid=1000031");
+    expect(response.body).toEqual(
       expect.objectContaining({
-        Car: expect.any(String), 
-        Destination: expect.any(String), 
-        DestinationCode: expect.any(String),
-        DestinationName: expect.any(String),
-        Group: expect.any(String),
-        Line: expect.any(String), 
-        LocationCode: "A01", 
-        LocationName: "Metro Center",
-        Min:expect.any(String)
-      })
-    ]))
-  });
-
-  test('/api/nextarrival?station=B01', async () => {
-    const response = await request(app).get('/api/nextarrival?station=B01')
-    expect(response.body).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-     //   Car: expect.any(String), 
-        Destination: expect.any(String), 
-     //   DestinationCode: expect.any(String),
-        DestinationName: expect.any(String),
-        Group: expect.any(String),
-        Line: expect.any(String), 
-        LocationCode: "B01", 
-        LocationName: "Gallery Pl-Chinatown",
-        Min:expect.any(String)
-      })
-    ]))
-  });
-
-  test('/api/nextarrival?station=F01', async () => {
-    const response = await request(app).get('/api/nextarrival?station=F01')
-    expect(response.body).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        Destination: expect.any(String), 
-        DestinationName: expect.any(String),
-        Group: expect.any(String),
-        Line: expect.any(String), 
-        LocationCode: expect.any(String), 
-        LocationName: expect.any(String),
-        Min:expect.any(String)
-      })
-    ]))
-  });
-
-  test('/api/fares?sourcestation=F01&destinationstation=N01', async () => {
-    var temp = await get_fare_info("F01","N01")
-    const response = await request(app).get("/api/fares?sourcestation=F01&destinationstation=N01")
-    expect(response.body).toEqual(temp)
-  });
-
-  test('/api/entrances', async () => {
-    const response = await request(app).get("/api/entrances?station=A01")
-    expect(response.body).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        Name: expect.any(String), 
-        Description: expect.any(String), 
-        Lat: expect.any(Number),
-        Lon: expect.any(Number),
-        Type: expect.any(String)
-      })
-    ]))
-  });
-
-  test('/api/busStop?stopid=1000031', async () => {
-    const response = await request(app).get("/api/busStop?stopid=1000031")
-    expect(response.body).toEqual(expect.objectContaining({
-      name: "MARTIN LUTHER KING JR AVE SW + DARRINGTON ST SW", 
-      lat: expect.any(Number),
-      lon: expect.any(Number),
-      routes: expect.any(Array),
-    }))
+        name: "MARTIN LUTHER KING JR AVE SW + DARRINGTON ST SW",
+        lat: expect.any(Number),
+        lon: expect.any(Number),
+        routes: expect.any(Array),
+      }),
+    );
   });
 
   //Tests for revised routes
 
   test("/", async () => {
-    const response = await request(app).get("/")
-    .expect('This is the DC Metro API backend');
+    const response = await request(app)
+      .get("/")
+      .expect("This is the DC Metro API backend");
     expect(response.statusCode).toBe(200);
   });
 
-  
   test("/bus/routes/A4", async () => {
-    const response = await request(app).get("/bus/routes/A4")
-    expect(response.body).toEqual(expect.objectContaining({
-      name: "A4 - DC VILLAGE - ANACOSTIA", 
-      description: "Anacostia-Fort Drum Line",
-      lastUpdated: expect.any(Number),
-      paths: expect.any(Object)
-    }))
+    const response = await request(app).get("/bus/routes/A4");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        name: "A4 - DC VILLAGE - ANACOSTIA",
+        description: "Anacostia-Fort Drum Line",
+        lastUpdated: expect.any(Number),
+        paths: expect.any(Object),
+      }),
+    );
     expect(response.statusCode).toBe(200);
   });
   test("/bus/routes/A4/1", async () => {
-    const response = await request(app).get("/bus/routes/A4/1")
-    expect(response.body).toEqual(expect.objectContaining({
-      TripHeadsign: "DC VILLAGE VIA FORT DRUM", 
-      DirectionText: "SOUTH",
-      DirectionNum: "1",
-      Shape: expect.any(Array),
-      Stops: expect.any(Array)
-    }))
+    const response = await request(app).get("/bus/routes/A4/1");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        TripHeadsign: "DC VILLAGE VIA FORT DRUM",
+        DirectionText: "SOUTH",
+        DirectionNum: "1",
+        Shape: expect.any(Array),
+        Stops: expect.any(Array),
+      }),
+    );
     expect(response.statusCode).toBe(200);
   });
 
   test("/bus/routes/A4/1", async () => {
-    const response = await request(app).get("/bus/routes/A4/1")
-    expect(response.body).toEqual(expect.objectContaining({
-      TripHeadsign: "DC VILLAGE VIA FORT DRUM", 
-      DirectionText: "SOUTH",
-      DirectionNum: "1",
-      Shape: expect.any(Array),
-      Stops: expect.any(Array)
-    }))
+    const response = await request(app).get("/bus/routes/A4/1");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        TripHeadsign: "DC VILLAGE VIA FORT DRUM",
+        DirectionText: "SOUTH",
+        DirectionNum: "1",
+        Shape: expect.any(Array),
+        Stops: expect.any(Array),
+      }),
+    );
     expect(response.statusCode).toBe(200);
   });
 
-/*
+  /*
   test('/api/bootstrap', async () => {
     get_bus_route("A4")
     let isDone = false
@@ -225,42 +247,135 @@ describe("Backend tests", () => {
     const response = await request(app).get("/api/busRoute/direction1/stops?route=A4")
     expect(response.body).toEqual(bus_route_test.Direction1.Stops)
   });*/
-/*
+  /*
   async function get_bus_route(route:string){
     bus_route_test = await(await fetch(`https://api.wmata.com/Bus.svc/json/jRouteDetails?RouteID=${route}&api_key=${process.env.WMATA_KEY}`)).json();
   }*/
 
-  async function get_test_station_info(station:string){
-    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY_JEST}`)).json();
-    station_info_test = temp
-    return temp
+  async function get_test_station_info(station: string) {
+    var temp = await (
+      await fetch(
+        `https://api.wmata.com/Rail.svc/json/jStationInfo?StationCode=${station}&api_key=${process.env.WMATA_KEY_JEST}`,
+      )
+    ).json();
+    station_info_test = temp;
+    return temp;
   }
-  
-  async function get_fare_info(source:string, dest:string){
-    var temp = await (await fetch(`https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY_JEST}`)).json();
+
+  async function get_fare_info(source: string, dest: string) {
+    var temp = await (
+      await fetch(
+        `https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?FromStationCode=${source}&ToStationCode=${dest}&api_key=${process.env.WMATA_KEY_JEST}`,
+      )
+    ).json();
     fares_test = temp.StationToStationInfos[0].RailFare;
-    return temp.StationToStationInfos[0].RailFare
+    return temp.StationToStationInfos[0].RailFare;
   }
-})
+});
 
-var stationlist = ["Metro Center", "Farragut North", "Dupont Circle", "Woodley Park-Zoo/Adams Morgan",
- "Cleveland Park", "Van Ness-UDC", "Tenleytown-AU", "Friendship Heights", "Bethesda", "Medical Center", 
- "Grosvenor-Strathmore", "North Bethesda", "Twinbrook", "Rockville", "Shady Grove", "Gallery Pl-Chinatown", 
- "Judiciary Square", "Union Station", "Rhode Island Ave-Brentwood", "Brookland-CUA", "Fort Totten", 
-"Takoma", "Silver Spring", "Forest Glen", "Wheaton", "Glenmont", "NoMa-Gallaudet U", "Metro Center", 
-"McPherson Square", "Farragut West", "Foggy Bottom-GWU", "Rosslyn", "Arlington Cemetery", "Pentagon", 
-"Pentagon City", "Crystal City", "Ronald Reagan Washington National Airport", "Potomac Yard", "Braddock Road", 
-"King St-Old Town", "Eisenhower Avenue", "Huntington", "Federal Triangle", "Smithsonian", "L'Enfant Plaza", 
-"Federal Center SW", "Capitol South", "Eastern Market", "Potomac Ave", "Stadium-Armory", "Minnesota Ave", 
-"Deanwood", "Cheverly", "Landover", "New Carrollton", "Mt Vernon Sq 7th St-Convention Center", 
-"Shaw-Howard U", "U Street/African-Amer Civil War Memorial/Cardozo", "Columbia Heights", 
-"Georgia Ave-Petworth", "Fort Totten", "West Hyattsville", "Hyattsville Crossing", "College Park-U of Md", 
-"Greenbelt", "Gallery Pl-Chinatown", "Archives-Navy Memorial-Penn Quarter", "L'Enfant Plaza", "Waterfront", 
-"Navy Yard-Ballpark", "Anacostia", "Congress Heights", "Southern Avenue", "Naylor Road", "Suitland", 
-"Branch Ave", "Benning Road", "Capitol Heights", "Addison Road-Seat Pleasant", "Morgan Boulevard", "Downtown Largo", 
-"Van Dorn Street", "Franconia-Springfield", "Court House", "Clarendon", "Virginia Square-GMU", "Ballston-MU", 
-"East Falls Church", "West Falls Church", "Dunn Loring-Merrifield", "Vienna/Fairfax-GMU", "McLean", "Tysons", 
-"Greensboro", "Spring Hill", "Wiehle-Reston East", "Reston Town Center", "Herndon", "Innovation Center", 
-"Washington Dulles International Airport", "Loudoun Gateway", "Ashburn"]
+var stationlist = [
+  "Metro Center",
+  "Farragut North",
+  "Dupont Circle",
+  "Woodley Park-Zoo/Adams Morgan",
+  "Cleveland Park",
+  "Van Ness-UDC",
+  "Tenleytown-AU",
+  "Friendship Heights",
+  "Bethesda",
+  "Medical Center",
+  "Grosvenor-Strathmore",
+  "North Bethesda",
+  "Twinbrook",
+  "Rockville",
+  "Shady Grove",
+  "Gallery Pl-Chinatown",
+  "Judiciary Square",
+  "Union Station",
+  "Rhode Island Ave-Brentwood",
+  "Brookland-CUA",
+  "Fort Totten",
+  "Takoma",
+  "Silver Spring",
+  "Forest Glen",
+  "Wheaton",
+  "Glenmont",
+  "NoMa-Gallaudet U",
+  "Metro Center",
+  "McPherson Square",
+  "Farragut West",
+  "Foggy Bottom-GWU",
+  "Rosslyn",
+  "Arlington Cemetery",
+  "Pentagon",
+  "Pentagon City",
+  "Crystal City",
+  "Ronald Reagan Washington National Airport",
+  "Potomac Yard",
+  "Braddock Road",
+  "King St-Old Town",
+  "Eisenhower Avenue",
+  "Huntington",
+  "Federal Triangle",
+  "Smithsonian",
+  "L'Enfant Plaza",
+  "Federal Center SW",
+  "Capitol South",
+  "Eastern Market",
+  "Potomac Ave",
+  "Stadium-Armory",
+  "Minnesota Ave",
+  "Deanwood",
+  "Cheverly",
+  "Landover",
+  "New Carrollton",
+  "Mt Vernon Sq 7th St-Convention Center",
+  "Shaw-Howard U",
+  "U Street/African-Amer Civil War Memorial/Cardozo",
+  "Columbia Heights",
+  "Georgia Ave-Petworth",
+  "Fort Totten",
+  "West Hyattsville",
+  "Hyattsville Crossing",
+  "College Park-U of Md",
+  "Greenbelt",
+  "Gallery Pl-Chinatown",
+  "Archives-Navy Memorial-Penn Quarter",
+  "L'Enfant Plaza",
+  "Waterfront",
+  "Navy Yard-Ballpark",
+  "Anacostia",
+  "Congress Heights",
+  "Southern Avenue",
+  "Naylor Road",
+  "Suitland",
+  "Branch Ave",
+  "Benning Road",
+  "Capitol Heights",
+  "Addison Road-Seat Pleasant",
+  "Morgan Boulevard",
+  "Downtown Largo",
+  "Van Dorn Street",
+  "Franconia-Springfield",
+  "Court House",
+  "Clarendon",
+  "Virginia Square-GMU",
+  "Ballston-MU",
+  "East Falls Church",
+  "West Falls Church",
+  "Dunn Loring-Merrifield",
+  "Vienna/Fairfax-GMU",
+  "McLean",
+  "Tysons",
+  "Greensboro",
+  "Spring Hill",
+  "Wiehle-Reston East",
+  "Reston Town Center",
+  "Herndon",
+  "Innovation Center",
+  "Washington Dulles International Airport",
+  "Loudoun Gateway",
+  "Ashburn",
+];
 
-export{}
+export {};
