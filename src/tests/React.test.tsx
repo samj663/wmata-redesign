@@ -179,7 +179,7 @@ describe("React Tests", () => {
 
     for (const e of alerts) {
       await waitFor(() => {
-        let input = getAllByText(dom.container, e.descriptionText);
+        let input = getByText(dom.container, e.descriptionText);
         expect(input).not.toBeNull;
       });
     }
