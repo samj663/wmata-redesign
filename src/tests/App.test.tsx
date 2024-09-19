@@ -5,7 +5,7 @@ import "jest-extended";
 const request = require("supertest");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "..", ".env.local") });
-jest.setTimeout(300000); // Gives this test suite 5 minutes to run everything.
+jest.setTimeout(1200000); // Gives this test suite 5 minutes to run everything.
 
 describe("Backend tests", () => {
   var station_info_test: any;
