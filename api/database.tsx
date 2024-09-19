@@ -112,6 +112,9 @@ async function service_id_today() {
       }
       backend.fetch_status.bus_database_status.service_id =
         result[0].service_id;
+      console.log(
+        `service id in current bus trips service_id=${result[0].service_id}`,
+      );
       return result[0].service_id;
     }
     let date = new Date()
@@ -127,6 +130,11 @@ async function service_id_today() {
     var output;
     if (service_exception.length > 0) {
       sql.end();
+      backend.fetch_status.bus_database_status.service_id =
+        service_exception[0].service_id;
+      console.log(
+        `service exception service_id=${service_exception[0].service_id} - ${date}`,
+      );
       return service_exception[0].service_id;
     }
     let day = new Date().toLocaleDateString("en-US", {
@@ -169,6 +177,7 @@ async function service_id_today() {
       await reset_bus_trip(backend.fetch_status.bus_database_status.service_id);
     }
     backend.fetch_status.bus_database_status.service_id = output;
+    console.log(`bus calendar service_id=${output}`);
     return output;
   } catch (e: any) {
     console.error(e);

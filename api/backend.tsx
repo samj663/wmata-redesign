@@ -95,8 +95,12 @@ export var bootstrap_retry_counter = {
  * Starts up backend system and manage when to get next arrival data
  */
 export async function main() {
-  await runAtSpecificTimeOfDay(4, 30, () => rail_db.read_rail_schedule());
-  await runAtSpecificTimeOfDay(4, 35, () => bus_db.read_bus_schedule_new());
+  // await bus_db.read_bus_schedule_new();
+
+  await bus_db.read_bus_schedule_new();
+  await rail_db.read_rail_schedule();
+  await runAtSpecificTimeOfDay(4, 30, () => bus_db.read_bus_schedule_new());
+  await runAtSpecificTimeOfDay(4, 35, () => rail_db.read_rail_schedule());
   await bootstrap_get_station_data();
   await bootstrap_bus_stops();
   await bootstrap_get_rail_alerts();
@@ -330,6 +334,7 @@ export async function runAtSpecificTimeOfDay(
   minutes: number,
   func: any,
 ) {
+  //console.log("HELLOOO");
   const twentyFourHours = 86400000;
   const now = new Date(
     new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
@@ -347,9 +352,12 @@ export async function runAtSpecificTimeOfDay(
   if (eta_ms < 0) {
     eta_ms += twentyFourHours;
   }
+  // console.log(eta_ms);
   setTimeout(async function () {
     //run once
-    await func();
+    //console.log("HEY");
+    //await func();
+
     // run every 24 hours from now on
     setInterval(func, twentyFourHours);
   }, eta_ms);
