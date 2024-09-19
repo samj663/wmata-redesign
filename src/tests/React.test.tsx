@@ -169,7 +169,7 @@ describe("React Tests", () => {
   test("AlertsOffCanvas Component", async () => {
     var dom: any;
     var response = await fetch(
-      "https://dcmetrobackend.samueljohnson.dev/api/alerts",
+      "https://dcmetrobackend.samueljohnson.dev/rail/alerts",
     );
     var alerts = await response.json();
 
@@ -179,7 +179,7 @@ describe("React Tests", () => {
 
     for (const e of alerts) {
       await waitFor(() => {
-        let input = getAllByText(dom.container, e.Description);
+        let input = getAllByText(dom.container, e.descriptionText);
         expect(input).not.toBeNull;
       });
     }
