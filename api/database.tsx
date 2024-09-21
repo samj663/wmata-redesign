@@ -177,7 +177,7 @@ async function service_id_today() {
       await reset_bus_trip(backend.fetch_status.bus_database_status.service_id);
     }
     backend.fetch_status.bus_database_status.service_id = output;
-    console.log(`bus calendar service_id=${output}`);
+    //console.log(`bus calendar service_id=${output}`);
     return output;
   } catch (e: any) {
     console.error(e);
