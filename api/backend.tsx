@@ -97,10 +97,11 @@ export var bootstrap_retry_counter = {
 export async function main() {
   // await bus_db.read_bus_schedule_new();
 
-  await bus_db.read_bus_schedule_new();
-  await rail_db.read_rail_schedule();
-  await runAtSpecificTimeOfDay(4, 30, () => bus_db.read_bus_schedule_new());
-  await runAtSpecificTimeOfDay(4, 35, () => rail_db.read_rail_schedule());
+  // await bus_db.read_bus_schedule_new();
+  // await rail_db.read_rail_schedule();
+  await runAtSpecificTimeOfDay(4, 30, () => update_both_database());
+  // await runAtSpecificTimeOfDay(4, 30, () => bus_db.read_bus_schedule_new());
+  //  await runAtSpecificTimeOfDay(4, 35, () => rail_db.read_rail_schedule());
   await bootstrap_get_station_data();
   await bootstrap_bus_stops();
   await bootstrap_get_rail_alerts();
@@ -152,6 +153,11 @@ export async function bootstrap_get_bus_alerts() {
     console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
     setTimeout(bootstrap_get_bus_alerts, 10000);
   }
+}
+
+async function update_both_database() {
+  await bus_db.read_bus_schedule_new();
+  await rail_db.read_rail_schedule();
 }
 
 export async function bootstrap_get_train_data() {
@@ -355,8 +361,8 @@ export async function runAtSpecificTimeOfDay(
   // console.log(eta_ms);
   setTimeout(async function () {
     //run once
-    //console.log("HEY");
-    //await func();
+    // console.log("HEY");
+    await func();
 
     // run every 24 hours from now on
     setInterval(func, twentyFourHours);
