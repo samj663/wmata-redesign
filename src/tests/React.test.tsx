@@ -178,10 +178,12 @@ describe("React Tests", () => {
     });
 
     for (const e of alerts) {
-      await waitFor(() => {
-        let input = getByText(dom.container, e.descriptionText);
-        expect(input).not.toBeNull;
-      });
+      for (const l of e.line) {
+        await waitFor(() => {
+          let input = getByText(dom.container, l);
+          expect(input).not.toBeNull;
+        });
+      }
     }
   });
 });
