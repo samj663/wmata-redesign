@@ -6,6 +6,7 @@
 import * as backend from "./backend";
 import * as rail from "./rail";
 import * as bus from "./bus";
+import * as query from "./database_user_query";
 const express = require("express");
 const path = require("path");
 export const app = express();
@@ -527,6 +528,15 @@ app.get("/rail/schedule/calendar", function (request: any, response: any) {
     response.json(rail.schedule_calendar_object);
   }
 });
+
+app.get(
+  "/rail/schedule/run/:trip_id",
+  async function (request: any, response: any) {
+    if (request.params.trip_id) {
+      response.json(await query.get_rail_scheduled_run(request.params.trip_id));
+    }
+  },
+);
 
 app.get("/bus/alerts", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");

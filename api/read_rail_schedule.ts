@@ -107,6 +107,10 @@ export async function read_rail_schedule() {
   var e = s.shift().split(",");
 
   let new_dates = s[0].split(",");
+
+  let flush_vehicle_id = await sql`update rail_trips set license_plate=-1`;
+  console.log(`Flushed vehicle_id`);
+
   console.log(
     `Current Rail Schedule: ${new_dates[3]} to  ${new_dates[4]} --- Downloaded Rail Schedule: ${dates[0].start_date} to ${dates[0].end_date}`,
   );

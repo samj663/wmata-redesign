@@ -8,12 +8,15 @@ require("dotenv").config({
 });
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 const database_url = `${process.env.digitalocean_url}?ssl=require`;
+const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+const database_user_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+const database_server_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 const fs = require("fs");
 var AdmZip = require("adm-zip");
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 // Not in use. Database only stores bus information for now.
-async function get_next_scheduled_trains(
+/*async function get_next_scheduled_trains(
   station_code: string,
   direction: number,
 ) {
@@ -52,18 +55,18 @@ async function get_next_scheduled_trains(
     console.error(e);
   }
   sql.end();
-}
+}*/
 
 // Not in use. Database only stores bus information for now
-async function get_train_position_destinations(trains: any) {
+/*async function get_train_position_destinations(trains: any) {
   let temp = trains.map((x: any) => {
     return x.vehicle.trip.tripId;
   });
   return temp;
-}
+}*/
 
 //Not in use. All next bus info is updated from get_all_next_bus()
-export async function get_next_bus(stop_id: string) {
+/*export async function get_next_bus(stop_id: string) {
   let sql = postgres(database_url);
   try {
     let start_time = new Date();
@@ -77,7 +80,7 @@ export async function get_next_bus(stop_id: string) {
     console.error(e);
   }
   sql.end();
-}
+}*/
 /**
  * Gets service id from tripupdates.
  */
@@ -321,7 +324,7 @@ export async function update_bus_data() {
   setTimeout(update_bus_data, 20000);
 }
 
-export async function update_bus_data_no_db() {
+/*export async function update_bus_data_no_db() {
   let sql = postgres(database_url);
   try {
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
@@ -382,7 +385,7 @@ export async function update_bus_data_no_db() {
   }
   sql.end();
   setTimeout(update_bus_data, 20000);
-}
+}*/
 
 export async function update_rail_data() {
   let sql = postgres(database_url);
