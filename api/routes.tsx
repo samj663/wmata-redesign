@@ -538,6 +538,52 @@ app.get(
   },
 );
 
+app.get(
+  "/bus/schedule/run/:trip_id",
+  async function (request: any, response: any) {
+    if (request.params.trip_id) {
+      response.json(await query.get_bus_scheduled_run(request.params.trip_id));
+    }
+  },
+);
+
+app.get(
+  "/bus/schedule/timetable/:stop_id/:day/:month/:year",
+  async function (request: any, response: any) {
+    if (
+      request.params.stop_id &&
+      request.params.day &&
+      request.params.month &&
+      request.params.year
+    ) {
+      response.json(
+        await query.get_bus_schedule_timetable(
+          request.params.stop_id,
+          `${request.params.day}-${request.params.month}-${request.params.year}`,
+        ),
+      );
+    }
+  },
+);
+app.get(
+  "/rail/schedule/timetable/:stop_id/:day/:month/:year",
+  async function (request: any, response: any) {
+    if (
+      request.params.stop_id &&
+      request.params.day &&
+      request.params.month &&
+      request.params.year
+    ) {
+      response.json(
+        await query.get_rail_schedule_timetable(
+          request.params.stop_id,
+          `${request.params.month}-${request.params.day}-${request.params.year}`,
+        ),
+      );
+    }
+  },
+);
+
 app.get("/bus/alerts", function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Cache-Control", "public, max-age=600");

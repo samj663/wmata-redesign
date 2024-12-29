@@ -8,7 +8,7 @@ require("dotenv").config({
 });
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 //const database_url = `${process.env.digitalocean_url}?ssl=require`;
-const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+//const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 const database_user_pool_url = `${process.env.digitalocean_user_pool_url}?ssl=require`;
 //const database_server_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 
@@ -38,4 +38,221 @@ export async function get_rail_scheduled_run(trip_id: String) {
   };
   sql.end();
   return output;
+}
+
+export async function get_bus_scheduled_run(trip_id: String) {
+  try {
+    let sql = postgres(database_user_pool_url);
+    let trip_array =
+      await sql`select stop_sequence, departure_time, stop_code, delay from bus_stop_times
+    inner join bus_stops on bus_stops.stop_id = bus_stop_times.stop_id
+    inner join bus_trips on bus_trips.trip_id = bus_stop_times.trip_id where
+    bus_trips.trip_id = ${trip_id}
+    order by stop_sequence asc`;
+    let trip_info = await sql`
+    select trip_id, trip_headsign, vehicle_id, service_id, route_id from bus_trips where
+    bus_trips.trip_id = ${trip_id}`;
+    if (trip_info.length == 0) {
+      return {};
+    }
+    let output = {
+      trip_id: trip_info[0].trip_id,
+      trip_headsign: trip_info[0].trip_headsign,
+      service_id: trip_info[0].service_id,
+      vehicle_id: trip_info[0].vehicle_id,
+      route_id: trip_info[0].route_id,
+      stop_times: trip_array,
+    };
+    sql.end();
+    return output;
+  } catch (e: any) {
+    return {};
+  }
+}
+
+export async function get_bus_schedule_timetable(
+  stop_id: string,
+  date: string,
+) {
+  let tempy = await service_id_today(date);
+  console.log(tempy);
+  let sql = postgres(database_user_pool_url);
+  let trip_array =
+    await sql` select bus_trips.trip_id, departure_time, route_id, bus_trips.trip_headsign, vehicle_id  from bus_stop_times
+        inner join bus_stops on bus_stops.stop_id = bus_stop_times.stop_id
+        inner join bus_trips on bus_trips.trip_id = bus_stop_times.trip_id where
+        bus_stops.stop_code = ${stop_id} and
+	bus_trips.service_id = ${tempy}
+	order by departure_time asc`;
+  console.log(trip_array);
+  sql.end();
+  return trip_array;
+}
+
+export async function get_rail_schedule_timetable(
+  stop_id: string,
+  date: string,
+) {
+  try {
+    let tempy = await rail_service_id_today(date);
+    console.log(tempy);
+    let sql = postgres(database_user_pool_url);
+    let trip_array =
+      await sql` select rail_trips.trip_id, departure_time, route_id, rail_trips.trip_headsign, train_id, license_plate  from rail_stop_times
+        inner join rail_stops on rail_stops.stop_id = rail_stop_times.stop_id
+        inner join rail_trips on rail_trips.trip_id = rail_stop_times.trip_id where
+        rail_stops.stop_id like ${"%" + stop_id + "%"} and
+	rail_trips.service_id in ${sql(tempy)}
+	order by departure_time asc`;
+    console.log(trip_array);
+    sql.end();
+    return trip_array;
+  } catch (e: any) {
+    return [];
+  }
+}
+
+async function service_id_today(param_date: string) {
+  let sql = postgres(database_user_pool_url);
+  try {
+    console.log(param_date);
+    let date = new Date(Date.parse(param_date))
+      .toLocaleDateString("af-ZA", {
+        timeZone: "America/New_York",
+        month: "2-digit",
+        year: "numeric",
+        day: "2-digit",
+      })
+      .replace(/-/g, "");
+    console.log(`date ${date}`);
+    let service_exception =
+      await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`;
+    var output;
+    if (service_exception.length > 0) {
+      sql.end();
+      backend.fetch_status.bus_database_status.service_id =
+        service_exception[0].service_id;
+      console.log(
+        `service exception service_id=${service_exception[0].service_id} - ${date}`,
+      );
+      return service_exception[0].service_id;
+    }
+    let day = new Date(Date.parse(param_date)).toLocaleDateString("en-US", {
+      timeZone: "America/New_York",
+      weekday: "short",
+    });
+
+    console.log(day);
+
+    if (day == "Sun") {
+      output = (
+        await sql`select service_id from bus_calendar where sunday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Mon") {
+      output = (
+        await sql`select service_id from bus_calendar where monday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Tue") {
+      output = (
+        await sql`select service_id from bus_calendar where tuesday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Wed") {
+      output = (
+        await sql`select service_id from bus_calendar where wednesday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Thu") {
+      output = (
+        await sql`select service_id from bus_calendar where thursday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Fri") {
+      output = (
+        await sql`select service_id from bus_calendar where friday = 1 limit 1`
+      )[0].service_id;
+    } else {
+      output = (
+        await sql`select service_id from bus_calendar where saturday = 1 limit 1`
+      )[0].service_id;
+    }
+
+    sql.end();
+    return output;
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    backend.handleErrors(e, "database/service_id_today", "bus_database_status");
+    return -1;
+  }
+}
+
+async function rail_service_id_today(param_date: string) {
+  let sql = postgres(database_user_pool_url);
+  try {
+    console.log(param_date);
+    let date = new Date(Date.parse(param_date))
+      .toLocaleDateString("af-ZA", {
+        timeZone: "America/New_York",
+        month: "2-digit",
+        year: "numeric",
+        day: "2-digit",
+      })
+      .replace(/-/g, "");
+    console.log(`date ${date}`);
+    let service_exception =
+      await sql`select service_id from rail_calendar_dates where service_date = ${date} and exception_type = 1`;
+    var output;
+    console.log(service_exception);
+    if (service_exception.length > 0) {
+      sql.end();
+      backend.fetch_status.bus_database_status.service_id =
+        service_exception[0].service_id;
+      console.log(
+        `service exception service_id=${service_exception[0].service_id} - ${date}`,
+      );
+      return service_exception.map((a: any) => a.service_id);
+    }
+    let day = new Date(Date.parse(param_date)).toLocaleDateString("en-US", {
+      timeZone: "America/New_York",
+      weekday: "short",
+    });
+
+    console.log(day);
+
+    if (day == "Sun") {
+      output = (
+        await sql`select service_id from rail_calendar where sunday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Mon") {
+      output = (
+        await sql`select service_id from rail_calendar where monday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Tue") {
+      output = (
+        await sql`select service_id from rail_calendar where tuesday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Wed") {
+      output = (
+        await sql`select service_id from rail_calendar where wednesday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Thu") {
+      output = (
+        await sql`select service_id from rail_calendar where thursday = 1 limit 1`
+      )[0].service_id;
+    } else if (day == "Fri") {
+      output = (
+        await sql`select service_id from rail_calendar where friday = 1 limit 1`
+      )[0].service_id;
+    } else {
+      output = (
+        await sql`select service_id from rail_calendar where saturday = 1 limit 1`
+      )[0].service_id;
+    }
+
+    sql.end();
+    return output;
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    backend.handleErrors(e, "database/service_id_today", "bus_database_status");
+    return -1;
+  }
 }

@@ -85,6 +85,7 @@ var AdmZip = require("adm-zip");
  * Gets service id from tripupdates.
  */
 async function service_id_today() {
+  let service_ids = [];
   let sql = postgres(database_url);
   try {
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
@@ -129,16 +130,20 @@ async function service_id_today() {
       })
       .replace(/-/g, "");
     let service_exception =
-      await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`;
+      await sql`select * from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`;
     var output;
     if (service_exception.length > 0) {
-      sql.end();
+      //sql.end();
       backend.fetch_status.bus_database_status.service_id =
         service_exception[0].service_id;
-      console.log(
-        `service exception service_id=${service_exception[0].service_id} - ${date}`,
-      );
-      return service_exception[0].service_id;
+      //    console.log(service_exception);
+      if (service_exception[0].exception_type == 1) {
+        service_ids.push(service_exception[0].service_id);
+        console.log(
+          `service exception service_id=${service_exception[0].service_id} - ${date}`,
+        );
+      }
+      //return service_exception[0].service_id;
     }
     let day = new Date().toLocaleDateString("en-US", {
       timeZone: "America/New_York",
@@ -181,7 +186,10 @@ async function service_id_today() {
     }
     backend.fetch_status.bus_database_status.service_id = output;
     //console.log(`bus calendar service_id=${output}`);
-    return output;
+    //return output;
+    service_ids.push(output);
+    console.log(service_ids);
+    return service_ids;
   } catch (e: any) {
     console.error(e);
     sql.end();
@@ -207,7 +215,7 @@ export async function get_all_next_bus() {
   let sql = postgres(database_url);
   try {
     let today_service = await service_id_today();
-    if (today_service == -1) {
+    if (today_service.lenght == 0) {
       throw new Error("Function 'today_service' failed");
     }
     let start_time = new Date();
@@ -226,7 +234,7 @@ export async function get_all_next_bus() {
       output = await sql`
       SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id, bus_trips.delay
       FROM bus_stop_times, bus_trips, bus_stops WHERE
-      bus_trips.service_id = ${today_service} and
+      bus_trips.service_id in ${sql(today_service)} and
       bus_trips.trip_id = bus_stop_times.trip_id and
       bus_stops.stop_id = bus_stop_times.stop_id and
       (bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp : temp} or
@@ -236,7 +244,7 @@ export async function get_all_next_bus() {
       output = await sql`
         SELECT stop_code, route_id, departure_time, trip_headsign, bus_trips.vehicle_id, bus_trips.trip_id, bus_trips.delay
         FROM bus_stop_times, bus_trips, bus_stops WHERE
-        bus_trips.service_id = ${today_service} and
+        bus_trips.service_id in ${sql(today_service)} and
         bus_trips.trip_id = bus_stop_times.trip_id and
         bus_stops.stop_id = bus_stop_times.stop_id and
         bus_stop_times.departure_time >= ${temp.length == 7 ? "0" + temp : temp} and
