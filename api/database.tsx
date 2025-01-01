@@ -85,7 +85,7 @@ var AdmZip = require("adm-zip");
  * Gets service id from tripupdates.
  */
 async function service_id_today() {
-  let service_ids = [];
+  let service_ids: any = [];
   let sql = postgres(database_url);
   try {
     let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
@@ -121,30 +121,7 @@ async function service_id_today() {
       );
       return result[0].service_id;
     }
-    let date = new Date()
-      .toLocaleDateString("af-ZA", {
-        timeZone: "America/New_York",
-        month: "2-digit",
-        year: "numeric",
-        day: "2-digit",
-      })
-      .replace(/-/g, "");
-    let service_exception =
-      await sql`select * from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`;
     var output;
-    if (service_exception.length > 0) {
-      //sql.end();
-      backend.fetch_status.bus_database_status.service_id =
-        service_exception[0].service_id;
-      //    console.log(service_exception);
-      if (service_exception[0].exception_type == 1) {
-        service_ids.push(service_exception[0].service_id);
-        console.log(
-          `service exception service_id=${service_exception[0].service_id} - ${date}`,
-        );
-      }
-      //return service_exception[0].service_id;
-    }
     let day = new Date().toLocaleDateString("en-US", {
       timeZone: "America/New_York",
       weekday: "short",
@@ -179,6 +156,31 @@ async function service_id_today() {
         await sql`select service_id from bus_calendar where saturday = 1 limit 1`
       )[0].service_id;
     }
+    service_ids.push(output);
+
+    let date = new Date()
+      .toLocaleDateString("af-ZA", {
+        timeZone: "America/New_York",
+        month: "2-digit",
+        year: "numeric",
+        day: "2-digit",
+      })
+      .replace(/-/g, "");
+    let service_addition =
+      await sql`select * from bus_calendar_dates where service_date = ${date} and exception_type = 1`;
+    let service_deletion =
+      await sql`select * from bus_calendar_dates where service_date = ${date} and exception_type = 2`;
+
+    if (service_deletion.length > 0) {
+      service_ids = service_ids.filter((x: any) => {
+        x != service_deletion[0].service_id;
+      });
+      console.log("Service deletion: " + service_deletion[0].service_id);
+    }
+    if (service_addition.length > 0) {
+      service_ids.push(service_addition[0].service_id);
+      console.log("Service addition: " + service_addition[0].service_id);
+    }
 
     sql.end();
     if (backend.fetch_status.bus_database_status.service_id != output) {
@@ -187,8 +189,8 @@ async function service_id_today() {
     backend.fetch_status.bus_database_status.service_id = output;
     //console.log(`bus calendar service_id=${output}`);
     //return output;
-    service_ids.push(output);
-    console.log(service_ids);
+
+    console.log("CURRENT IDS" + service_ids);
     return service_ids;
   } catch (e: any) {
     console.error(e);
