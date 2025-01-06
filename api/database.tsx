@@ -88,7 +88,7 @@ async function service_id_today() {
   let service_ids: any = [];
   let sql = postgres(database_url);
   try {
-    let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
+    /*let req = `https://api.wmata.com/gtfs/bus-gtfsrt-tripupdates.pb?api_key=${process.env.WMATA_KEY}`;
     const res = await fetch(req);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
       Buffer.from(await res.arrayBuffer()),
@@ -102,9 +102,9 @@ async function service_id_today() {
 
     result.sort(function (a: any, b: any) {
       return parseInt(b.count) - parseInt(a.count);
-    });
+    });*/
 
-    if (result.length > 0) {
+    /*   if (result.length > 0) {
       sql.end();
       if (
         backend.fetch_status.bus_database_status.service_id !=
@@ -120,7 +120,7 @@ async function service_id_today() {
         `service id in current bus trips service_id=${result[0].service_id}`,
       );
       return result[0].service_id;
-    }
+    }*/
     var output;
     let day = new Date().toLocaleDateString("en-US", {
       timeZone: "America/New_York",
@@ -183,14 +183,12 @@ async function service_id_today() {
     }
 
     sql.end();
-    if (backend.fetch_status.bus_database_status.service_id != output) {
+    if (backend.fetch_status.bus_database_status.service_id != service_ids) {
       await reset_bus_trip(backend.fetch_status.bus_database_status.service_id);
     }
-    backend.fetch_status.bus_database_status.service_id = output;
+    backend.fetch_status.bus_database_status.service_id = service_ids;
     //console.log(`bus calendar service_id=${output}`);
-    //return output;
 
-    console.log("CURRENT IDS" + service_ids);
     return service_ids;
   } catch (e: any) {
     console.error(e);
@@ -276,34 +274,38 @@ export async function update_bus_data() {
     var trip_updates: any = [];
     var time_updates: any = [];
     feed.entity.forEach(function (entity: any) {
-      trip_updates.push([
-        entity.tripUpdate.trip.tripId,
-        parseInt(entity.tripUpdate.vehicle.id) >= 0
-          ? parseInt(entity.tripUpdate.vehicle.id)
-          : -1,
-        parseInt(entity.tripUpdate.delay) >= 0
-          ? parseInt(entity.tripUpdate.delay)
-          : 0,
-      ]);
+      if (entity.tripUpdate.trip.tripID != null) {
+        trip_updates.push([
+          entity.tripUpdate.trip.tripId,
+          parseInt(entity.tripUpdate.vehicle.id) >= 0
+            ? parseInt(entity.tripUpdate.vehicle.id)
+            : -1,
+          parseInt(entity.tripUpdate.delay) >= 0
+            ? parseInt(entity.tripUpdate.delay)
+            : 0,
+        ]);
+      }
       entity.tripUpdate.stopTimeUpdate.forEach(function (e: any) {
         var t;
         var time;
         if (e.departure != null) {
           t = parseInt(e.departure.time + "000");
           time = new Date(t);
-        } else {
+        } else if (e.arrival != null) {
           t = parseInt(e.arrival.time + "000");
           time = new Date(t);
         }
-        let temp = time
-          .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
-          .toString(); //val[2].length == 7 ?"0" +val[2]:val[2]
-        time_updates.push([
-          entity.tripUpdate.trip.tripId,
-          temp.length == 7 ? "0" + temp : temp,
-          parseInt(e.stopSequence) >= 0 ? parseInt(e.stopSequence) : -1,
-          e.stopId,
-        ]);
+        if (time != null) {
+          let temp = time
+            .toLocaleTimeString("it-IT", { timeZone: "America/New_York" })
+            .toString(); //val[2].length == 7 ?"0" +val[2]:val[2]
+          time_updates.push([
+            entity.tripUpdate.trip.tripId,
+            temp.length == 7 ? "0" + temp : temp,
+            parseInt(e.stopSequence) >= 0 ? parseInt(e.stopSequence) : -1,
+            e.stopId,
+          ]);
+        }
       });
     });
     var updated_count = 0;
