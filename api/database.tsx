@@ -274,7 +274,7 @@ export async function update_bus_data() {
     var trip_updates: any = [];
     var time_updates: any = [];
     feed.entity.forEach(function (entity: any) {
-      if (entity.tripUpdate.trip.tripId != null) {
+      if (entity.tripUpdate.trip != null) {
         if (entity.tripUpdate.vehicle != null) {
           trip_updates.push([
             entity.tripUpdate.trip.tripId,
