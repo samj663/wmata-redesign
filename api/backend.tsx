@@ -67,7 +67,7 @@ export var fetch_status = {
     error_code: "",
   },
   bus_database_status: {
-    service_id: 0,
+    service_id: [],
     status: "SUCCESS",
     last_success_timestamp: 0,
     last_error_timestamp: 0,

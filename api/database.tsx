@@ -183,8 +183,18 @@ async function service_id_today() {
     }
 
     sql.end();
-    if (backend.fetch_status.bus_database_status.service_id != service_ids) {
-      await reset_bus_trip(backend.fetch_status.bus_database_status.service_id);
+
+    if (backend.fetch_status.bus_database_status.service_id.length != 0) {
+      var temparr1 = backend.fetch_status.bus_database_status.service_id.sort();
+      var temparr2 = service_ids.sort();
+      for (var i = 0; i < temparr1.length; ++i) {
+        if (temparr1[i] !== temparr2[i]) {
+          await reset_bus_trip(
+            backend.fetch_status.bus_database_status.service_id,
+          );
+          break;
+        }
+      }
     }
     backend.fetch_status.bus_database_status.service_id = service_ids;
     //console.log(`bus calendar service_id=${output}`);
@@ -198,11 +208,11 @@ async function service_id_today() {
   }
 }
 
-async function reset_bus_trip(service_id: number) {
+async function reset_bus_trip(service_id: any) {
   let sql = postgres(database_url);
   try {
     let t =
-      await sql`UPDATE bus_trips SET vehicle_id = -1, delay = 0 where service_id = ${service_id}`;
+      await sql`UPDATE bus_trips SET vehicle_id = -1, delay = 0 where service_id in ${sql(service_id)}`;
   } catch (e: any) {
     backend.handleErrors(e, "database/reset_bus_trip", "");
   }
