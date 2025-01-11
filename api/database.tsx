@@ -274,16 +274,18 @@ export async function update_bus_data() {
     var trip_updates: any = [];
     var time_updates: any = [];
     feed.entity.forEach(function (entity: any) {
-      if (entity.tripUpdate.trip.tripID != null) {
-        trip_updates.push([
-          entity.tripUpdate.trip.tripId,
-          parseInt(entity.tripUpdate.vehicle.id) >= 0
-            ? parseInt(entity.tripUpdate.vehicle.id)
-            : -1,
-          parseInt(entity.tripUpdate.delay) >= 0
-            ? parseInt(entity.tripUpdate.delay)
-            : 0,
-        ]);
+      if (entity.tripUpdate.trip.tripId != null) {
+        if (entity.tripUpdate.vehicle != null) {
+          trip_updates.push([
+            entity.tripUpdate.trip.tripId,
+            parseInt(entity.tripUpdate.vehicle.id) >= 0
+              ? parseInt(entity.tripUpdate.vehicle.id)
+              : -1,
+            parseInt(entity.tripUpdate.delay) >= 0
+              ? parseInt(entity.tripUpdate.delay)
+              : 0,
+          ]);
+        }
       }
       entity.tripUpdate.stopTimeUpdate.forEach(function (e: any) {
         var t;
