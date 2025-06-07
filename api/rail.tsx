@@ -178,14 +178,14 @@ export async function get_train_positions() {
     var b = Buffer.from(await res.arrayBuffer());
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
     let trip_ids = feed.entity.map((x: any) => {
-      return x.vehicle.trip.tripId;
+      return x.vehicle.trip?.tripId ?? "NULL";
     });
     feed.entity.forEach(function (entity: any) {
       if (entity.vehicle.position) {
         geojson.features.push({
           type: "Feature",
           properties: {
-            line: entity.vehicle.trip.routeId,
+            line: entity.vehicle.trip?.routeId ?? "NULL",
             id: entity.vehicle.vehicle.id,
             label: entity.vehicle.vehicle.label,
             licensePlate: entity.vehicle.vehicle.licensePlate,
