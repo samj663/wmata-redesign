@@ -126,7 +126,7 @@ export async function get_rail_schedule_timetable(
 ) {
   try {
     let tempy = await rail_service_id_today(date);
-    console.log(tempy);
+   // console.log(tempy);
     let sql = postgres(database_user_pool_url);
     let trip_array =
       await sql` select rail_trips.trip_id, departure_time, route_id, rail_trips.trip_headsign, train_id, license_plate  from rail_stop_times
@@ -135,7 +135,7 @@ export async function get_rail_schedule_timetable(
         rail_stops.stop_id like ${"%" + stop_id + "%"} and
 	rail_trips.service_id in ${sql(tempy)}
 	order by departure_time asc`;
-    console.log(trip_array);
+   // console.log(trip_array);
     sql.end();
     return trip_array;
   } catch (e: any) {
@@ -155,17 +155,15 @@ async function service_id_today(param_date: string) {
         day: "2-digit",
       })
       .replace(/-/g, "");
-    console.log(`date ${date}`);
+   // console.log(`date ${date}`);
     let service_exception =
       await sql`select service_id from bus_calendar_dates where service_date = ${date} and exception_type = 1 limit 1`;
     var output;
     if (service_exception.length > 0) {
       sql.end();
-      backend.fetch_status.bus_database_status.service_id =
-        service_exception[0].service_id;
-      console.log(
-        `service exception service_id=${service_exception[0].service_id} - ${date}`,
-      );
+  //    console.log(
+   //     `service exception service_id=${service_exception[0].service_id} - ${date}`,
+  //    );
       return service_exception[0].service_id;
     }
     let day = new Date(Date.parse(param_date)).toLocaleDateString("en-US", {
@@ -173,7 +171,7 @@ async function service_id_today(param_date: string) {
       weekday: "short",
     });
 
-    console.log(day);
+   // console.log(day);
 
     if (day == "Sun") {
       output = (
@@ -234,8 +232,6 @@ async function rail_service_id_today(param_date: string) {
     console.log(service_exception);
     if (service_exception.length > 0) {
       sql.end();
-      backend.fetch_status.bus_database_status.service_id =
-        service_exception[0].service_id;
       console.log(
         `service exception service_id=${service_exception[0].service_id} - ${date}`,
       );

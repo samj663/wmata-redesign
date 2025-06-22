@@ -19,7 +19,7 @@ export function expressapp(app:any){
           response.json(
             await query.get_bus_schedule_timetable_TESTING(
               request.params.stop_id,
-              `${request.params.day}-${request.params.month}-${request.params.year}`,
+              `${request.params.year}-${request.params.month}-${request.params.day} EST`,
             ),
           );
         }
