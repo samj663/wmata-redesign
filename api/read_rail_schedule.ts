@@ -7,9 +7,10 @@ require("dotenv").config({
 const fs = require("fs");
 var AdmZip = require("adm-zip");
 const { default: fetch } = require("node-fetch");
-const url = `${process.env.digitalocean_url}?ssl=require`;
+const url = `${process.env.digitalocean_url}?ssl=require`; // PRODUCTION DB
+//const url = `${process.env.digitalocean_testing_url}?ssl=require`; // TEST DB
 
-read_rail_schedule();
+//read_rail_schedule();
 
 async function get_static_data(req: any, folder_name: any) {
   console.info("Fetching Data...");

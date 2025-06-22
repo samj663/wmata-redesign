@@ -7,10 +7,11 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-const database_url = `${process.env.digitalocean_url}?ssl=require`;
-const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
-const database_user_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
-const database_server_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+const database_url = `${process.env.digitalocean_url}?ssl=require`; // PRODUCTION DB
+//const database_url = `${process.env.digitalocean_testing_url}?ssl=require`; // TESTING DB
+//const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+//const database_user_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
+//const database_server_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 const fs = require("fs");
 var AdmZip = require("adm-zip");
 
@@ -157,7 +158,6 @@ async function service_id_today() {
       )[0].service_id;
     }
     service_ids.push(output);
-
     let date = new Date()
       .toLocaleDateString("af-ZA", {
         timeZone: "America/New_York",
@@ -620,6 +620,24 @@ export async function get_train_schedule_calendar() {
     // console.log(groupBy(output, "service_date"))
     sql.end();
     return output;
+    //setTimeout(get_train_schedule_today, 20000)
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    //setTimeout(get_train_schedule_today, 20000)
+    return null;
+    // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+  }
+}
+
+export async function ios_app_version(){
+  let sql = postgres(database_url);
+  try {
+    let output = await sql`
+        SELECT version from app_version`;
+    // console.log(groupBy(output, "service_date"))
+    sql.end();
+    return output
     //setTimeout(get_train_schedule_today, 20000)
   } catch (e: any) {
     console.error(e);

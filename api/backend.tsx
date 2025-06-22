@@ -76,6 +76,17 @@ export var fetch_status = {
   },
 };
 
+export var app_versions = {
+  ios:{
+    active: [],
+    inactive: []
+  },
+  android:{
+    active: [],
+    inactive: []
+  }
+}
+
 const MAX_RETRY = 5;
 
 /**
@@ -99,26 +110,53 @@ export async function main() {
 
   // await bus_db.read_bus_schedule_new();
   // await rail_db.read_rail_schedule();
-  await runAtSpecificTimeOfDay(4, 30, () => update_both_database());
+  update_app_version();
+  runAtSpecificTimeOfDay(4, 30, () => update_both_database());
   // await runAtSpecificTimeOfDay(4, 30, () => bus_db.read_bus_schedule_new());
   //  await runAtSpecificTimeOfDay(4, 35, () => rail_db.read_rail_schedule());
+
+  //await bus_db.read_bus_schedule_new();
+  await update_both_database()
   await bootstrap_get_station_data();
   await bootstrap_bus_stops();
   await bootstrap_get_rail_alerts();
   await bootstrap_get_train_data();
   await bootstrap_train_positions();
   await bootstrap_get_bus_alerts();
-
+  await bootstrap_bus_routes();
+  await bus.update_bus_data();
   await rail.get_elevator_escalator_alerts();
   //await database.get_train_schedule_today()
   //await bus.read_bus_trip_data();
   await rail.update_rail_schedule();
   //await rail.update_full_rail_schedule()
   await database.update_bus_data();
-  await bus.update_bus_data();
+  
   //database.refresh_bus_database()
 
-  await bootstrap_bus_routes();
+  
+}
+
+export async function update_app_version(){
+  var ios_versions = await database.ios_app_version()
+  if(ios_versions != null){
+    var active: any = []
+    var inactive:any = []
+    ios_versions.forEach((x:any) => {
+      if(x.is_active = true){
+        active.push(x.version)
+      }
+      else{
+        inactive.push(x.version)
+      }
+    });
+    app_versions.ios.active = active
+    app_versions.ios.inactive = inactive
+  }
+  else{
+    console.error("WARNING: App version failed to update")
+  }
+  setTimeout(update_app_version, 3600000);
 }
 //get_bus_alerts_gtft_rt()
 export async function bootstrap_get_rail_alerts() {
@@ -156,8 +194,8 @@ export async function bootstrap_get_bus_alerts() {
 }
 
 async function update_both_database() {
-  await bus_db.read_bus_schedule_new();
   await rail_db.read_rail_schedule();
+  await bus_db.read_bus_schedule_new();
 }
 
 export async function bootstrap_get_train_data() {
@@ -361,7 +399,7 @@ export async function runAtSpecificTimeOfDay(
   // console.log(eta_ms);
   setTimeout(async function () {
     //run once
-    // console.log("HEY");
+    console.log("HEY");
     await func();
 
     // run every 24 hours from now on

@@ -9,7 +9,8 @@ const fs = require("fs");
 //const decompress = require("decompress");
 var AdmZip = require("adm-zip");
 const { default: fetch } = require("node-fetch");
-const url = `${process.env.digitalocean_url}?ssl=require`;
+const url = `${process.env.digitalocean_url}?ssl=require`; // PRODUCTION DB
+//const url = `${process.env.digitalocean_testing_url}?ssl=require`; // TEST DB
 //read_bus_schedule_new();
 
 //get_static_data(`https://api.wmata.com/gtfs/rail-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`,"./static_rail");
@@ -135,6 +136,7 @@ export async function read_bus_schedule_new() {
     await sql`TRUNCATE TABLE bus_stop_times CASCADE;`;
     await sql`TRUNCATE TABLE bus_calendar_dates CASCADE;`;
     await sql`TRUNCATE TABLE bus_calendar CASCADE;`;
+    await sql`TRUNCATE TABLE bus_routes CASCADE;`;
     sql.end();
   }
 
@@ -150,6 +152,7 @@ export async function read_bus_schedule_new() {
   var stop_times: object[] = [];
   var calendar_dates: object[] = [];
   var calendar: object[] = [];
+  var routes: object[] = [];
 
   var stops: object[] = [];
   for (const e of s) {
@@ -200,10 +203,11 @@ export async function read_bus_schedule_new() {
       direction_id: parseInt(val[4]),
       vehicle_id: -1,
       delay: 0,
+      shape_id: val[6]
     });
     count += 1;
     rows_entered += 1;
-    if (count == 9200) {
+    if (count == 8000) {
       let sql = postgres(url);
       await sql` insert into bus_trips ${sql(trips)} ON CONFLICT DO NOTHING`;
       //rows_entered += 92000
@@ -289,7 +293,7 @@ export async function read_bus_schedule_new() {
         //rows_entered += 10000
         //console.log("Added calendar data: ", rows_entered)
         count = 0;
-        calendar_dates = [];
+        calendar = [];
         sql.end();
       }
     }
@@ -299,12 +303,56 @@ export async function read_bus_schedule_new() {
 
       console.log("Added calendar data: ", rows_entered);
       count = 0;
-      calendar_dates = [];
+      calendar = [];
       sql.end();
     }
   } catch (e: any) {
     console.error("WARNING: bus_calendar.txt is missing");
   }
+
+  try {
+    console.log("STARTING SHAPES")
+    content = await fs.readFileSync("./static_bus/shapes.txt", "utf8");
+    console.log("SHAPESDS")
+    s = content.split("\n");
+    e = s.shift().split(",");
+    rows_entered = 0;
+    for (const e of s) {
+      let val = e.split(",");
+      if (val[0] == undefined || val[1] == undefined || val[2] == undefined || val[3] == undefined) continue;
+      routes.push({
+        route_id: val[0],
+        lat: parseFloat(val[1]),
+        lon: parseFloat(val[2]),
+        sequence_id: parseInt(val[3]),
+      });
+      //console.log(val)
+      count += 1;
+      rows_entered += 1;
+      if (count == 10000) {
+        let sql = postgres(url);
+        await sql` insert into bus_routes ${sql(routes)} ON CONFLICT DO NOTHING`;
+
+        //rows_entered += 10000
+        //console.log("Added routes data: ", rows_entered)
+        count = 0;
+        routes = [];
+        sql.end();
+      }
+    }
+    if (count > 0) {
+      let sql = postgres(url);
+      await sql` insert into bus_routes ${sql(routes)} ON CONFLICT DO NOTHING`;
+
+      console.log("Added shapes data: ", rows_entered);
+      count = 0;
+      routes = [];
+      sql.end();
+    }
+  } catch (e: any) {
+    console.error(e);
+  }
+
   /* let sql = postgres(url);
     let t = await sql`TRUNCATE bus_stop_times CASCADE`
     sql.end()*/

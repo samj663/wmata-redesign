@@ -8,11 +8,9 @@ import * as backend from "./backend";
 import * as database from "./database";
 import { busRoute, busStop } from "./interfaces_and_classes";
 const { default: fetch } = require("node-fetch");
-const express = require("express");
 const path = require("path");
 const fs = require("fs");
 var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-//const app = express();
 require("dotenv").config({
   path: path.resolve(__dirname, "../..", ".env.local"),
 });

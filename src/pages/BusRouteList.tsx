@@ -14,6 +14,7 @@ export default function BusRouteList() {
   const [active_stops, set_active_stops] = useState(null);
   const [active_path, set_active_path] = useState(null);
   const [center_to, set_center_to] = useState(null);
+  const [bus_route, set_bus_route] = useState("");
   const elementRef = useRef<any>(null);
 
   const list = (t: any, index: number) => (
@@ -95,6 +96,19 @@ export default function BusRouteList() {
             </tr>
           </thead>
           <tbody>
+            <td>
+              <input
+                    type="text"
+                    className={`form-control m-1`}
+                    id="exampleFormControlInput1"
+                    placeholder=""
+                    value={bus_route}
+                    onChange={(e) => set_bus_route(e.target.value)}
+                  ></input>
+                  <button type="submit" className="btn btn-primary m-1 ">
+                    Search
+                  </button>
+            </td>
             {/*Array.from(Array(10).keys()).map(listPlaceholder)*/}
             {isLoading
               ? Array.from(Array(10).keys()).map(listPlaceholder)
@@ -162,6 +176,7 @@ export default function BusRouteList() {
               setRoute={setRoute}
             />
           ) : (
+            
             handleBusRouteList()
           )}
         </div>

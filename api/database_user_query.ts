@@ -10,6 +10,7 @@ var GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 //const database_url = `${process.env.digitalocean_url}?ssl=require`;
 //const database_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 const database_user_pool_url = `${process.env.digitalocean_user_pool_url}?ssl=require`;
+//const database_user_pool_url = `${process.env.digitalocean_testing_pool_url}?ssl=require`;
 //const database_server_pool_url = `${process.env.digitalocean_pool_url}?ssl=require`;
 
 export async function get_rail_scheduled_run(trip_id: String) {
@@ -41,8 +42,9 @@ export async function get_rail_scheduled_run(trip_id: String) {
 }
 
 export async function get_bus_scheduled_run(trip_id: String) {
+  let sql = postgres(database_user_pool_url);
   try {
-    let sql = postgres(database_user_pool_url);
+    
     let trip_array =
       await sql`select stop_sequence, departure_time, stop_code, delay from bus_stop_times
     inner join bus_stops on bus_stops.stop_id = bus_stop_times.stop_id
@@ -66,10 +68,12 @@ export async function get_bus_scheduled_run(trip_id: String) {
     sql.end();
     return output;
   } catch (e: any) {
+    sql.end();
     return {};
   }
 }
 
+//Takes too long to load ~13 secs per call
 export async function get_bus_schedule_timetable(
   stop_id: string,
   date: string,
@@ -78,15 +82,42 @@ export async function get_bus_schedule_timetable(
   console.log(tempy);
   let sql = postgres(database_user_pool_url);
   let trip_array =
-    await sql` select bus_trips.trip_id, departure_time, route_id, bus_trips.trip_headsign, vehicle_id  from bus_stop_times
+    await sql`
+        select bus_trips.trip_id, departure_time, route_id, bus_trips.trip_headsign, vehicle_id  from bus_stop_times
         inner join bus_stops on bus_stops.stop_id = bus_stop_times.stop_id
         inner join bus_trips on bus_trips.trip_id = bus_stop_times.trip_id where
         bus_stops.stop_code = ${stop_id} and
-	bus_trips.service_id = ${tempy}
-	order by departure_time asc`;
+        bus_trips.service_id = ${tempy}
+        order by departure_time asc`;
   console.log(trip_array);
   sql.end();
   return trip_array;
+}
+
+//Takes 5 to 7 seconds. Is that resonable?
+export async function get_bus_schedule_timetable_TESTING(
+  stop_code: string,
+  date: string,
+) {
+  let tempy = await service_id_today(date);
+ // console.log(tempy);
+  let sql = postgres(database_user_pool_url);
+  let stop_id = await sql`select stop_id from bus_stops where stop_code = ${stop_code}`
+  //console.log(stop_id)
+  if(stop_id.length == 1){
+    let trip_array =
+    await sql`
+        select bus_trips.trip_id, departure_time, route_id, bus_trips.trip_headsign, vehicle_id from bus_stop_times
+        inner join bus_trips on bus_trips.trip_id = bus_stop_times.trip_id where
+        bus_stop_times.stop_id = ${stop_id[0].stop_id} and
+        bus_trips.service_id = ${tempy}
+        order by departure_time asc`;
+    sql.end();
+    return trip_array;    
+  }
+  //console.log(trip_array);
+  sql.end();
+  return [];
 }
 
 export async function get_rail_schedule_timetable(
@@ -256,3 +287,53 @@ async function rail_service_id_today(param_date: string) {
     return -1;
   }
 }
+
+export async function get_bus_route_path(route: string){
+let sql = postgres(database_user_pool_url);
+  try {
+    let output = await sql`
+        SELECT * FROM bus_routes where route_id = ${route}
+        ORDER BY sequence_id asc`;
+    sql.end();
+    return output;
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    return null;
+  }
+}
+
+export async function get_bus_route_path_geojson(route: string){
+let sql = postgres(database_user_pool_url);
+  try {
+    let output = await sql`
+        SELECT * FROM bus_routes where route_id = ${route}
+        ORDER BY sequence_id asc`;
+
+    var path1: any = {
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: [],
+        },
+        properties: {
+          type: "line",
+          title: "Direction1",
+          description: "Direction path",
+        },
+    };
+    for (const e of output) {
+      path1.geometry.coordinates.push([e.lon, e.lat]);
+    }
+    sql.end();
+    return {
+      type: "FeatureCollection",
+      features: [path1],
+    };
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    return null;
+  }
+}
+
