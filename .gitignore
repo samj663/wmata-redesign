@@ -54,3 +54,4 @@ api/certs
 *available_routes.txt
 static_bus/
 static_rail/
+bus-gtfs-static-old/

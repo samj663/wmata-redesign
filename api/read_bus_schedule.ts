@@ -14,7 +14,7 @@ const url = `${process.env.digitalocean_url}?ssl=require`; // PRODUCTION DB
 //read_bus_schedule_new();
 
 //get_static_data(`https://api.wmata.com/gtfs/rail-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`,"./static_rail");
-//get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus_test")
+//get_static_data(`https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`, "./static_bus/_test")
 
 async function get_static_data(req: any, folder_name: any) {
   console.info("Fetching Data...");
@@ -99,7 +99,7 @@ export async function read_bus_schedule_new() {
   );
   await get_static_data(
     `https://api.wmata.com/gtfs/bus-gtfs-static.zip?api_key=${process.env.WMATA_KEY}`,
-    "./static_bus",
+    "./static_bus/",
   );
 
   let sql = postgres(url);
@@ -116,10 +116,14 @@ export async function read_bus_schedule_new() {
   //console.log(dates)
   let flush_vehicle_id = await sql`update bus_trips set vehicle_id=-1`;
   console.log(`Flushed vehicle_id`);
-  console.log(
-    `Current Bus Schedule: ${new_dates[3]} to  ${new_dates[4]} --- Downloaded Bus Schedule: ${dates[0].start_date} to ${dates[0].end_date}`,
+   const now = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
   );
 
+  console.log(
+    `TODAY: ${parseInt(`${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`)} --- Downloaded Bus Schedule: ${new_dates[3]} to ${new_dates[4]} --- Current Bus Schedule: ${dates[0].start_date} to ${dates[0].end_date}`,
+  );
+  
   if (
     new_dates[3] == dates[0].start_date &&
     new_dates[4] == dates[0].end_date
@@ -127,7 +131,12 @@ export async function read_bus_schedule_new() {
     console.log("NOTICE: Checked GTFS bus schedule. No date change found.");
     sql.end();
     return;
-  } else {
+  } else if((parseInt(`${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`)) < new_dates[3]){
+    console.log(`NOTICE: Checked GTFS bus schedule. New schedule found but not in effect. TODAY: ${now.getFullYear()}${(now.getMonth() + 1 < 10 ? '0' : '') + now.getMonth() + 1}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`);
+    sql.end();
+    return;
+  } else { 
+
     console.warn(
       "WARNING: Checked GTFS bus schedule. Date change found. Updating bus database.",
     );
