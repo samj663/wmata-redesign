@@ -132,7 +132,7 @@ export async function read_bus_schedule_new() {
     sql.end();
     return;
   } else if((parseInt(`${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`)) < new_dates[3]){
-    console.log(`NOTICE: Checked GTFS bus schedule. New schedule found but not in effect. TODAY: ${now.getFullYear()}${(now.getMonth() + 1 < 10 ? '0' : '') + now.getMonth() + 1}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`);
+    console.log(`NOTICE: Checked GTFS bus schedule. New schedule found but not in effect. TODAY: ${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`);
     sql.end();
     return;
   } else { 
@@ -146,9 +146,10 @@ export async function read_bus_schedule_new() {
     await sql`TRUNCATE TABLE bus_calendar_dates CASCADE;`;
     await sql`TRUNCATE TABLE bus_calendar CASCADE;`;
     await sql`TRUNCATE TABLE bus_routes CASCADE;`;
+    await sql`TRUNCATE TABLE bus_route_list CASCADE;`;
     sql.end();
   }
-
+  sql.end();
   // await create_tables();
   var content = await fs.readFileSync("./static_bus/stops.txt", "utf8");
   var s = content.split("\n");
@@ -162,7 +163,7 @@ export async function read_bus_schedule_new() {
   var calendar_dates: object[] = [];
   var calendar: object[] = [];
   var routes: object[] = [];
-
+  var route_list: object[] = [];
   var stops: object[] = [];
   for (const e of s) {
     let val = e.split(",");
@@ -194,6 +195,33 @@ export async function read_bus_schedule_new() {
     console.log("Added final stops data: ", rows_entered);
     count = 0;
     stops = [];
+    sql.end();
+  }
+
+content = await fs.readFileSync("./static_bus/routes.txt", "utf8"); //Route list
+  s = content.split("\n");
+  e = s.shift().split(",");
+  rows_entered = 0;
+  for (const e of s) {
+    let val = e.split(",");
+    if (val[1] == undefined) continue;
+    route_list.push({
+      route_id: val[0],
+      short_name: val[2],
+      long_name: val[3],
+      color: val[7],
+      text_color: val[8]
+    });
+    count += 1;
+    rows_entered += 1;
+  }
+  if (count > 0) {
+    let sql = postgres(url);
+    
+    await sql` insert into bus_route_list ${sql(route_list)} ON CONFLICT DO NOTHING`;
+    console.log("Added final trips data: ", rows_entered);
+    count = 0;
+    trips = [];
     sql.end();
   }
 
