@@ -313,8 +313,13 @@ let sql = postgres(database_user_pool_url);
 export async function get_bus_route_path_geojson(route: string){
 let sql = postgres(database_user_pool_url);
   try {
+    var output:any = {
+      type: "FeatureCollection",
+      name: '',
+      features: [],
+    }
     let output1:any = await sql`
-        SELECT DISTINCT shape_id FROM bus_trips where  
+        SELECT DISTINCT shape_id, trip_headsign FROM bus_trips where  
         route_id = ${route} AND
         service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}`;
 
@@ -322,32 +327,33 @@ let sql = postgres(database_user_pool_url);
     for (var t of output1){
       temp.push(t.shape_id)
     }
-    //console.log(`${output1} --- ${temp}`)
     let output2 = await sql`
         SELECT * FROM bus_routes where route_id in ${sql(temp)}
         ORDER BY route_id, sequence_id asc`;
-  //  console.log(`service_id = ${backend.fetch_status.bus_database_status.service_id}, output1 = ${output1}, output2 length=${output2.length}`)
-
-    var path1: any = {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [],
-        },
-        properties: {
-          type: "line",
-          title: "Direction1",
-          description: "Direction path",
-        },
-    };
-    for (const e of output2) {
-      path1.geometry.coordinates.push([e.lon, e.lat]);
+    //console.log(`${output1} --- ${temp}`)
+    for (var id of output1){
+      let temp = output2.filter((x:any) => x.route_id == id.shape_id)
+      var path: any = {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [],
+          },
+          properties: {
+            type: "line",
+            title: id.shape_id,
+            description: id.trip_headsign,
+          },
+        };
+      for (var coords of temp){
+        path.geometry.coordinates.push([coords.lon, coords.lat]);
+      }
+      output.features.push(path)
     }
+    
+  //  console.log(`service_id = ${backend.fetch_status.bus_database_status.service_id}, output1 = ${output1}, output2 length=${output2.length}`)
     sql.end();
-    return {
-      type: "FeatureCollection",
-      features: [path1],
-    };
+    return output;
   } catch (e: any) {
     console.error(e);
     sql.end();

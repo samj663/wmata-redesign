@@ -197,11 +197,11 @@ export function expressapp(app:any){
     app.get(//NEED INPUT VALIDATION
       "/bus/route/path/:route",
       async function (request: any, response: any) {
-        if(query.validate_route_name(request.params.route) == true){
+        if(false && query.validate_route_name(request.params.route) == true){
           response.json(await query.get_bus_route_path(request.params.route));
         }
         else{
-          response.json({error: "Invalid Route"}).status(400);
+          response.json({error: "Route not in use"}).status(400);
         }
       },
     );
