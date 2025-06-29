@@ -392,6 +392,29 @@ export async function all_bus_routes(){
   }
 }
 
+export async function bus_routes_for_stop(stop: string){
+  let sql = postgres(database_user_pool_url);
+  try {
+    let output = await sql`
+        SELECT DISTINCT bus_trips.route_id, bus_route_list.short_name, bus_route_list.long_name, bus_route_list.color, bus_route_list.text_color
+    FROM bus_trips
+    INNER JOIN bus_stop_times ON bus_stop_times.trip_id = bus_trips.trip_id
+    INNER JOIN bus_stops ON bus_stops.stop_id = bus_stop_times.stop_id
+	  INNER JOIN bus_route_list ON bus_route_list.route_id = bus_trips.route_id
+    WHERE bus_stops.stop_code = ${stop}`;
+    // console.log(groupBy(output, "service_date"))
+    sql.end();
+    return output
+    //setTimeout(get_train_schedule_today, 20000)
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    //setTimeout(get_train_schedule_today, 20000)
+    return [];
+    // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+  }
+}
+
 export function validate_route_name(route:string){
   if(route.length != 3){
     return false

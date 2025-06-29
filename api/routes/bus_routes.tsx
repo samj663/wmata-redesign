@@ -227,4 +227,15 @@ export function expressapp(app:any){
         }
       },
     );
+    app.get( //NEED INPUT VALIDATION
+      "/bus/stop/routes/:stop",
+      async function (request: any, response: any) {
+        if(query.validate_stop_id(request.params.stop) == true){
+          response.json(await query.bus_routes_for_stop(request.params.stop));
+        }
+        else{
+          response.json({error: "Invalid stop_id"}).status(400);
+        }
+      },
+    );
 }
