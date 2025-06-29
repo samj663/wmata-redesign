@@ -320,8 +320,7 @@ let sql = postgres(database_user_pool_url);
     }
     let output1:any = await sql`
         SELECT DISTINCT shape_id, trip_headsign FROM bus_trips where  
-        route_id = ${route} AND
-        service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}`;
+        route_id = ${route}`;
 
     let temp = []
     for (var t of output1){
