@@ -363,7 +363,7 @@ export async function get_bus_route_stops(route: String){
     FROM bus_trips
     INNER JOIN bus_stop_times ON bus_stop_times.trip_id = bus_trips.trip_id
     INNER JOIN bus_stops ON bus_stops.stop_id = bus_stop_times.stop_id
-    WHERE route_id = ${route} AND service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}
+    WHERE route_id = ${route}
     order by trip_headsign, shape_id,direction_id, stop_sequence;`;
 
     sql.end();
