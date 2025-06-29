@@ -6,15 +6,15 @@ const express = require("express");
 const path = require("path");
 export const app = express();
 
-export function expressapp(app:any){
-    app.get(
-      "/bus/schedule/timetable/:stop_id/:day/:month/:year",
-      async function (request: any, response: any) {
-        if (
-          request.params.stop_id &&
-          request.params.day &&
-          request.params.month &&
-          request.params.year
+export function expressapp(app:any){ 
+  app.get( //NEED INPUT VALIDATION
+    "/bus/schedule/timetable/:stop_id/:day/:month/:year",
+    async function (request: any, response: any) {
+      if (
+        request.params.stop_id && request.params.day && request.params.month && request.params.year
+      ) {
+        if(query.validate_date(request.params.year,request.params.month,request.params.day) == true &&
+           query.validate_stop_id(request.params.stop_id) == true
         ) {
           response.json(
             await query.get_bus_schedule_timetable_TESTING(
@@ -23,8 +23,12 @@ export function expressapp(app:any){
             ),
           );
         }
-      },
-    );
+        else{
+          response.json({error: "Invalid input"}).status(400);
+        }
+      }
+    },
+  );
 
     app.get("/bus/alerts", function (request: any, response: any) {
       response.set("Access-Control-Allow-Origin", "*");
@@ -107,7 +111,7 @@ export function expressapp(app:any){
     
     app.get(
       "/bus/routes/:route?/:direction?",
-      function (request: any, response: any) {
+      async function (request: any, response: any) {
         response.set("Access-Control-Allow-Origin", "*");
         if (backend.bootstrap_status.bus_routes === "RUNNING") {
           response.json({ error: "System is booting up. Please try again later." });
@@ -130,7 +134,7 @@ export function expressapp(app:any){
               response.json(bus.bus_routes.get(request.params.route));
             }
           } else {
-            response.json(bus.bus_route_list);
+            response.json(await query.all_bus_routes());
           }
         }
       },
@@ -177,26 +181,50 @@ export function expressapp(app:any){
         }
       },
     );
-    app.get(
+    app.get(//NEED INPUT VALIDATION
       "/bus/schedule/run/:trip_id",
       async function (request: any, response: any) {
         if (request.params.trip_id) {
-          response.json(await query.get_bus_scheduled_run(request.params.trip_id));
+          if(query.validate_trip_id(request.params.trip_id) == true){
+            response.json(await query.get_bus_scheduled_run(request.params.trip_id));
+          }
+          else{
+            response.json({error: "Invalid trip_id"}).status(400);
+          }
         }
       },
     );
-    app.get(
+    app.get(//NEED INPUT VALIDATION
       "/bus/route/path/:route",
       async function (request: any, response: any) {
+        if(query.validate_route_name(request.params.route) == true){
           response.json(await query.get_bus_route_path(request.params.route));
-        
+        }
+        else{
+          response.json({error: "Invalid Route"}).status(400);
+        }
       },
     );
-    app.get(
+    app.get(//NEED INPUT VALIDATION
       "/bus/route/path/:route/geojson",
       async function (request: any, response: any) {
+        if(query.validate_route_name(request.params.route) == true){
           response.json(await query.get_bus_route_path_geojson(request.params.route));
-        
+        }
+        else{
+          response.json({error: "Invalid Route"}).status(400);
+        }
+      },
+    );
+    app.get( //NEED INPUT VALIDATION
+      "/bus/route/stops/:route",
+      async function (request: any, response: any) {
+        if(query.validate_route_name(request.params.route) == true){
+          response.json(await query.get_bus_route_stops(request.params.route));
+        }
+        else{
+          response.json({error: "Invalid Route"}).status(400);
+        }
       },
     );
 }

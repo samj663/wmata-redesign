@@ -149,7 +149,7 @@ export async function read_bus_schedule_new() {
     await sql`TRUNCATE TABLE bus_route_list CASCADE;`;
     sql.end();
   }
-  sql.end();
+ // sql.end();
   // await create_tables();
   var content = await fs.readFileSync("./static_bus/stops.txt", "utf8");
   var s = content.split("\n");

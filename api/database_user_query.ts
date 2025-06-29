@@ -287,11 +287,22 @@ async function rail_service_id_today(param_date: string) {
 export async function get_bus_route_path(route: string){
 let sql = postgres(database_user_pool_url);
   try {
-    let output = await sql`
-        SELECT * FROM bus_routes where route_id = ${route}
-        ORDER BY sequence_id asc`;
+    let output1:any = await sql`
+        SELECT DISTINCT shape_id FROM bus_trips where  
+        route_id = ${route} AND
+        service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}`;
+
+    let temp = []
+    for (var t of output1){
+      temp.push(t.shape_id)
+    }
+    //console.log(`${output1} --- ${temp}`)
+    let output2 = await sql`
+        SELECT * FROM bus_routes where route_id in ${sql(temp)}
+        ORDER BY route_id, sequence_id asc`;
+  //  console.log(`service_id = ${backend.fetch_status.bus_database_status.service_id}, output1 = ${output1}, output2 length=${output2.length}`)
     sql.end();
-    return output;
+    return output2;
   } catch (e: any) {
     console.error(e);
     sql.end();
@@ -302,9 +313,20 @@ let sql = postgres(database_user_pool_url);
 export async function get_bus_route_path_geojson(route: string){
 let sql = postgres(database_user_pool_url);
   try {
-    let output = await sql`
-        SELECT * FROM bus_routes where route_id = ${route}
-        ORDER BY sequence_id asc`;
+    let output1:any = await sql`
+        SELECT DISTINCT shape_id FROM bus_trips where  
+        route_id = ${route} AND
+        service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}`;
+
+    let temp = []
+    for (var t of output1){
+      temp.push(t.shape_id)
+    }
+    //console.log(`${output1} --- ${temp}`)
+    let output2 = await sql`
+        SELECT * FROM bus_routes where route_id in ${sql(temp)}
+        ORDER BY route_id, sequence_id asc`;
+  //  console.log(`service_id = ${backend.fetch_status.bus_database_status.service_id}, output1 = ${output1}, output2 length=${output2.length}`)
 
     var path1: any = {
         type: "Feature",
@@ -318,7 +340,7 @@ let sql = postgres(database_user_pool_url);
           description: "Direction path",
         },
     };
-    for (const e of output) {
+    for (const e of output2) {
       path1.geometry.coordinates.push([e.lon, e.lat]);
     }
     sql.end();
@@ -333,3 +355,82 @@ let sql = postgres(database_user_pool_url);
   }
 }
 
+export async function get_bus_route_stops(route: String){
+  let sql = postgres(database_user_pool_url);
+  try {
+    let output:any = await sql`
+    SELECT DISTINCT bus_stops.stop_id, bus_stops.stop_name, direction_id, stop_sequence, trip_headsign, shape_id
+    FROM bus_trips
+    INNER JOIN bus_stop_times ON bus_stop_times.trip_id = bus_trips.trip_id
+    INNER JOIN bus_stops ON bus_stops.stop_id = bus_stop_times.stop_id
+    WHERE route_id = ${route} AND service_id IN ${sql(backend.fetch_status.bus_database_status.service_id)}
+    order by trip_headsign, shape_id,direction_id, stop_sequence;`;
+
+    sql.end();
+    return output;
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    return null;
+  }
+}
+export async function all_bus_routes(){
+  let sql = postgres(database_user_pool_url);
+  try {
+    let output = await sql`
+        SELECT * from bus_route_list`;
+    // console.log(groupBy(output, "service_date"))
+    sql.end();
+    return output
+    //setTimeout(get_train_schedule_today, 20000)
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    //setTimeout(get_train_schedule_today, 20000)
+    return [];
+    // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+  }
+}
+
+export function validate_route_name(route:string){
+  if(route.length != 3){
+    return false
+  }
+  if(!["A","C","D","F","M","P"].includes(route[0])){
+    return false
+  }
+  if(!["0","1","2","3","4","5","6","7","8","9"].includes(route[1])){
+    return false
+  }
+  if(!["0","1","2","3","4","5","6","7","8","9","X"].includes(route[2])){
+    return false
+  }
+  return true
+}
+
+export function validate_trip_id(route:string){
+  if(!isNaN(parseInt(route))){
+    return true
+  }
+  return false
+}
+
+//7 digit identifier for every bus stop
+export function validate_stop_id(stop:string){
+  if(!isNaN(parseInt(stop))){
+    return true
+  }
+  return false
+}
+
+export function validate_date(year:string, month:string, day:string){
+  if(!isNaN(parseInt(year)) && !isNaN(parseInt(month)) && !isNaN(parseInt(day))){
+    if(year.length == 4 && month.length == 2 && day.length == 2){
+      return true
+    }
+    else{
+      return false
+    }
+  }
+  return false
+}
