@@ -420,6 +420,25 @@ export async function bus_routes_for_stop(stop: string){
   }
 }
 
+export async function bus_stop_list(){
+  let sql = postgres(database_user_pool_url);
+  try {
+    let output = await sql`
+        SELECT * FROM bus_stops
+order by stop_code`;
+    // console.log(groupBy(output, "service_date"))
+    sql.end();
+    return output
+    //setTimeout(get_train_schedule_today, 20000)
+  } catch (e: any) {
+    console.error(e);
+    sql.end();
+    //setTimeout(get_train_schedule_today, 20000)
+    return [];
+    // backend.handleErrors(e, "database/get_all_next_bus", "bus_database_status")
+  }
+}
+
 export function validate_route_name(route:string){
   if(route.length != 3){
     return false

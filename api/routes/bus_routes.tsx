@@ -238,4 +238,10 @@ export function expressapp(app:any){
         }
       },
     );
+    app.get( //NEED INPUT VALIDATION
+      "/bus/stops",
+      async function (request: any, response: any) {
+          response.json(await query.bus_stop_list());
+      },
+    );
 }
