@@ -345,7 +345,7 @@ export async function update_bus_data() {
     //console.warn(`Database Info Failed To Update --`)
   }
   sql.end();
-  setTimeout(update_bus_data, 20000);
+  setTimeout(update_bus_data, 40000);
 }
 
 /*export async function update_bus_data_no_db() {
