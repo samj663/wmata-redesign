@@ -165,7 +165,7 @@ describe("Backend tests", () => {
   });
 
   test("/api/busStop?stopid=1000028", async () => {
-    const response = await request(app).get("/api/busStop?stopid=1000031");
+    const response = await request(app).get("/api/busStop?stopid=1000028");
     expect(response.body).toEqual(
       expect.objectContaining({
         name: expect.any(String),
