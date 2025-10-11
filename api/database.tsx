@@ -175,11 +175,11 @@ async function service_id_today() {
       service_ids = service_ids.filter((x: any) => {
         x != service_deletion[0].service_id;
       });
-      console.log("Service deletion: " + service_deletion[0].service_id);
+      //console.log("Service deletion: " + service_deletion[0].service_id);
     }
     if (service_addition.length > 0) {
       service_ids.push(service_addition[0].service_id);
-      console.log("Service addition: " + service_addition[0].service_id);
+   //   console.log("Service addition: " + service_addition[0].service_id);
     }
 
     sql.end();

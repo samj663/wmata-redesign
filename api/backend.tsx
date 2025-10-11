@@ -20,6 +20,11 @@ require("dotenv").config({
 
 //export var error_log: error_template[] = [];
 
+export var statistics = {
+  hourly: {},
+  daily: {},
+  weekly: {}
+}
 export var lastUpdated = {
   next_train: null,
   stations_fares_entrances: null,
