@@ -17,7 +17,7 @@ export function expressapp(app:any){
            query.validate_stop_id(request.params.stop_id) == true
         ) {
           response.json(
-            await query.get_bus_schedule_timetable_TESTING(
+            await query.get_bus_schedule_timetable(
               request.params.stop_id,
               `${request.params.year}-${request.params.month}-${request.params.day} EST`,
             ),
