@@ -455,7 +455,7 @@ export async function update_rail_schedule() {
   }
   if (temp3 != undefined) {
     schedule_data_full = new Map(Object.entries(groupBy(temp3, "replace")));
-    //console.log("NOTICE: Updated full rail schedule")
+    //console.info("INFO: Updated full rail schedule")
   }
   setTimeout(update_rail_schedule, 20000);
 }

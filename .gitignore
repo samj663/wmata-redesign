@@ -55,3 +55,8 @@ api/certs
 static_bus/
 static_rail/
 bus-gtfs-static-old/
+.idea/.gitignore
+.idea/modules.xml
+.idea/vcs.xml
+.idea/wmata-redesign-ts.iml
+.idea/inspectionProfiles/Project_Default.xml

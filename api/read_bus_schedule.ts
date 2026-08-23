@@ -128,15 +128,14 @@ export async function read_bus_schedule_new() {
     new_dates[3] == dates[0].start_date &&
     new_dates[4] == dates[0].end_date
   ) {
-    console.log("NOTICE: Checked GTFS bus schedule. No date change found.");
+    console.info("INFO: Checked GTFS bus schedule. No date change found.");
     sql.end();
     return;
   } else if((parseInt(`${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`)) < new_dates[3]){
-    console.log(`NOTICE: Checked GTFS bus schedule. New schedule found but not in effect. TODAY: ${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`);
+    console.info(`INFO: Checked GTFS bus schedule. New schedule found but not in effect. TODAY: ${now.getFullYear()}${((now.getMonth() + 1) < 10 ? '0' : '') + (now.getMonth() + 1)}${(now.getDate() < 10 ? '0' : '') + now.getDate()}`);
     sql.end();
     return;
   } else { 
-
     console.warn(
       "WARNING: Checked GTFS bus schedule. Date change found. Updating bus database.",
     );
@@ -433,5 +432,5 @@ content = await fs.readFileSync("./static_bus/routes.txt", "utf8"); //Route list
   await psql`TRUNCATE bus_feed_info CASCADE`;
   await psql`insert into bus_feed_info values (${new_dates[3]},${new_dates[4]})`;
   psql.end();
-  console.log("NOTICE: Finished updating bus database");
+  console.info("INFO: Finished updating bus database");
 }

@@ -281,7 +281,7 @@ export function expressapp(app:any){
     });
 
     //Catchall function to handle invalid endpoints.
-    app.get("/api/*", function (request: any, response: any) {
+    app.get("/api/*all", function (request: any, response: any) {
       response.set("Access-Control-Allow-Origin", "*");
       response.json({
         error: "ummm... that wasn't a valid endpoint",

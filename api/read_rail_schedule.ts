@@ -119,7 +119,7 @@ export async function read_rail_schedule() {
     new_dates[3] == dates[0].start_date &&
     new_dates[4] == dates[0].end_date
   ) {
-    console.log("NOTICE: Checked GTFS rail schedule. No date change found.");
+    console.info("INFO: Checked GTFS rail schedule. No date change found.");
     sql.end();
     return;
   } else {
@@ -228,7 +228,7 @@ export async function read_rail_schedule() {
       sql.end();
     }
   } catch (e: any) {
-    console.error("ERROR: Error parsing fare_leg_rules.txt - " + e.message);
+    console.warn("WARNING: Error parsing fare_leg_rules.txt - " + e.message);
   }
 
   content = await fs.readFileSync("./static_rail/trips.txt", "utf8");
@@ -350,7 +350,7 @@ export async function read_rail_schedule() {
       sql.end();
     }
   } catch (e: any) {
-    console.error("ERROR: Error parsing calendar.txt - " + e.message);
+    console.warn("WARNING: Error parsing calendar.txt - " + e.message);
   }
 
   /* let sql = postgres(url);
@@ -397,7 +397,7 @@ export async function read_rail_schedule() {
   await psql`TRUNCATE rail_feed_info CASCADE`;
   await psql`insert into rail_feed_info values (${new_dates[3]},${new_dates[4]})`;
   psql.end();
-  console.log("NOTICE: Finished updating rail database");
+  console.info("INFO: Finished updating rail database");
 
   /* const columns =
     ["trip_id",

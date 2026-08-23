@@ -253,11 +253,11 @@ export async function get_bus_alerts_gtft_rt() {
     const res = await fetch(
       `https://api.wmata.com/gtfs/bus-gtfsrt-alerts.pb?api_key=${key}`,
     );
-    var b = Buffer.from(await res.arrayBuffer());
-    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
+    var b = await res.arrayBuffer();
+    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(new Uint8Array(b));
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
-      if (entity.alert.informedEntity[0].agencyId == "1") {
+     // if (entity.alert.informedEntity[0].agencyId == "1") {
         entity.alert.informedEntity.forEach(function (e: any) {
           line.push(e.routeId);
         });
@@ -265,18 +265,20 @@ export async function get_bus_alerts_gtft_rt() {
         output.push({
           alertId: entity.id,
           line: line,
-          cause: entity.alert.cause,
-          effect: entity.alert.effect,
-          headerText: entity.alert.headerText.translation[0].text,
-          descriptionText: entity.alert.descriptionText.translation[0].text,
+          cause: entity.alert?.cause,
+          effect: entity.alert?.effect,
+          headerText: entity.alert?.headerText?.translation[0]?.text,
+          descriptionText: entity.alert?.descriptionText?.translation[0]?.text,
         });
-      }
+     // }
     });
     backend.lastUpdated.alerts = feed.header.timestamp;
+    
   } catch (e: any) {
     backend.handleErrors(e, "bus/get_bus_alerts_gtft_rt", "bus_alerts");
     //backend.bootstrap_status.train_positions = "ERROR";
     //console.error(e);
+   // console.log(output);
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";
   }
