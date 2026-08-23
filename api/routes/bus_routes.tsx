@@ -110,7 +110,7 @@ export function expressapp(app:any){
     });
     
     app.get(
-      "/bus/routes/{:route}/{:direction}",
+      ["/bus/routes/{:route}/{:direction}", "/bus/routes"],
       async function (request: any, response: any) {
         response.set("Access-Control-Allow-Origin", "*");
         if (backend.bootstrap_status.bus_routes === "RUNNING") {

@@ -253,7 +253,7 @@ export async function get_bus_alerts_gtft_rt() {
     const res = await fetch(
       `https://api.wmata.com/gtfs/bus-gtfsrt-alerts.pb?api_key=${key}`,
     );
-    var b = await res.arrayBuffer();
+    var b = await res.arrayBuffer(8);
     var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(new Uint8Array(b));
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
@@ -277,7 +277,7 @@ export async function get_bus_alerts_gtft_rt() {
   } catch (e: any) {
     backend.handleErrors(e, "bus/get_bus_alerts_gtft_rt", "bus_alerts");
     //backend.bootstrap_status.train_positions = "ERROR";
-    //console.error(e);
+ //   console.error(e);
    // console.log(output);
     setTimeout(get_bus_alerts_gtft_rt, 5000); // Timeout might occur that will stop function.
     return "ERROR";

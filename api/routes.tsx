@@ -86,7 +86,7 @@ app.get("/status", function (request: any, response: any) {
  * @returns json file containing array of train objecs. See "train" interface in interfaces_and_classes.tsx
  */
 app.get(
-  "/rail/arrival/:station/{:group}",
+  ["/rail/arrival/:station/{:group}","/rail/arrival/:station"],
   function (request: any, response: any) {
     response.set("Access-Control-Allow-Origin", "*");
     response.set("Cache-Control", "public, max-age=20");
@@ -122,7 +122,7 @@ app.get(
  * @returns json file containing array of train objecs. See "train" interface in interfaces_and_classes.tsx
  */
 app.get(
-  "/rail/arrival/:station/{:group}/transf",
+  ["/rail/arrival/:station/{:group}/transf", "/rail/arrival/:station//transf"],
   function (request: any, response: any) {
     response.set("Access-Control-Allow-Origin", "*");
     response.set("Cache-Control", "public, max-age=20");
@@ -201,7 +201,7 @@ app.get("/rail/trainpositions", function (request: any, response: any) {
   response.json(rail.train_positions);
 });
 
-app.get("/rail/stations/list/{:get}", function (request: any, response: any) {
+app.get(["/rail/stations/list/{:get}", "/rail/stations/list"], function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Cache-Control", "public, max-age=31557600");
   let code = rail.stationNames.getCode(request.params.station)!;
@@ -216,7 +216,7 @@ app.get("/rail/stations/list/{:get}", function (request: any, response: any) {
   else response.json(output);
 });
 
-app.get("/rail/stations/{:station}", function (request: any, response: any) {
+app.get(["/rail/stations/{:station}","/rail/stations"], function (request: any, response: any) {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Cache-Control", "public, max-age=604800");
   if (request.params.station == null) {
@@ -252,7 +252,7 @@ app.get("/rail/alerts", function (request: any, response: any) {
 });
 
 app.get(
-  "/rail/outages/escalator/{:station}",
+  ["/rail/outages/escalator/{:station}", "/rail/outages/escalator"],
   function (request: any, response: any) {
     response.set("Access-Control-Allow-Origin", "*");
     if (backend.bootstrap_status.stations_fares_entrances === "RUNNING") {
@@ -291,7 +291,7 @@ app.get(
 );
 
 app.get(
-  "/rail/outages/elevator/{:station}",
+  ["/rail/outages/elevator/{:station}", "/rail/outages/elevator"],
   function (request: any, response: any) {
     response.set("Access-Control-Allow-Origin", "*");
     if (backend.bootstrap_status.stations_fares_entrances === "RUNNING") {
