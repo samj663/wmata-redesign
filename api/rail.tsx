@@ -364,10 +364,10 @@ export async function get_rail_alerts_gtft_rt() {
   var output: any = [];
   try {
     const res = await fetch(
-      `https://api.wmata.com/gtfs/rail-gtfsrt-alerts.pb?api_key=${key}`,
+      `https://api.wmata.com/gtfs-metro-alert/rail-gtfs-metro-alerts.pb?api_key=${key}`,
     );
-    var b = Buffer.from(await res.arrayBuffer());
-    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(b);
+    var b = await res.arrayBuffer(8);
+    var feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(new Uint8Array(b));
     feed.entity.forEach(function (entity: any) {
       let line: any = []; //entity.alert.informedEntity[0].routeId
       entity.alert.informedEntity.forEach(function (e: any) {

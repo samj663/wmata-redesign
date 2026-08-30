@@ -169,16 +169,6 @@ export async function bootstrap_get_rail_alerts() {
   //  var status = await rail.get_rail_alerts();
   var status = await rail.get_rail_alerts_gtft_rt();
   bootstrap_status.rail_alerts = status;
-
-  if (status === "ERROR") {
-    if (bootstrap_retry_counter.rail_alerts >= MAX_RETRY) {
-      shutdown(
-        "Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_rail_alerts",
-      );
-    } else bootstrap_retry_counter.rail_alerts++;
-    console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
-    setTimeout(bootstrap_get_rail_alerts, 10000);
-  }
 }
 
 export async function bootstrap_get_bus_alerts() {
@@ -186,16 +176,6 @@ export async function bootstrap_get_bus_alerts() {
   //  var status = await rail.get_rail_alerts();
   var status = await bus.get_bus_alerts_gtft_rt();
   bootstrap_status.bus_alerts = status;
-
-  if (status === "ERROR") {
-    if (bootstrap_retry_counter.rail_alerts >= MAX_RETRY) {
-      shutdown(
-        "Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_rail_alerts",
-      );
-    } else bootstrap_retry_counter.rail_alerts++;
-    console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
-    setTimeout(bootstrap_get_bus_alerts, 10000);
-  }
 }
 
 async function update_both_database() {
@@ -230,7 +210,7 @@ export async function bootstrap_get_station_data() {
         "Max number of fetches during startup exceeded. Shutting down...n/ Cause: bootstrap_get_data",
       );
     } else bootstrap_retry_counter.stations_fares_entrances++;
-    console.log("Bus stop caching ran into Error. Trying again in 10 seconds");
+    console.log("Station data ran into Error. Trying again in 10 seconds");
     setTimeout(bootstrap_get_station_data, 10000);
   }
 }
